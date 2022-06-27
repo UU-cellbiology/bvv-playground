@@ -6,4 +6,6 @@ public interface GammaConverterSetup extends ConverterSetup {
 
 	void setDisplayGamma( double gamma );
 	double getDisplayGamma();
+	void setLUT(float [][] lut_in);
+	float [][] getLUT();
 }

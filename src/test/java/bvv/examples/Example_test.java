@@ -34,6 +34,7 @@ import bdv.tools.brightness.ConverterSetup;
 import bdv.util.AxisOrder;
 import bdv.util.RandomAccessibleIntervalSource;
 import bdv.viewer.SourceAndConverter;
+import bvv.tools.RealARGBColorGammaConverterSetup;
 import bvv.util.Bvv;
 import bvv.util.BvvFunctions;
 import bvv.util.BvvHandle;
@@ -72,8 +73,16 @@ public class Example_test
 
 		final BvvStackSource source =		BvvFunctions.showGamma( img, "test");
 		source.setDisplayRange( 0, 255 );
-		final BvvSource source2 = BvvFunctions.show( Views.translate( img, 0, 0, 100 ), "view", Bvv.options().addTo( source ) );
+		final BvvStackSource source2 = BvvFunctions.showGamma( Views.translate( img, 0, 0, 100 ), "view", Bvv.options().addTo( source ) );
 		source2.setDisplayRange( 0, 255 );
+		int zzz = source.getConverterSetups().size();
+		RealARGBColorGammaConverterSetup conv1 = (RealARGBColorGammaConverterSetup) source.getConverterSetups().get(0);
+		
+		conv1.setLUT(RealARGBColorGammaConverterSetup.getRGBLutTable("Spectrum"));
+		
+		RealARGBColorGammaConverterSetup conv2 = (RealARGBColorGammaConverterSetup) source2.getConverterSetups().get(0);
+		
+		conv2.setLUT(RealARGBColorGammaConverterSetup.getRGBLutTable("Fire"));
 		//final BvvSource source2 = BvvFunctions.show( img2, "view", Bvv.options().addTo( source ) );
 		//sds.getConverter();
 		BvvHandle handle = source.getBvvHandle();

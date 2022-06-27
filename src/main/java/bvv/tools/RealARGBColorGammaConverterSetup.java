@@ -5,6 +5,9 @@ import java.util.List;
 
 import org.scijava.listeners.Listeners;
 
+import ij.IJ;
+import ij.ImagePlus;
+import ij.process.ByteProcessor;
 import net.imglib2.display.ColorConverter;
 import net.imglib2.type.numeric.ARGBType;
 
@@ -14,6 +17,10 @@ public class RealARGBColorGammaConverterSetup implements GammaConverterSetup {
 	private final List< ColorConverter > converters;
 
 	private final Listeners.List< SetupChangeListener > listeners;
+	
+	private float [][] lut;
+	
+	private boolean iniLUT = false;
 
 	public RealARGBColorGammaConverterSetup( final int setupId, final ColorConverter... converters )
 	{
@@ -138,5 +145,63 @@ public class RealARGBColorGammaConverterSetup implements GammaConverterSetup {
 		return converters.get( 0 ).getColor();
 	}
 
+	@Override
+	public void setLUT(float[][] lut_in) {
+		
+		lut =new float[lut_in.length][];
+		for(int i=0;i<lut_in.length;i++)
+			lut[i]=lut_in[i].clone();
+		iniLUT = true;
+	}
 
+	@Override
+	public float[][] getLUT() {
+		
+		//return grayscale
+		if(!iniLUT)
+		{
+			lut =new float[256][3];
+			for(int i=0;i<256;i++)
+				for(int j=0;j<3;j++)
+				{
+					lut [i][j]=i/255.0f;
+				}
+		}
+		return lut;
+	}
+
+	/** function gets LUT specified by sZLUTName in settings
+	 * and returns 256x3 table map in HSB format */
+	static public float [][]  getRGBLutTable(String sLUTName)
+	{
+		int i,j;
+	
+		int [] onepix; 
+		float [][] RGBLutTable = new float[256][3];
+		ByteProcessor ish = new ByteProcessor(256,1);
+		for ( i=0; i<256; i++)
+			for (j=0; j<10; j++)
+				ish.putPixel(i, j, i);
+		ImagePlus ccc = new ImagePlus("test",ish);
+		ccc.show();
+		IJ.run(sLUTName);
+		IJ.run("RGB Color");
+		//ipLUT= (ColorProcessor) ccc.getProcessor();
+		ccc.setSlice(1);
+		for(i=0;i<256;i++)
+		{
+			
+			onepix= ccc.getPixel(i, 0);
+			//rgbtable[i]=ccc.getPixel(i, 1);
+			//java.awt.Color.RGBtoHSB(onepix[0], onepix[1], onepix[2], hsbvals);
+			RGBLutTable[i][0]=(float)(onepix[0]/255.0f);
+			RGBLutTable[i][1]=(float)(onepix[1]/255.0f);
+			RGBLutTable[i][2]=(float)(onepix[2]/255.0f);
+		}
+
+		ccc.changes=false;
+		ccc.close();
+		return RGBLutTable;
+		//return;
+	}
 }
