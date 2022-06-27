@@ -1,3 +1,0 @@
-install:
-  # This is the default jitpack command for Maven builds
-  - mvn install -DskipTests
