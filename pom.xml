@@ -9,12 +9,12 @@
 	</parent>
 
 	<groupId>sc.fiji</groupId>
-	<artifactId>bigvolumeviewer</artifactId>
-	<version>0.2.1-SNAPSHOT</version>
+	<artifactId>bvv-playground</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
 
-	<name>BigVolumeViewer</name>
+	<name>BVV-playground</name>
 	<description>Volume rendering of bdv datasets</description>
-	<url>https://github.com/tpietzsch/jogl-minimal</url>
+	<url>https://github.com/ekatrukha/bvv-playground</url>
 	<inceptionYear>2018</inceptionYear>
 	<organization>
 		<name>BigDataViewer</name>
@@ -40,12 +40,18 @@
 				<role>maintainer</role>
 			</roles>
 		</developer>
+
 	</developers>
 	<contributors>
 		<contributor>
 			<name>Ulrik Guenther</name>
 			<url>https://ulrik.is/writing</url>
 			<properties><id>skalarproduktraum</id></properties>
+		</contributor>
+		<contributor>
+			<name>Eugene Katrukha</name>
+			<url>http://imagej.net/User:Ekatrukha</url>
+			<properties><id>ekatrukha</id></properties>
 		</contributor>
 	</contributors>
 
@@ -57,18 +63,18 @@
 	</mailingLists>
 
 	<scm>
-		<connection>scm:git:git://github.com/tpietzsch/jogl-minimal</connection>
-		<developerConnection>scm:git:git@github.com:tpietzsch/jogl-minimal</developerConnection>
+		<connection>scm:git:git://github.com/ekatrukha/bvv-playground</connection>
+		<developerConnection>scm:git:git@github.com:ekatrukha/bvv-playground</developerConnection>
 		<tag>HEAD</tag>
-		<url>https://github.com/tpietzsch/jogl-minimal</url>
+		<url>https://github.com/ekatrukha/bvv-playground</url>
 	</scm>
 	<issueManagement>
 		<system>GitHub Issues</system>
-		<url>https://github.com/tpietzsch/jogl-minimal/issues</url>
+		<url>https://github.com/ekatrukha/bvv-playground/issues</url>
 	</issueManagement>
 	<ciManagement>
 		<system>Travis CI</system>
-		<url>https://travis-ci.org/tpietzsch/jogl-minimal</url>
+		<url>https://travis-ci.org/ekatrukha/bvv-playground</url>
 	</ciManagement>
 
 	<properties>
@@ -82,7 +88,7 @@
 		<ST4.version>4.0.8</ST4.version>
 
 		<!-- NB: Deploy releases to the SciJava Maven repository. -->
-		<releaseProfiles>deploy-to-scijava</releaseProfiles>
+		<!-- releaseProfiles>deploy-to-scijava</releaseProfiles -->
 	</properties>
 
 	<repositories>

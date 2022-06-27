@@ -102,7 +102,7 @@ public class BvvFunctions
 		else
 			type = Util.getTypeFromInterval( img );
 
-		return addRandomAccessibleInterval( handle, ( RandomAccessibleInterval ) img, ( NumericType ) type, name, axisOrder, sourceTransform );
+		return (BvvStackSource<T>) addRandomAccessibleInterval( handle, ( RandomAccessibleInterval ) img, ( NumericType ) type, name, axisOrder, sourceTransform );
 	}
 
 	public static < T > BvvStackSource< T > show(

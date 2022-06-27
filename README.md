@@ -1,4 +1,8 @@
-[![](https://travis-ci.org/tpietzsch/jogl-minimal.svg?branch=master)](https://travis-ci.org/tpietzsch/jogl-minimal)
-[![Build Status](https://github.com/tpietzsch/jogl-minimal/workflows/build/badge.svg)](https://github.com/tpietzsch/jogl-minimal/actions?workflow=build)
+[![Build Status](https://github.com/ekatrukha/bvv-playground/workflows/build/badge.svg)](https://github.com/ekatrukha/bvv-playground/actions?workflow=build)
 
-# BigVolumeViewer
+# BigVolumeViewer-playground
+
+This is a fork of [BVV](https://github.com/tpietzsch/jogl-minimal) to play around with some new features:
+- using LUTs;
+- using gamma correction;
+- using different volume render methods (transparency/illumination);
