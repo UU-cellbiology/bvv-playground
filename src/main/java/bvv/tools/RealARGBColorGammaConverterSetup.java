@@ -19,6 +19,8 @@ public class RealARGBColorGammaConverterSetup implements GammaConverterSetup {
 	private final Listeners.List< SetupChangeListener > listeners;
 	
 	private float [][] lut;
+	/**0 = maximum intensity projection; 1 = transparency **/
+	private int nRenderType =0; 
 	
 	private boolean iniLUT = false;
 
@@ -203,5 +205,20 @@ public class RealARGBColorGammaConverterSetup implements GammaConverterSetup {
 		ccc.close();
 		return RGBLutTable;
 		//return;
+	}
+
+	@Override
+	public void setRenderType(int nRender) {
+		// TODO Auto-generated method stub
+		if (nRender >=1)
+			nRenderType = 1;
+		else
+			nRenderType = 0;
+	}
+
+	@Override
+	public int getRenderType() {
+		// TODO Auto-generated method stub
+		return nRenderType;
 	}
 }

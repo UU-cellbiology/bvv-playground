@@ -52,9 +52,10 @@ import net.imglib2.type.numeric.ARGBType;
 import net.imglib2.type.numeric.integer.UnsignedByteType;
 import net.imglib2.type.numeric.integer.UnsignedShortType;
 import net.imglib2.view.Views;
+import tpietzsch.example2.VolumeViewerPanel;
 
 
-public class Example_test
+public class Example_gamma_lut_render
 {
 	/**
 	 * Show 16-bit volume.
@@ -71,30 +72,27 @@ public class Example_test
 		//final Img< UnsignedByteType > img2 = ImageJFunctions.wrapByte( imp2 );
 
 
-		final BvvStackSource source =		BvvFunctions.showGamma( img, "test");
-		source.setDisplayRange( 0, 255 );
+		final BvvStackSource source = BvvFunctions.showGamma( img, "test");
+		source.setDisplayRange( 0, 455 );
+		source.setDisplayRangeBounds(0, 555);
 		final BvvStackSource source2 = BvvFunctions.showGamma( Views.translate( img, 0, 0, 100 ), "view", Bvv.options().addTo( source ) );
-		source2.setDisplayRange( 0, 255 );
-		int zzz = source.getConverterSetups().size();
+		source2.setDisplayRange( 0, 455 );
+		source2.setDisplayRangeBounds(0, 555);
+
 		RealARGBColorGammaConverterSetup conv1 = (RealARGBColorGammaConverterSetup) source.getConverterSetups().get(0);
 		
-		conv1.setLUT(RealARGBColorGammaConverterSetup.getRGBLutTable("Spectrum"));
+		//set LUT
+		conv1.setLUT(RealARGBColorGammaConverterSetup.getRGBLutTable("Ice"));
+		//set render type (1 = transparency, 0 = max intensity projection)
+		conv1.setRenderType(1);
 		
-		RealARGBColorGammaConverterSetup conv2 = (RealARGBColorGammaConverterSetup) source2.getConverterSetups().get(0);
-		
+		RealARGBColorGammaConverterSetup conv2 = (RealARGBColorGammaConverterSetup) source2.getConverterSetups().get(0);		
 		conv2.setLUT(RealARGBColorGammaConverterSetup.getRGBLutTable("Fire"));
-		//final BvvSource source2 = BvvFunctions.show( img2, "view", Bvv.options().addTo( source ) );
-		//sds.getConverter();
-		BvvHandle handle = source.getBvvHandle();
-		//handle.getConverterSetups().s
+		conv2.setRenderType(1);
 		
-		//handle.getCardPanel()
 		
-		//AffineTransform3D transform = new AffineTransform3D();
-		
-		//source.getBvvHandle().getViewerPanel().state().getViewerTransform(transform);
+		final VolumeViewerPanel viewer = source.getBvvHandle().getViewerPanel();
+		viewer.requestRepaint();
 
-		// source handle can be used to set color, display range, visibility, ...
-		//source.setDisplayRange( 0, 555 );
 	}
 }

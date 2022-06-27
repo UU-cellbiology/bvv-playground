@@ -474,7 +474,7 @@ public class MultiVolumeShaderMip
 			if (converter instanceof GammaConverterSetup)
 			{
 				uniformGamma.set((float)((GammaConverterSetup)converter).getDisplayGamma());
-				uniformRenderType.set(1);
+				uniformRenderType.set(((GammaConverterSetup)converter).getRenderType());
 			}
 			//final double fgamma = converter.getGamma();
 			final double s = 1.0 / ( fmax - fmin );
@@ -513,7 +513,7 @@ public class MultiVolumeShaderMip
 				}
 				else
 				{
-					lut.set(RealARGBColorGammaConverterSetup.getRGBLutTable("Spectrum"));
+					lut.set(RealARGBColorGammaConverterSetup.getRGBLutTable("Grays"));
 				}
 			}
 		}
