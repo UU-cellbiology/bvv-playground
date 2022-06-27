@@ -1,0 +1,542 @@
+/*
+ * #%L
+ * BigDataViewer core classes with minimal dependencies.
+ * %%
+ * Copyright (C) 2012 - 2022 BigDataViewer developers.
+ * %%
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ * 
+ * 1. Redistributions of source code must retain the above copyright notice,
+ *    this list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright notice,
+ *    this list of conditions and the following disclaimer in the documentation
+ *    and/or other materials provided with the distribution.
+ * 
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDERS OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
+ * #L%
+ */
+package bvv.tools;
+
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Container;
+import java.awt.Dimension;
+import java.awt.Frame;
+import java.awt.Window;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
+import java.awt.event.KeyEvent;
+import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
+
+import java.util.concurrent.atomic.AtomicBoolean;
+import javax.swing.AbstractAction;
+import javax.swing.Action;
+import javax.swing.ActionMap;
+import javax.swing.BorderFactory;
+import javax.swing.BoxLayout;
+import javax.swing.InputMap;
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JColorChooser;
+import javax.swing.JComponent;
+import javax.swing.JDialog;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JSpinner;
+import javax.swing.KeyStroke;
+import javax.swing.SpinnerNumberModel;
+import javax.swing.SwingUtilities;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+
+import bdv.util.InvokeOnEDT;
+import bdv.tools.brightness.ColorIcon;
+import bdv.tools.brightness.ConverterSetup;
+import bdv.tools.brightness.MinMaxGroup;
+import bdv.tools.brightness.SetupAssignments;
+import bdv.tools.brightness.SliderPanel;
+import bdv.tools.brightness.SliderPanelDouble;
+import bdv.util.BoundedValueDouble;
+import bdv.util.DelayedPackDialog;
+import mpicbg.spim.data.generic.sequence.BasicViewSetup;
+import net.imglib2.type.numeric.ARGBType;
+
+
+/**
+ * Adjust brightness and colors for individual (or groups of) {@link BasicViewSetup setups}.
+ *
+ * @author Tobias Pietzsch
+ */
+@Deprecated
+public class BrightnessDialogBT extends DelayedPackDialog
+{
+	public BrightnessDialogBT( final Frame owner, final SetupAssignmentsBT setupAssignments )
+	{
+		super( owner, "brightness and color", false );
+
+		final Container content = getContentPane();
+
+		final MinMaxPanelsBT minMaxPanels = new MinMaxPanelsBT( setupAssignments, this, true );
+		final ColorsPanel colorsPanel = new ColorsPanel( setupAssignments );
+		content.add( minMaxPanels, BorderLayout.NORTH );
+		content.add( colorsPanel, BorderLayout.SOUTH );
+
+		final ActionMap am = getRootPane().getActionMap();
+		final InputMap im = getRootPane().getInputMap( JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT );
+		final Object hideKey = new Object();
+		final Action hideAction = new AbstractAction()
+		{
+			@Override
+			public void actionPerformed( final ActionEvent e )
+			{
+				setVisible( false );
+			}
+
+			private static final long serialVersionUID = 3904286091931838921L;
+		};
+		im.put( KeyStroke.getKeyStroke( KeyEvent.VK_ESCAPE, 0 ), hideKey );
+		am.put( hideKey, hideAction );
+
+		final AtomicBoolean recreateContentPending = new AtomicBoolean();
+
+		setupAssignments.setUpdateListener( new SetupAssignmentsBT.UpdateListener()
+		{
+			@Override
+			public void update()
+			{
+				try
+				{
+					if ( isVisible() )
+					{
+						InvokeOnEDT.invokeAndWait( () -> {
+							System.out.println( "colorsPanel.recreateContent()" );
+							colorsPanel.recreateContent();
+							minMaxPanels.recreateContent();
+							recreateContentPending.set( false );
+						} );
+					}
+					else
+					{
+						recreateContentPending.set( true );
+					}
+				}
+				catch ( InvocationTargetException | InterruptedException e )
+				{
+					e.printStackTrace();
+				}
+			}
+		} );
+
+		addComponentListener( new ComponentAdapter()
+		{
+			@Override
+			public void componentShown( final ComponentEvent e )
+			{
+				if ( recreateContentPending.getAndSet( false ) )
+				{
+					colorsPanel.recreateContent();
+					minMaxPanels.recreateContent();
+				}
+			}
+		} );
+
+		pack();
+	}
+
+	public static class ColorsPanel extends JPanel
+	{
+		private final SetupAssignmentsBT setupAssignments;
+
+		private final ArrayList< JButton > buttons;
+
+		private final JColorChooser colorChooser;
+
+		public ColorsPanel( final SetupAssignmentsBT assignments )
+		{
+			super();
+			this.setupAssignments = assignments;
+			buttons = new ArrayList<>();
+			colorChooser = new JColorChooser();
+
+			setLayout( new BoxLayout( this, BoxLayout.LINE_AXIS ) );
+			setBorder( BorderFactory.createEmptyBorder( 2, 2, 2, 2 ) );
+			recreateContent();
+		}
+
+		public void recreateContent()
+		{
+			removeAll();
+			buttons.clear();
+
+			add( new JLabel( "set view colors:" ) );
+			for ( final ConverterSetup setup : setupAssignments.getConverterSetups() )
+			{
+				final JButton button = new JButton( new ColorIcon( getColor( setup ) ) );
+				button.addActionListener( e -> {
+					colorChooser.setColor( getColor( setup ) );
+					final JDialog d = JColorChooser.createDialog( button, "Choose a color", true, colorChooser, new ActionListener()
+					{
+						@Override
+						public void actionPerformed( final ActionEvent arg0 )
+						{
+							final Color c = colorChooser.getColor();
+							if (c != null)
+							{
+								button.setIcon( new ColorIcon( c ) );
+								setColor( setup, c );
+							}
+						}
+					}, null );
+					d.setVisible( true );
+				} );
+				button.setEnabled( setup.supportsColor() );
+				buttons.add( button );
+				add( button );
+			}
+
+			invalidate();
+			final Window frame = SwingUtilities.getWindowAncestor( this );
+			if ( frame != null )
+				frame.pack();
+		}
+
+		private static Color getColor( final ConverterSetup setup )
+		{
+			if ( setup.supportsColor() )
+			{
+				final int value = setup.getColor().get();
+				return new Color( value );
+			}
+			else
+				return null;
+		}
+
+		private static void setColor( final ConverterSetup setup, final Color color )
+		{
+			setup.setColor( new ARGBType( color.getRGB() | 0xff000000 ) );
+		}
+
+		private static final long serialVersionUID = 6408468837346789676L;
+	}
+
+	public static class MinMaxPanelsBT extends JPanel
+	{
+		private final SetupAssignmentsBT setupAssignments;
+
+		private final ArrayList< MinMaxPanelBT > minMaxPanels;
+
+		private final JDialog dialog;
+
+		private final boolean rememberSizes;
+
+		public MinMaxPanelsBT( final SetupAssignmentsBT assignments, final JDialog dialog, final boolean rememberSizes )
+		{
+			super();
+			this.setupAssignments = assignments;
+			this.rememberSizes = rememberSizes;
+			minMaxPanels = new ArrayList<>();
+
+			setLayout( new BoxLayout( this, BoxLayout.PAGE_AXIS ) );
+			setBorder( BorderFactory.createEmptyBorder( 2, 2, 2, 2 ) );
+			recreateContent();
+
+			this.dialog = dialog;
+		}
+
+		public void recreateContent()
+		{
+			final Dimension sliderSize = ( rememberSizes && !minMaxPanels.isEmpty() ) ?
+					minMaxPanels.get( 0 ).sliders.getPreferredSize() : null;
+
+			removeAll();
+			minMaxPanels.clear();
+			
+			for ( final MinMaxGroupBT group : setupAssignments.getMinMaxGroups() )
+			{
+				final MinMaxPanelBT panel = new MinMaxPanelBT(group, setupAssignments, this, rememberSizes );
+				if ( sliderSize != null )
+					panel.sliders.setPreferredSize( sliderSize );
+				minMaxPanels.add( panel );
+				add( panel );
+			}
+
+			for ( final MinMaxPanelBT panel : minMaxPanels )
+			{
+				panel.update();
+				panel.showAdvanced( isShowingAdvanced );
+			}
+
+			invalidate();
+			final Window frame = SwingUtilities.getWindowAncestor( this );
+			if ( frame != null )
+				frame.pack();
+		}
+
+		private boolean isShowingAdvanced = false;
+
+		public void showAdvanced( final boolean b )
+		{
+			isShowingAdvanced = b;
+			for( final MinMaxPanelBT panel : minMaxPanels )
+			{
+				panel.storeSliderSize();
+				panel.showAdvanced( isShowingAdvanced );
+			}
+			if ( dialog != null )
+				dialog.pack();
+		}
+
+		private static final long serialVersionUID = 6538962298579455010L;
+	}
+
+	/**
+	 * A panel containing min/max {@link SliderPanel SliderPanels}, view setup check-boxes and advanced settings.
+	 */
+	public static class MinMaxPanelBT extends JPanel implements MinMaxGroupBT.UpdateListener, BoundedValueDouble.UpdateListener
+	{
+		private final SetupAssignmentsBT setupAssignments;
+
+		private final MinMaxGroupBT minMaxGroup;
+		
+		BoundedValueDouble gammaRange;
+
+		private final ArrayList< JCheckBox > boxes;
+
+		private final JPanel sliders;
+
+		private final Runnable showAdvanced;
+
+		private final Runnable hideAdvanced;
+
+		private boolean isShowingAdvanced;
+
+		private final boolean rememberSizes;
+
+		public MinMaxPanelBT( final MinMaxGroupBT group, final SetupAssignmentsBT assignments, final MinMaxPanelsBT minMaxPanels, final boolean rememberSizes )
+		{
+			super();
+			setupAssignments = assignments;
+			minMaxGroup = (MinMaxGroupBT)group;
+			this.rememberSizes = rememberSizes;
+//			setBorder( BorderFactory.createCompoundBorder( BorderFactory.createEmptyBorder( 2, 2, 2, 2 ), BorderFactory.createLineBorder( Color.black ) ) );
+			setBorder( BorderFactory.createCompoundBorder( BorderFactory.createEmptyBorder( 2, 2, 2, 2 ), BorderFactory.createEtchedBorder() ) );
+			setLayout( new BorderLayout( 10, 10 ) );
+
+			sliders = new JPanel();
+			sliders.setLayout( new BoxLayout( sliders, BoxLayout.PAGE_AXIS ) );
+
+			final double spinnerStepSize = 1;
+			final SliderPanelDouble minPanel = new SliderPanelDouble( "min", group.getMinBoundedValue(), spinnerStepSize );
+			minPanel.setBorder( BorderFactory.createEmptyBorder( 0, 10, 10, 10 ) );
+			sliders.add( minPanel );
+			final SliderPanelDouble maxPanel = new SliderPanelDouble( "max", group.getMaxBoundedValue(), spinnerStepSize );
+			maxPanel.setBorder( BorderFactory.createEmptyBorder( 0, 10, 10, 10 ) );
+			sliders.add( maxPanel );
+			gammaRange = new BoundedValueDouble( 0.01, 3.0, 1.0)
+			{
+				@Override
+				public void setCurrentValue( final double value )
+				{
+					super.setCurrentValue( value );
+					update();
+				}
+			};
+			final SliderPanelDouble gammaPanel = new SliderPanelDouble( "gamma", gammaRange, 0.02);
+			gammaPanel.setBorder( BorderFactory.createEmptyBorder( 0, 10, 10, 10 ) );
+			sliders.add( gammaPanel )	;
+			if ( rememberSizes && ! minMaxPanels.minMaxPanels.isEmpty() )
+			{
+				final Dimension dim = minMaxPanels.minMaxPanels.get( 0 ).sliders.getSize();
+				if ( dim.width > 0 )
+					sliders.setPreferredSize( dim );
+			}
+
+			add( sliders, BorderLayout.CENTER );
+
+			boxes = new ArrayList<>();
+			final JPanel boxesPanel = new JPanel();
+			boxesPanel.setLayout( new BoxLayout( boxesPanel, BoxLayout.LINE_AXIS ) );
+
+			for ( final ConverterSetup setup : assignments.getConverterSetups() )
+			{
+				final JCheckBox box = new JCheckBox();
+				box.addActionListener( new ActionListener()
+				{
+					@Override
+					public void actionPerformed( final ActionEvent arg0 )
+					{
+						if ( box.isSelected() )
+							assignments.moveSetupToGroup( setup, minMaxGroup );
+						else if ( !assignments.removeSetupFromGroup( setup, minMaxGroup ) )
+							box.setSelected( true );
+					}
+				} );
+				boxesPanel.add( box );
+				boxes.add( box );
+			}
+			
+			minMaxGroup.setUpdateListener( this );
+
+			final JPanel advancedPanel = new JPanel();
+			advancedPanel.setLayout( new BoxLayout( advancedPanel, BoxLayout.PAGE_AXIS ) );
+
+			final JSpinner dummy = new JSpinner();
+			dummy.setModel( new SpinnerNumberModel( minMaxGroup.getRangeMax(), minMaxGroup.getFullRangeMin(), minMaxGroup.getFullRangeMax(), 1 ) );
+			dummy.setBorder( BorderFactory.createEmptyBorder( 0, 10, 10, 10 ) );
+			final Dimension ps = dummy.getPreferredSize();
+
+			final JSpinner spinnerRangeMin = new JSpinner();
+			spinnerRangeMin.setModel( new SpinnerNumberModel( minMaxGroup.getRangeMin(), Integer.MIN_VALUE, Integer.MAX_VALUE, 1 ) );
+			spinnerRangeMin.addChangeListener( new ChangeListener()
+			{
+				@Override
+				public void stateChanged( final ChangeEvent e )
+				{
+					final double value = ( ( Number ) spinnerRangeMin.getValue() ).doubleValue();
+					if ( value < minMaxGroup.getFullRangeMin() )
+						spinnerRangeMin.setValue( minMaxGroup.getFullRangeMin() );
+					else if ( value > minMaxGroup.getRangeMax() - 1 )
+						spinnerRangeMin.setValue( minMaxGroup.getRangeMax() - 1);
+					else
+						minMaxGroup.setRange( value, minMaxGroup.getRangeMax() );
+				}
+			} );
+			spinnerRangeMin.setPreferredSize( ps );
+			spinnerRangeMin.setBorder( BorderFactory.createEmptyBorder( 0, 10, 10, 10 ) );
+
+			final JSpinner spinnerRangeMax = new JSpinner();
+			spinnerRangeMax.setModel( new SpinnerNumberModel( minMaxGroup.getRangeMax(), Integer.MIN_VALUE, Integer.MAX_VALUE, 1 ) );
+			spinnerRangeMax.addChangeListener( new ChangeListener()
+			{
+				@Override
+				public void stateChanged( final ChangeEvent e )
+				{
+					final double value = ( ( Number ) spinnerRangeMax.getValue() ).doubleValue();
+					if ( value < minMaxGroup.getRangeMin() + 1 )
+						spinnerRangeMax.setValue( minMaxGroup.getRangeMin() + 1 );
+					else if ( value > minMaxGroup.getFullRangeMax() )
+						spinnerRangeMax.setValue( minMaxGroup.getFullRangeMax() );
+					else
+						minMaxGroup.setRange( minMaxGroup.getRangeMin(), value );
+				}
+			} );
+			spinnerRangeMax.setPreferredSize( ps );
+			spinnerRangeMax.setBorder( BorderFactory.createEmptyBorder( 0, 10, 10, 10 ) );
+
+			final JButton advancedButton = new JButton( ">>" );
+			advancedButton.setBorder( BorderFactory.createEmptyBorder( 0, 10, 0, 10 ) );
+			isShowingAdvanced = false;
+			advancedButton.addActionListener( new ActionListener()
+			{
+				@Override
+				public void actionPerformed( final ActionEvent e )
+				{
+					minMaxPanels.showAdvanced( ! isShowingAdvanced );
+				}
+			} );
+			boxesPanel.add( advancedButton );
+
+			showAdvanced = new Runnable()
+			{
+				@Override
+				public void run()
+				{
+					advancedPanel.add( spinnerRangeMin );
+					advancedPanel.add( spinnerRangeMax );
+					advancedButton.setText( "<<" );
+					isShowingAdvanced = true;
+				}
+			};
+
+			hideAdvanced = new Runnable()
+			{
+				@Override
+				public void run()
+				{
+					advancedPanel.remove( spinnerRangeMin );
+					advancedPanel.remove( spinnerRangeMax );
+					advancedButton.setText( ">>" );
+					isShowingAdvanced = false;
+				}
+			};
+
+			addComponentListener( new ComponentAdapter()
+			{
+				@Override
+				public void componentResized( final ComponentEvent e )
+				{
+					storeSliderSize();
+				}
+			} );
+
+			minPanel.setRangeListener( () -> spinnerRangeMin.setValue( minMaxGroup.getRangeMin() ) );
+			maxPanel.setRangeListener( () -> spinnerRangeMax.setValue( minMaxGroup.getRangeMax() ) );
+
+			final JPanel eastPanel = new JPanel();
+			eastPanel.setLayout( new BoxLayout( eastPanel, BoxLayout.LINE_AXIS ) );
+			eastPanel.add( boxesPanel, BorderLayout.CENTER );
+			eastPanel.add( advancedPanel, BorderLayout.EAST );
+			add( eastPanel, BorderLayout.EAST );
+		}
+
+		public void showAdvanced( final boolean b )
+		{
+			if ( b )
+				showAdvanced.run();
+			else
+				hideAdvanced.run();
+		}
+
+		public void storeSliderSize()
+		{
+			if ( rememberSizes )
+			{
+				final Dimension dim = sliders.getSize();
+				if ( dim.width > 0 )
+					sliders.setPreferredSize( dim );
+			}
+		}
+
+		@Override
+		public void update()
+		{
+			for ( int i = 0; i < boxes.size(); ++i )
+			{
+				final int setupId = setupAssignments.getConverterSetups().get( i ).getSetupId();
+				boolean b = false;
+				for ( final ConverterSetup s : minMaxGroup.setups )
+					if ( s.getSetupId() == setupId )
+					{
+						b = true;
+						if(s instanceof GammaConverterSetup)
+						{
+							((GammaConverterSetup) s).setDisplayGamma(gammaRange.getCurrentValue());
+							//System.out.println(gammaRange.getCurrentValue());
+						}
+						break;
+					}
+				boxes.get( i ).setSelected( b );
+			}
+		}
+		
+		
+
+		private static final long serialVersionUID = -5209143847804383789L;
+	}
+
+	private static final long serialVersionUID = 7963632306732311403L;
+}

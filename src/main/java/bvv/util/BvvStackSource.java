@@ -30,10 +30,11 @@ package bvv.util;
 
 import bdv.tools.brightness.ConverterSetup;
 import bdv.tools.brightness.MinMaxGroup;
-import bdv.tools.brightness.SetupAssignments;
 import bdv.util.Bounds;
 import bdv.viewer.ConverterSetupBounds;
 import bdv.viewer.SourceAndConverter;
+import bvv.tools.SetupAssignmentsBT;
+
 import java.util.HashSet;
 import java.util.List;
 import net.imglib2.type.numeric.ARGBType;
@@ -97,7 +98,7 @@ public class BvvStackSource< T > extends BvvSource
 
 		// TODO: REMOVE
 		final HashSet< MinMaxGroup > groups = new HashSet<>();
-		final SetupAssignments sa = getBvvHandle().getSetupAssignments();
+		final SetupAssignmentsBT sa = getBvvHandle().getSetupAssignments();
 		for ( final ConverterSetup setup : converterSetups )
 			groups.add( sa.getMinMaxGroup( setup ) );
 		for ( final MinMaxGroup group : groups )

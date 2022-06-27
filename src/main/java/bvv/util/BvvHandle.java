@@ -40,12 +40,15 @@ import bdv.viewer.SourceAndConverter;
 import bdv.viewer.TimePointListener;
 import bdv.viewer.TransformListener;
 import bdv.viewer.ViewerStateChangeListener;
+import bvv.tools.SetupAssignmentsBT;
+
 import java.awt.Dimension;
 import java.util.ArrayList;
 import java.util.List;
 import net.imglib2.realtransform.AffineTransform3D;
 import org.scijava.ui.behaviour.util.InputActionBindings;
 import org.scijava.ui.behaviour.util.TriggerBehaviourBindings;
+
 import tpietzsch.example2.VolumeViewerPanel;
 import tpietzsch.frombdv.ManualTransformationEditor;
 
@@ -66,7 +69,7 @@ public abstract class BvvHandle implements Bvv
 	protected ConverterSetups setups;
 
 	// TODO: Remove
-	protected SetupAssignments setupAssignments;
+	protected SetupAssignmentsBT setupAssignments;
 
 	protected final ArrayList< BvvSource > bvvSources;
 
@@ -113,7 +116,7 @@ public abstract class BvvHandle implements Bvv
 
 	// TODO: REMOVE
 	@Deprecated
-	public SetupAssignments getSetupAssignments()
+	public SetupAssignmentsBT getSetupAssignments()
 	{
 		return setupAssignments;
 	}
@@ -126,7 +129,8 @@ public abstract class BvvHandle implements Bvv
 	@Deprecated
 	int getUnusedSetupId()
 	{
-		return BdvFunctions.getUnusedSetupId( setupAssignments );
+		return setupAssignments.getUnusedSetupId(setupAssignments);
+		//return BdvFunctions.getUnusedSetupId( setupAssignments );
 	}
 
 	@Override

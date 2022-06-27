@@ -65,5 +65,7 @@ public class Example07
 		} );
 
 		viewer.requestRepaint();
+		
+		
 	}
 }

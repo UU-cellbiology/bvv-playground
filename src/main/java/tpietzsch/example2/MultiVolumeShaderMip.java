@@ -29,6 +29,11 @@
 package tpietzsch.example2;
 
 import bdv.tools.brightness.ConverterSetup;
+import bvv.tools.GammaConverterSetup;
+import ij.IJ;
+import ij.ImagePlus;
+import ij.process.ByteProcessor;
+
 import java.util.AbstractMap;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -48,6 +53,7 @@ import tpietzsch.dither.DitherBuffer;
 import tpietzsch.example2.VolumeShaderSignature.PixelType;
 import tpietzsch.example2.VolumeShaderSignature.VolumeSignature;
 import tpietzsch.shadergen.Uniform1f;
+import tpietzsch.shadergen.Uniform1i;
 import tpietzsch.shadergen.Uniform2f;
 import tpietzsch.shadergen.Uniform3f;
 import tpietzsch.shadergen.Uniform3fv;
@@ -252,7 +258,7 @@ public class MultiVolumeShaderMip
 				"volume", "sampleVolume" ) );
 		segments.put( SegmentType.Convert, new SegmentTemplate(
 				"convert.frag",
-				"convert", "offset", "scale" ) );
+				"convert", "offset", "scale", "gamma", "renderType","lut" ) );
 		segments.put( SegmentType.ConvertRGBA, new SegmentTemplate(
 				"convert_rgba.frag",
 				"convert", "offset", "scale" ) );
@@ -308,6 +314,7 @@ public class MultiVolumeShaderMip
 	{
 		converterSegments[ index ].setData( converter );
 	}
+	
 
 	/**
 	 * Register {@code texture} to be set for uniform sampler {@code name}.
@@ -426,6 +433,9 @@ public class MultiVolumeShaderMip
 	{
 		private final Uniform4f uniformOffset;
 		private final Uniform4f uniformScale;
+		private final Uniform1f uniformGamma;
+		private final Uniform1i uniformRenderType;
+		private final Uniform3fv lut; 
 
 		private final PixelType pixelType;
 		private final double rangeScale;
@@ -434,6 +444,10 @@ public class MultiVolumeShaderMip
 		{
 			uniformOffset = prog.getUniform4f( segment,"offset" );
 			uniformScale = prog.getUniform4f( segment,"scale" );
+			uniformGamma = prog.getUniform1f( segment,"gamma" );
+			uniformRenderType = prog.getUniform1i( segment,"renderType" );
+			lut = prog.getUniform3fv(segment,"lut");
+					
 
 			this.pixelType = pixelType;
 
@@ -454,6 +468,14 @@ public class MultiVolumeShaderMip
 		{
 			final double fmin = converter.getDisplayRangeMin() / rangeScale;
 			final double fmax = converter.getDisplayRangeMax() / rangeScale;
+			uniformGamma.set(1.0f);
+			uniformRenderType.set(1);
+			if (converter instanceof GammaConverterSetup)
+			{
+				uniformGamma.set((float)((GammaConverterSetup)converter).getDisplayGamma());
+				uniformRenderType.set(1);
+			}
+			//final double fgamma = converter.getGamma();
 			final double s = 1.0 / ( fmax - fmin );
 			final double o = -fmin * s;
 
@@ -482,10 +504,52 @@ public class MultiVolumeShaderMip
 						( float ) ( s * g ),
 						( float ) ( s * b ),
 						( float ) ( s ) );
+
+				if (converter instanceof GammaConverterSetup)
+				{
+					lut.set(getRGBLutTable("Green"));
+				}
+				else
+				{
+					lut.set(getRGBLutTable("Red"));
+				}
 			}
 		}
 	}
+	/** function gets LUT specified by sZLUTName in settings
+	 * and returns 256x3 table map in HSB format */
+	static float [][]  getRGBLutTable(String sLUTName)
+	{
+		int i,j;
+	
+		int [] onepix; 
+		float [][] RGBLutTable = new float[256][3];
+		ByteProcessor ish = new ByteProcessor(256,1);
+		for ( i=0; i<256; i++)
+			for (j=0; j<10; j++)
+				ish.putPixel(i, j, i);
+		ImagePlus ccc = new ImagePlus("test",ish);
+		ccc.show();
+		IJ.run(sLUTName);
+		IJ.run("RGB Color");
+		//ipLUT= (ColorProcessor) ccc.getProcessor();
+		ccc.setSlice(1);
+		for(i=0;i<256;i++)
+		{
+			
+			onepix= ccc.getPixel(i, 0);
+			//rgbtable[i]=ccc.getPixel(i, 1);
+			//java.awt.Color.RGBtoHSB(onepix[0], onepix[1], onepix[2], hsbvals);
+			RGBLutTable[i][0]=(float)(onepix[0]/255.0f);
+			RGBLutTable[i][1]=(float)(onepix[1]/255.0f);
+			RGBLutTable[i][2]=(float)(onepix[2]/255.0f);
+		}
 
+		ccc.changes=false;
+		ccc.close();
+		return RGBLutTable;
+		//return;
+	}
 	private static class AdditionalSampler
 	{
 		private final UniformSampler sampler;

@@ -33,6 +33,10 @@ import static bdv.BigDataViewer.initSetups;
 import bdv.viewer.ConverterSetups;
 import bdv.viewer.SynchronizedViewerState;
 import bdv.viewer.ViewerState;
+import bvv.tools.BrightnessDialogBT;
+import bvv.tools.MinMaxGroupBT;
+import bvv.tools.SetupAssignmentsBT;
+
 import com.jogamp.opengl.GL3;
 
 import java.io.File;
@@ -86,8 +90,8 @@ public class BigVolumeViewer
 	private final VolumeViewerPanel viewer;
 	private final ManualTransformation manualTransformation;
 	private final Bookmarks bookmarks;
-	private final SetupAssignments setupAssignments;
-	private final BrightnessDialog brightnessDialog;
+	private final SetupAssignmentsBT setupAssignments;
+	private final BrightnessDialogBT brightnessDialog;
 	private final VisibilityAndGroupingDialog activeSourcesDialog;
 	private final ManualTransformationEditor manualTransformationEditor;
 
@@ -143,15 +147,15 @@ public class BigVolumeViewer
 				setups.put( source, setup );
 		}
 
-		setupAssignments = new SetupAssignments( converterSetups, 0, 65535 );
+		setupAssignments = new SetupAssignmentsBT( converterSetups, 0, 65535 );
 		if ( setupAssignments.getMinMaxGroups().size() > 0 )
 		{
-			final MinMaxGroup group = setupAssignments.getMinMaxGroups().get( 0 );
+			final MinMaxGroupBT group = setupAssignments.getMinMaxGroups().get( 0 );
 			for ( final ConverterSetup setup : setupAssignments.getConverterSetups() )
 				setupAssignments.moveSetupToGroup( setup, group );
 		}
 
-		brightnessDialog = new BrightnessDialog( frame, setupAssignments );
+		brightnessDialog = new BrightnessDialogBT( frame, setupAssignments );
 		activeSourcesDialog = new VisibilityAndGroupingDialog( frame, viewer.state() );
 
 		fileChooser = new JFileChooser();
@@ -210,7 +214,7 @@ public class BigVolumeViewer
 	 * @deprecated Instead {@code getViewer().state()} returns the {@link ViewerState} that can be modified directly.
 	 */
 	@Deprecated
-	public SetupAssignments getSetupAssignments()
+	public SetupAssignmentsBT getSetupAssignments()
 	{
 		return setupAssignments;
 	}
@@ -509,7 +513,7 @@ public class BigVolumeViewer
 
 	public static void main( final String[] args ) throws SpimDataException
 	{
-		final String xmlFilename = "/Users/pietzsch/workspace/data/111010_weber_full.xml";
+		final String xmlFilename = "/home/eugene/workspace/ExM_MT.xml";
 //		final String xmlFilename = "/Users/pietzsch/Desktop/data/TGMM_METTE/Pdu_H2BeGFP_CAAXmCherry_0123_20130312_192018.corrected/dataset_hdf5.xml";
 //		final String xmlFilename = "/Users/pietzsch/Desktop/data/MAMUT/MaMuT_demo_dataset/MaMuT_Parhyale_demo.xml";
 

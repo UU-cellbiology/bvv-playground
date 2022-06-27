@@ -123,6 +123,7 @@ public class Example06
 				"diff", Bvv.options().sourceTransform( transform ).addTo( sourceRed ) );
 		sourceDiff.setDisplayRange( 0, 255 );
 		sourceDiff.setDisplayRangeBounds( 0, 255 );
+		
 
 		// add original RGB image, shifted to the left
 		transform.translate( -1200, 0, 0 );

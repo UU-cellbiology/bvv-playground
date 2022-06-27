@@ -45,6 +45,8 @@ import bdv.util.volatiles.VolatileView;
 import bdv.util.volatiles.VolatileViewData;
 import bdv.viewer.Source;
 import bdv.viewer.SourceAndConverter;
+import bvv.tools.BvvGamma;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -79,6 +81,12 @@ public class BvvFunctions
 	{
 		return show( img, name, Bvv.options() );
 	}
+	public static < T > BvvStackSource< T > showGamma(
+			final RandomAccessibleInterval< T > img,
+			final String name )
+	{
+		return showGamma( img, name, Bvv.options() );
+	}
 
 	@SuppressWarnings( { "unchecked", "rawtypes" } )
 	public static < T > BvvStackSource< T > show(
@@ -104,7 +112,30 @@ public class BvvFunctions
 
 		return (BvvStackSource<T>) addRandomAccessibleInterval( handle, ( RandomAccessibleInterval ) img, ( NumericType ) type, name, axisOrder, sourceTransform );
 	}
+	@SuppressWarnings( { "unchecked", "rawtypes" } )
+	public static < T > BvvStackSource< T > showGamma(
+			final RandomAccessibleInterval< T > img,
+			final String name,
+			final BvvOptions options )
+	{
+		final Bvv bvv = options.values.addTo();
+		final BvvHandle handle = ( bvv == null )
+				? new BvvHandleFrame( options )
+				: bvv.getBvvHandle();
+		final AxisOrder axisOrder = AxisOrder.getAxisOrder( options.values.axisOrder(), img, false );
+		final AffineTransform3D sourceTransform = options.values.getSourceTransform();
+		final T type;
+		if ( img instanceof VolatileView )
+		{
+			final VolatileViewData< ?, ? > viewData = ( ( VolatileView< ?, ? > ) img ).getVolatileViewData();
+			type = ( T ) viewData.getVolatileType();
+			handle.getCacheControls().addCacheControl( viewData.getCacheControl() );
+		}
+		else
+			type = Util.getTypeFromInterval( img );
 
+		return (BvvStackSource<T>) addRandomAccessibleIntervalGamma( handle, ( RandomAccessibleInterval ) img, ( NumericType ) type, name, axisOrder, sourceTransform );
+	}
 	public static < T > BvvStackSource< T > show(
 			final Source< T > source )
 	{
@@ -171,7 +202,20 @@ public class BvvFunctions
 		WrapBasicImgLoader.removeWrapperIfPresent( spimData );
 		return bvvSources;
 	}
+	
+	public static List< BvvStackSource< ? > > show(
+			final SourceAndConverter< ? > sourceconv,
+			final BvvOptions options )
+	{
+		final Bvv bvv = options.values.addTo();
+		final BvvHandle handle = ( bvv == null )
+				? new BvvHandleFrame( options )
+				: bvv.getBvvHandle();
 
+		final List< BvvStackSource< ? > > bvvSources = new ArrayList<>();
+		bvvSources.add( addSpimDataSource( handle, sourceconv, 1 ) );
+		return bvvSources;
+	}
 	// TODO: move to BdvFunctionUtils
 	public static int getUnusedSetupId( final BigDataViewer bdv )
 	{
@@ -228,6 +272,57 @@ public class BvvFunctions
 				s = new RandomAccessibleIntervalSource<>( stack, type, sourceTransform, name );
 			}
 			addSourceToListsGenericType( s, handle.getUnusedSetupId(), converterSetups, sources );
+		}
+		handle.add( converterSetups, sources, numTimepoints );
+		final BvvStackSource< T > bvvSource = new BvvStackSource<>( handle, numTimepoints, type, converterSetups, sources );
+		handle.addBvvSource( bvvSource );
+		return bvvSource;
+	}
+	
+	/**
+	 * Add the given {@link RandomAccessibleInterval} {@code img} to the given
+	 * {@link BvvHandle} as a new {@link BvvStackSource}. The {@code img} is
+	 * expected to be 2D, 3D, 4D, or 5D with the given {@link AxisOrder}.
+	 *
+	 * @param handle
+	 *            handle to add the {@code img} to.
+	 * @param img
+	 *            {@link RandomAccessibleInterval} to add.
+	 * @param type
+	 *            instance of the {@code img} type.
+	 * @param name
+	 *            name to give to the new source
+	 * @param axisOrder
+	 *            {@link AxisOrder} of the source, is used to appropriately split {@code img} into channels and timepoints.
+	 * @param sourceTransform
+	 *            transforms from source coordinates to global coordinates.
+	 * @return a new {@link BdvStackSource} handle for the newly added source(s).
+	 */
+	private static < T extends NumericType< T > > BvvStackSource< T > addRandomAccessibleIntervalGamma(
+			final BvvHandle handle,
+			final RandomAccessibleInterval< T > img,
+			final T type,
+			final String name,
+			final AxisOrder axisOrder,
+			final AffineTransform3D sourceTransform )
+	{
+		final List< ConverterSetup > converterSetups = new ArrayList<>();
+		final List< SourceAndConverter< T > > sources = new ArrayList<>();
+		final ArrayList< RandomAccessibleInterval< T > > stacks = AxisOrder.splitInputStackIntoSourceStacks( img, axisOrder );
+		int numTimepoints = 1;
+		for ( final RandomAccessibleInterval< T > stack : stacks )
+		{
+			final Source< T > s;
+			if ( stack.numDimensions() > 3 )
+			{
+				numTimepoints = ( int ) stack.max( 3 ) + 1;
+				s = new RandomAccessibleIntervalSource4D<>( stack, type, sourceTransform, name );
+			}
+			else
+			{
+				s = new RandomAccessibleIntervalSource<>( stack, type, sourceTransform, name );
+			}
+			addSourceToListsGenericTypeGamma( s, handle.getUnusedSetupId(), converterSetups, sources );
 		}
 		handle.add( converterSetups, sources, numTimepoints );
 		final BvvStackSource< T > bvvSource = new BvvStackSource<>( handle, numTimepoints, type, converterSetups, sources );
@@ -352,6 +447,37 @@ public class BvvFunctions
 		else
 			throw new IllegalArgumentException( "Unknown source type. Expected RealType, ARGBType, or VolatileARGBType" );
 	}
+	
+	/**
+	 * Add the given {@code source} to the lists of {@code converterSetups}
+	 * (using specified {@code setupId}) and {@code sources}. For this, the
+	 * {@code source} is wrapped with an appropriate {@link Converter} to
+	 * {@link ARGBType} and into a {@link TransformedSource}.
+	 *
+	 * @param source
+	 *            source to add.
+	 * @param setupId
+	 *            id of the new source for use in {@link SetupAssignments}.
+	 * @param converterSetups
+	 *            list of {@link ConverterSetup}s to which the source should be
+	 *            added.
+	 * @param sources
+	 *            list of {@link SourceAndConverter}s to which the source should
+	 *            be added.
+	 */
+	@SuppressWarnings( { "rawtypes", "unchecked" } )
+	private static < T > void addSourceToListsGenericTypeGamma(
+			final Source< T > source,
+			final int setupId,
+			final List< ConverterSetup > converterSetups,
+			final List< SourceAndConverter< T > > sources )
+	{
+		final T type = source.getType();
+		if ( type instanceof RealType || type instanceof ARGBType || type instanceof VolatileARGBType )
+			addSourceToListsNumericTypeGamma( ( Source ) source, setupId, converterSetups, ( List ) sources );
+		else
+			throw new IllegalArgumentException( "Unknown source type. Expected RealType, ARGBType, or VolatileARGBType" );
+	}
 
 	/**
 	 * Add the given {@code source} to the lists of {@code converterSetups}
@@ -382,7 +508,36 @@ public class BvvFunctions
 		converterSetups.add( BigDataViewer.createConverterSetup( soc, setupId ) );
 		sources.add( soc );
 	}
-
+	/**
+	 * Add the given {@code source} to the lists of {@code converterSetups}
+	 * (using specified {@code setupId}) and {@code sources}. For this, the
+	 * {@code source} is wrapped with an appropriate {@link Converter} to
+	 * {@link ARGBType} and into a {@link TransformedSource}.
+	 *
+	 * @param source
+	 *            source to add.
+	 * @param setupId
+	 *            id of the new source for use in {@link SetupAssignments}.
+	 * @param converterSetups
+	 *            list of {@link ConverterSetup}s to which the source should be
+	 *            added.
+	 * @param sources
+	 *            list of {@link SourceAndConverter}s to which the source should
+	 *            be added.
+	 */
+	private static < T extends NumericType< T > > void addSourceToListsNumericTypeGamma(
+			final Source< T > source,
+			final int setupId,
+			final List< ConverterSetup > converterSetups,
+			final List< SourceAndConverter< T > > sources )
+	{
+		final T type = source.getType();
+		final SourceAndConverter< T > soc = BigDataViewer.wrapWithTransformedSource(
+				new SourceAndConverter<>( source, BvvGamma.createConverterToARGB( type ) ) );
+		
+		converterSetups.add( BvvGamma.createConverterSetup( soc, setupId ) );
+		sources.add( soc );
+	}
 	private static < T > BvvStackSource< T > addSpimDataSource(
 			final BvvHandle handle,
 			final SourceAndConverter< T > source,

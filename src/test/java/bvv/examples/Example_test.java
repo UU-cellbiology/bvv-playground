@@ -29,16 +29,31 @@
 
 package bvv.examples;
 
+import bdv.BigDataViewer;
+import bdv.tools.brightness.ConverterSetup;
+import bdv.util.AxisOrder;
+import bdv.util.RandomAccessibleIntervalSource;
+import bdv.viewer.SourceAndConverter;
+import bvv.util.Bvv;
 import bvv.util.BvvFunctions;
+import bvv.util.BvvHandle;
 import bvv.util.BvvSource;
+import bvv.util.BvvStackSource;
 import ij.IJ;
 import ij.ImagePlus;
+import net.imglib2.converter.Converter;
+import net.imglib2.converter.RealLUTConverter;
+import net.imglib2.display.ColorTable8;
 import net.imglib2.img.Img;
 import net.imglib2.img.display.imagej.ImageJFunctions;
 import net.imglib2.realtransform.AffineTransform3D;
+import net.imglib2.type.numeric.ARGBType;
+import net.imglib2.type.numeric.integer.UnsignedByteType;
 import net.imglib2.type.numeric.integer.UnsignedShortType;
+import net.imglib2.view.Views;
 
-public class Example01
+
+public class Example_test
 {
 	/**
 	 * Show 16-bit volume.
@@ -47,13 +62,30 @@ public class Example01
 	{
 		final ImagePlus imp = IJ.openImage( "https://imagej.nih.gov/ij/images/t1-head.zip" );
 		final Img< UnsignedShortType > img = ImageJFunctions.wrapShort( imp );
+		//final ImagePlus imp = IJ.openImage( "/home/eugene/Desktop/BigTrace_data/ExM_MT_8bit_blur.tif" );
+		//final Img< UnsignedByteType > img = ImageJFunctions.wrapByte( imp );
+		//final ImagePlus imp = IJ.openImage( "/home/eugene/Desktop/BigTrace_data/ch2.tif" );
+		//final Img< UnsignedByteType > img = ImageJFunctions.wrapByte( imp );
+		//final ImagePlus imp2 = IJ.openImage( "/home/eugene/Desktop/BigTrace_data/ch1.tif" );
+		//final Img< UnsignedByteType > img2 = ImageJFunctions.wrapByte( imp2 );
 
-		final BvvSource source = BvvFunctions.show( img, "t1-head" );
-		AffineTransform3D transform = new AffineTransform3D();
+
+		final BvvStackSource source =		BvvFunctions.showGamma( img, "test");
+		source.setDisplayRange( 0, 255 );
+		final BvvSource source2 = BvvFunctions.show( Views.translate( img, 0, 0, 100 ), "view", Bvv.options().addTo( source ) );
+		source2.setDisplayRange( 0, 255 );
+		//final BvvSource source2 = BvvFunctions.show( img2, "view", Bvv.options().addTo( source ) );
+		//sds.getConverter();
+		BvvHandle handle = source.getBvvHandle();
+		//handle.getConverterSetups().s
 		
-		source.getBvvHandle().getViewerPanel().state().getViewerTransform(transform);
+		//handle.getCardPanel()
+		
+		//AffineTransform3D transform = new AffineTransform3D();
+		
+		//source.getBvvHandle().getViewerPanel().state().getViewerTransform(transform);
 
 		// source handle can be used to set color, display range, visibility, ...
-		source.setDisplayRange( 0, 555 );
+		//source.setDisplayRange( 0, 555 );
 	}
 }
