@@ -124,6 +124,11 @@
 			<artifactId>ST4</artifactId>
 			<version>${ST4.version}</version>
 		</dependency>
+		<dependency> 
+    		<groupId>com.formdev</groupId> 
+    		<artifactId>jide-oss</artifactId> 
+    		<version>3.7.12</version>
+  		</dependency> 
 		<dependency>
 			<!-- only used for linear programming, get rid of this, we only need something extremely simple -->
 			<groupId>org.apache.commons</groupId>

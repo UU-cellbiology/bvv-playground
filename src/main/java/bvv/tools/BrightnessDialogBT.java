@@ -33,6 +33,7 @@ import java.awt.Color;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Frame;
+import java.awt.GridLayout;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -70,6 +71,7 @@ import bdv.tools.brightness.MinMaxGroup;
 import bdv.tools.brightness.SetupAssignments;
 import bdv.tools.brightness.SliderPanel;
 import bdv.tools.brightness.SliderPanelDouble;
+import bdv.ui.rangeslider.RangeSlider;
 import bdv.util.BoundedValueDouble;
 import bdv.util.DelayedPackDialog;
 import mpicbg.spim.data.generic.sequence.BasicViewSetup;
@@ -339,14 +341,24 @@ public class BrightnessDialogBT extends DelayedPackDialog
 			sliders = new JPanel();
 			sliders.setLayout( new BoxLayout( sliders, BoxLayout.PAGE_AXIS ) );
 
+			
 			final double spinnerStepSize = 1;
-			final SliderPanelDouble minPanel = new SliderPanelDouble( "min", group.getMinBoundedValue(), spinnerStepSize );
+			/*final SliderPanelDouble minPanel = new SliderPanelDouble( "min", group.getMinBoundedValue(), spinnerStepSize );
 			minPanel.setBorder( BorderFactory.createEmptyBorder( 0, 10, 10, 10 ) );
 			sliders.add( minPanel );
 			final SliderPanelDouble maxPanel = new SliderPanelDouble( "max", group.getMaxBoundedValue(), spinnerStepSize );
 			maxPanel.setBorder( BorderFactory.createEmptyBorder( 0, 10, 10, 10 ) );
-			sliders.add( maxPanel );
-			gammaRange = new BoundedValueDouble( 0.01, 7.0, 1.0)
+			sliders.add( maxPanel );*/
+			
+			//final RangeSliderPanelDouble lutPanel = new RangeSliderPanelDouble( "max", group.getMinBoundedValue(), group.getMaxBoundedValue(), spinnerStepSize );
+			
+			final RangeSliderPanelDouble lutPanel = new RangeSliderPanelDouble( "LUT range ", group.getMinBoundedValue(), group.getMaxBoundedValue(), spinnerStepSize );
+			sliders.add( lutPanel );
+			
+			//RangeSlider testRange = new RangeSlider(0, 100);
+			//sliders.add( testRange  );
+			
+			gammaRange = new BoundedValueDouble( 0.01, 27.0, 1.0)
 			{
 				@Override
 				public void setCurrentValue( final double value )
@@ -355,7 +367,7 @@ public class BrightnessDialogBT extends DelayedPackDialog
 					update();
 				}
 			};
-			final SliderPanelDouble gammaPanel = new SliderPanelDouble( "gamma", gammaRange, 0.02);
+			final SliderPanelDouble gammaPanel = new SliderPanelDouble( "LUT γ", gammaRange, 0.02);
 			gammaPanel.setBorder( BorderFactory.createEmptyBorder( 0, 10, 10, 10 ) );
 			sliders.add( gammaPanel )	;
 			if ( rememberSizes && ! minMaxPanels.minMaxPanels.isEmpty() )
@@ -392,7 +404,8 @@ public class BrightnessDialogBT extends DelayedPackDialog
 			minMaxGroup.setUpdateListener( this );
 
 			final JPanel advancedPanel = new JPanel();
-			advancedPanel.setLayout( new BoxLayout( advancedPanel, BoxLayout.PAGE_AXIS ) );
+			//advancedPanel.setLayout( new BoxLayout( advancedPanel, BoxLayout.PAGE_AXIS ) );
+			advancedPanel.setLayout( new GridLayout( 0,2,0,0 ) );
 
 			final JSpinner dummy = new JSpinner();
 			dummy.setModel( new SpinnerNumberModel( minMaxGroup.getRangeMax(), minMaxGroup.getFullRangeMin(), minMaxGroup.getFullRangeMax(), 1 ) );
@@ -482,9 +495,12 @@ public class BrightnessDialogBT extends DelayedPackDialog
 					storeSliderSize();
 				}
 			} );
-
-			minPanel.setRangeListener( () -> spinnerRangeMin.setValue( minMaxGroup.getRangeMin() ) );
-			maxPanel.setRangeListener( () -> spinnerRangeMax.setValue( minMaxGroup.getRangeMax() ) );
+			
+			lutPanel.addRangeListener( () -> spinnerRangeMin.setValue( minMaxGroup.getRangeMin() ) );
+			lutPanel.addRangeListener( () -> spinnerRangeMax.setValue( minMaxGroup.getRangeMax() ) );
+			
+			//minPanel.setRangeListener( () -> spinnerRangeMin.setValue( minMaxGroup.getRangeMin() ) );
+			//maxPanel.setRangeListener( () -> spinnerRangeMax.setValue( minMaxGroup.getRangeMax() ) );
 
 			final JPanel eastPanel = new JPanel();
 			eastPanel.setLayout( new BoxLayout( eastPanel, BoxLayout.LINE_AXIS ) );

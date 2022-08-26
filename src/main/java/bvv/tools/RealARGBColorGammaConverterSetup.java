@@ -19,6 +19,7 @@ public class RealARGBColorGammaConverterSetup implements GammaConverterSetup {
 	private final Listeners.List< SetupChangeListener > listeners;
 	
 	private float [][] lut;
+	
 	/**0 = maximum intensity projection; 1 = transparency **/
 	private int nRenderType =0; 
 	
