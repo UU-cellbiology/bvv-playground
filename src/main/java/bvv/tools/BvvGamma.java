@@ -3,9 +3,17 @@ package bvv.tools;
 import java.util.ArrayList;
 import java.util.List;
 
+import bdv.SpimSource;
+import bdv.ViewerImgLoader;
+import bdv.ViewerSetupImgLoader;
+import bdv.VolatileSpimSource;
 import bdv.tools.brightness.ConverterSetup;
 import bdv.tools.brightness.RealARGBColorConverterSetup;
 import bdv.viewer.SourceAndConverter;
+import mpicbg.spim.data.generic.AbstractSpimData;
+import mpicbg.spim.data.generic.sequence.BasicViewSetup;
+import mpicbg.spim.data.sequence.Angle;
+import mpicbg.spim.data.sequence.Channel;
 import net.imglib2.Volatile;
 import net.imglib2.converter.Converter;
 import net.imglib2.display.ColorConverter;
@@ -59,7 +67,7 @@ public class BvvGamma {
 	 *            setupId of the created {@code ConverterSetup}
 	 * @return a new {@code ConverterSetup} or {@code null}
 	 */
-	public static ConverterSetup createConverterSetup( final SourceAndConverter< ? > soc, final int setupId )
+	public static ConverterSetup createConverterSetupBT( final SourceAndConverter< ? > soc, final int setupId )
 	{
 		final List< ColorConverter > converters = new ArrayList<>();
 
@@ -80,4 +88,67 @@ public class BvvGamma {
 		else
 			return new RealARGBColorGammaConverterSetup( setupId, converters );
 	}
+	
+	public static void initSetups(
+			final AbstractSpimData< ? > spimData,
+			final List< ConverterSetup > converterSetups,
+			final List< SourceAndConverter< ? > > sources )
+	{
+		for ( final BasicViewSetup setup : spimData.getSequenceDescription().getViewSetupsOrdered() )
+			initSetupNumericType( spimData, setup, converterSetups, sources );
+	}
+	
+	private static < T extends NumericType< T >, V extends Volatile< T > & NumericType< V > > void initSetupNumericType(
+			final AbstractSpimData< ? > spimData,
+			final BasicViewSetup setup,
+			final List< ConverterSetup > converterSetups,
+			final List< SourceAndConverter< ? > > sources )
+	{
+		final int setupId = setup.getId();
+		final ViewerImgLoader imgLoader = ( ViewerImgLoader ) spimData.getSequenceDescription().getImgLoader();
+		@SuppressWarnings( "unchecked" )
+		final ViewerSetupImgLoader< T, V > setupImgLoader = ( ViewerSetupImgLoader< T, V > ) imgLoader.getSetupImgLoader( setupId );
+		final T type = setupImgLoader.getImageType();
+		final V volatileType = setupImgLoader.getVolatileImageType();
+
+		if ( ! ( type instanceof NumericType ) )
+			throw new IllegalArgumentException( "ImgLoader of type " + type.getClass() + " not supported." );
+
+		final String setupName = createSetupName( setup );
+
+		SourceAndConverter< V > vsoc = null;
+		if ( volatileType != null )
+		{
+			final VolatileSpimSource< V > vs = new VolatileSpimSource<>( spimData, setupId, setupName );
+			vsoc = new SourceAndConverter<>( vs, BvvGamma.createConverterToARGB( volatileType ) );
+		}
+
+		final SpimSource< T > s = new SpimSource<>( spimData, setupId, setupName );
+		final SourceAndConverter< T > soc = new SourceAndConverter<>( s, BvvGamma.createConverterToARGB( type ), vsoc );
+		final SourceAndConverter< T > tsoc = bdv.BigDataViewer.wrapWithTransformedSource( soc );
+		sources.add( tsoc );
+
+		final ConverterSetup converterSetup = BvvGamma.createConverterSetupBT( tsoc, setupId );
+		if ( converterSetup != null )
+			converterSetups.add( converterSetup );
+	}
+	
+	private static String createSetupName( final BasicViewSetup setup )
+	{
+		if ( setup.hasName() )
+			return setup.getName();
+
+		String name = "";
+
+		final Angle angle = setup.getAttribute( Angle.class );
+		if ( angle != null )
+			name += ( name.isEmpty() ? "" : " " ) + "a " + angle.getName();
+
+		final Channel channel = setup.getAttribute( Channel.class );
+		if ( channel != null )
+			name += ( name.isEmpty() ? "" : " " ) + "c " + channel.getName();
+
+		return name;
+	}
+
 }

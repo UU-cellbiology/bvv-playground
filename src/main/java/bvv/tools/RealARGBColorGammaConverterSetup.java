@@ -176,7 +176,7 @@ public class RealARGBColorGammaConverterSetup implements GammaConverterSetup {
 	 * and returns 256x3 table map in HSB format */
 	static public float [][]  getRGBLutTable(String sLUTName)
 	{
-		int i,j;
+		/*int i,j;
 	
 		int [] onepix; 
 		float [][] RGBLutTable = new float[256][3];
@@ -203,6 +203,14 @@ public class RealARGBColorGammaConverterSetup implements GammaConverterSetup {
 
 		ccc.changes=false;
 		ccc.close();
+		*/
+		
+		float [][] RGBLutTable = new float[256][3];
+		for(int i=0;i<256;i++)
+			for(int j=0;j<3;j++)
+			{
+				RGBLutTable [i][j]=i/255.0f;
+			}
 		return RGBLutTable;
 		//return;
 	}

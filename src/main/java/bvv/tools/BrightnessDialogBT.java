@@ -346,7 +346,7 @@ public class BrightnessDialogBT extends DelayedPackDialog
 			final SliderPanelDouble maxPanel = new SliderPanelDouble( "max", group.getMaxBoundedValue(), spinnerStepSize );
 			maxPanel.setBorder( BorderFactory.createEmptyBorder( 0, 10, 10, 10 ) );
 			sliders.add( maxPanel );
-			gammaRange = new BoundedValueDouble( 0.01, 3.0, 1.0)
+			gammaRange = new BoundedValueDouble( 0.01, 7.0, 1.0)
 			{
 				@Override
 				public void setCurrentValue( final double value )

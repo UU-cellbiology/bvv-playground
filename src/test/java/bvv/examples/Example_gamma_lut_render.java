@@ -29,6 +29,10 @@
 
 package bvv.examples;
 
+import org.joml.Matrix4f;
+
+import com.jogamp.opengl.GL;
+
 import bdv.BigDataViewer;
 import bdv.tools.brightness.ConverterSetup;
 import bdv.util.AxisOrder;
@@ -62,36 +66,46 @@ public class Example_gamma_lut_render
 	 */
 	public static void main( final String[] args )
 	{
-		final ImagePlus imp = IJ.openImage( "https://imagej.nih.gov/ij/images/t1-head.zip" );
-		final Img< UnsignedShortType > img = ImageJFunctions.wrapShort( imp );
-		//final ImagePlus imp = IJ.openImage( "/home/eugene/Desktop/BigTrace_data/ExM_MT_8bit_blur.tif" );
-		//final Img< UnsignedByteType > img = ImageJFunctions.wrapByte( imp );
+		//final ImagePlus imp = IJ.openImage( "https://imagej.nih.gov/ij/images/t1-head.zip" );
+		//final Img< UnsignedShortType > img = ImageJFunctions.wrapShort( imp );
+		final ImagePlus imp = IJ.openImage( "/home/eugene/Desktop/BigTrace_data/ExM_MT_8bit_blur.tif" );
+		final Img< UnsignedByteType > img = ImageJFunctions.wrapByte( imp );
 		//final ImagePlus imp = IJ.openImage( "/home/eugene/Desktop/BigTrace_data/ch2.tif" );
 		//final Img< UnsignedByteType > img = ImageJFunctions.wrapByte( imp );
 		//final ImagePlus imp2 = IJ.openImage( "/home/eugene/Desktop/BigTrace_data/ch1.tif" );
 		//final Img< UnsignedByteType > img2 = ImageJFunctions.wrapByte( imp2 );
 
-
-		final BvvStackSource source = BvvFunctions.showGamma( img, "test");
+		
+		//final BvvStackSource source = BvvFunctions.showGamma( img, "test");
+		final BvvStackSource source = BvvFunctions.show( img, "test");
+		
 		source.setDisplayRange( 0, 455 );
 		source.setDisplayRangeBounds(0, 555);
-		final BvvStackSource source2 = BvvFunctions.showGamma( Views.translate( img, 0, 0, 100 ), "view", Bvv.options().addTo( source ) );
-		source2.setDisplayRange( 0, 455 );
-		source2.setDisplayRangeBounds(0, 555);
+		//final BvvStackSource source2 = BvvFunctions.showGamma( Views.translate( img, 0, 0, 500 ), "view", Bvv.options().addTo( source ) );
+		//source2.setDisplayRange( 0, 455 );
+		//source2.setDisplayRangeBounds(0, 555);
 
 		RealARGBColorGammaConverterSetup conv1 = (RealARGBColorGammaConverterSetup) source.getConverterSetups().get(0);
 		
 		//set LUT
-		conv1.setLUT(RealARGBColorGammaConverterSetup.getRGBLutTable("Ice"));
+		conv1.setLUT(RealARGBColorGammaConverterSetup.getRGBLutTable("Fire"));
 		//set render type (1 = transparency, 0 = max intensity projection)
 		conv1.setRenderType(1);
-		
-		RealARGBColorGammaConverterSetup conv2 = (RealARGBColorGammaConverterSetup) source2.getConverterSetups().get(0);		
-		conv2.setLUT(RealARGBColorGammaConverterSetup.getRGBLutTable("Fire"));
-		conv2.setRenderType(1);
+	
+
+		//RealARGBColorGammaConverterSetup conv2 = (RealARGBColorGammaConverterSetup) source2.getConverterSetups().get(0);		
+		//conv2.setLUT(RealARGBColorGammaConverterSetup.getRGBLutTable("Grays"));
+		//conv2.setRenderType(1);
 		
 		
 		final VolumeViewerPanel viewer = source.getBvvHandle().getViewerPanel();
+		//set background color
+		/*
+		viewer.setRenderScene( ( gl, data ) -> {
+			gl.glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+			gl.glClear(GL.GL_COLOR_BUFFER_BIT);
+		} );
+		*/
 		viewer.requestRepaint();
 
 	}

@@ -34,8 +34,10 @@ import bdv.viewer.ConverterSetups;
 import bdv.viewer.SynchronizedViewerState;
 import bdv.viewer.ViewerState;
 import bvv.tools.BrightnessDialogBT;
+import bvv.tools.BvvGamma;
 import bvv.tools.MinMaxGroupBT;
 import bvv.tools.SetupAssignmentsBT;
+import ij.ImageJ;
 
 import com.jogamp.opengl.GL3;
 
@@ -472,7 +474,7 @@ public class BigVolumeViewer
 
 		final ArrayList< ConverterSetup > converterSetups = new ArrayList<>();
 		final ArrayList< SourceAndConverter< ? > > sources = new ArrayList<>();
-		initSetups( spimData, converterSetups, sources );
+		BvvGamma.initSetups( spimData, converterSetups, sources );
 
 
 		final SequenceDescriptionMinimal seq = spimData.getSequenceDescription();
@@ -513,7 +515,8 @@ public class BigVolumeViewer
 
 	public static void main( final String[] args ) throws SpimDataException
 	{
-		final String xmlFilename = "/home/eugene/workspace/ExM_MT.xml";
+		//new ImageJ();
+		final String xmlFilename = "/home/eugene/Desktop/BigTrace_data/ExM_MT.xml";
 //		final String xmlFilename = "/Users/pietzsch/Desktop/data/TGMM_METTE/Pdu_H2BeGFP_CAAXmCherry_0123_20130312_192018.corrected/dataset_hdf5.xml";
 //		final String xmlFilename = "/Users/pietzsch/Desktop/data/MAMUT/MaMuT_demo_dataset/MaMuT_Parhyale_demo.xml";
 
