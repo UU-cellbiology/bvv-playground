@@ -259,7 +259,7 @@ public class MultiVolumeShaderMip
 				"volume", "sampleVolume" ) );
 		segments.put( SegmentType.Convert, new SegmentTemplate(
 				"convert.frag",
-				"convert", "offset", "scale", "gamma", "renderType","lut" ) );
+				"convert", "offset", "scale", "gamma", "alphagamma","renderType","lut" ) );
 		segments.put( SegmentType.ConvertRGBA, new SegmentTemplate(
 				"convert_rgba.frag",
 				"convert", "offset", "scale" ) );
@@ -435,6 +435,8 @@ public class MultiVolumeShaderMip
 		private final Uniform4f uniformOffset;
 		private final Uniform4f uniformScale;
 		private final Uniform1f uniformGamma;
+		private final Uniform1f uniformGammaAlpha;
+		
 		private final Uniform1i uniformRenderType;
 		private final Uniform3fv lut; 
 
@@ -446,6 +448,7 @@ public class MultiVolumeShaderMip
 			uniformOffset = prog.getUniform4f( segment,"offset" );
 			uniformScale = prog.getUniform4f( segment,"scale" );
 			uniformGamma = prog.getUniform1f( segment,"gamma" );
+			uniformGammaAlpha = prog.getUniform1f( segment,"alphagamma" );
 			uniformRenderType = prog.getUniform1i( segment,"renderType" );
 			lut = prog.getUniform3fv(segment,"lut");
 					
@@ -469,24 +472,35 @@ public class MultiVolumeShaderMip
 		{
 			final double fmin = converter.getDisplayRangeMin() / rangeScale;
 			final double fmax = converter.getDisplayRangeMax() / rangeScale;
-			uniformGamma.set(2.0f);
-			uniformRenderType.set(1);
+			double fminA = fmin;
+			double fmaxA = fmax;
+
+			uniformGamma.set(1.0f);
+			uniformGammaAlpha.set(1.0f);
+			uniformRenderType.set(0);
 			if (converter instanceof GammaConverterSetup)
 			{		
-				uniformGamma.set((float)((GammaConverterSetup)converter).getDisplayGamma());				
+				uniformGamma.set((float)((GammaConverterSetup)converter).getDisplayGamma());
+				uniformGammaAlpha.set((float)((GammaConverterSetup)converter).getAlphaGamma());
 				uniformRenderType.set(((GammaConverterSetup)converter).getRenderType());
+				fminA = ((GammaConverterSetup)converter).getAlphaRangeMin() / rangeScale;
+				fmaxA = ((GammaConverterSetup)converter).getAlphaRangeMax() / rangeScale;
+
 			}
 			//final double fgamma = converter.getGamma();
 			final double s = 1.0 / ( fmax - fmin );
 			final double o = -fmin * s;
+			final double sA = 1.0 / ( fmaxA - fminA );
+			final double oA = -fminA * sA;
 
 			if ( pixelType == ARGB )
 			{
-				uniformOffset.set( ( float ) o, ( float ) o, ( float ) o, ( float ) o );
-				uniformScale.set( ( float ) s, ( float ) s, ( float ) s, ( float ) s );
+				uniformOffset.set( ( float ) o, ( float ) o, ( float ) o, ( float ) oA );
+				uniformScale.set( ( float ) s, ( float ) s, ( float ) s, ( float ) sA );
 			}
 			else
 			{
+				//TODO change it to LUT vs no LUT, for now like this
 				final int color = converter.getColor().get();
 				final double r = ( double ) ARGBType.red( color ) / 255.0;
 				final double g = ( double ) ARGBType.green( color ) / 255.0;
@@ -499,12 +513,12 @@ public class MultiVolumeShaderMip
 						( float ) ( o * r ),
 						( float ) ( o * g ),
 						( float ) ( o * b ),
-						( float ) ( o ) );
+						( float ) ( oA ) );
 				uniformScale.set(
 						( float ) ( s * r ),
 						( float ) ( s * g ),
 						( float ) ( s * b ),
-						( float ) ( s ) );
+						( float ) ( sA ) );
 
 				if (converter instanceof GammaConverterSetup)
 				{

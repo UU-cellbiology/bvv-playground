@@ -55,6 +55,7 @@ import bdv.util.BoundedValueDouble;
  */
 public class MinMaxGroupBT extends MinMaxGroup
 {
+	
 	private final double fullRangeMin;
 
 	private final double fullRangeMax;
@@ -63,7 +64,19 @@ public class MinMaxGroupBT extends MinMaxGroup
 	
 	private final double gammaFullRangeMax;
 	
+	private final double fullAlphaRangeMin;
+
+	private final double fullAlphaRangeMax;
+	
+	private final double gammaAlphaFullRangeMin;
+	
+	private final double gammaAlphaFullRangeMax;
+	
 	public BoundedValueDouble gammaRange; 
+	
+	public BoundedIntervalDouble alphaRange;
+	
+	public BoundedValueDouble gammaAlphaRange; 
 
 	public final Set< ConverterSetup > setups;
 
@@ -85,11 +98,34 @@ public class MinMaxGroupBT extends MinMaxGroup
 	{
 		super(fullRangeMin,fullRangeMax,rangeMin, rangeMax, currentMin,currentMax, minIntervalSize );
 		
+		alphaRange = new BoundedIntervalDouble( rangeMin,  rangeMax,  currentMin, currentMax,  minIntervalSize )		
+		{
+			@Override
+			public void updateInterval( final double minAlpha, final double maxAlpha )
+			{
+				for ( final ConverterSetup setup : setups )
+				{
+					if(setup instanceof GammaConverterSetup)
+					{
+					
+						final GammaConverterSetup setupgamma = (GammaConverterSetup)setup;
+						setupgamma.setAlphaRange( minAlpha, maxAlpha );
+					}
+				}
+
+			}
+		};
+		
 		//super( rangeMin, rangeMax, currentMin, currentMax, minIntervalSize );
 		this.fullRangeMin = fullRangeMin;
 		this.fullRangeMax = fullRangeMax;
+		this.fullAlphaRangeMin = fullRangeMin;
+		this.fullAlphaRangeMax = fullRangeMax;
+		
 		gammaFullRangeMin = 0.01;
 		gammaFullRangeMax = 100.0;
+		gammaAlphaFullRangeMin = 0.01;
+		gammaAlphaFullRangeMax = 100.0;
 		
 		gammaRange = new BoundedValueDouble( 0.01, 5.0, 1.0)
 		{
@@ -97,7 +133,17 @@ public class MinMaxGroupBT extends MinMaxGroup
 			public void setCurrentValue( final double value )
 			{
 				super.setCurrentValue( value );
-				updateGamma();
+				updateGamma();			
+			}
+		};
+		
+		gammaAlphaRange = new BoundedValueDouble( 0.01, 5.0, 1.0)
+		{
+			@Override
+			public void setCurrentValue( final double value )
+			{
+				super.setCurrentValue( value );
+				updateGammaAlpha();
 			}
 		};
 		setups = new LinkedHashSet<>();
@@ -109,10 +155,12 @@ public class MinMaxGroupBT extends MinMaxGroup
 	protected void updateInterval( final double min, final double max )
 	{
 		for ( final ConverterSetup setup : setups )
-			setup.setDisplayRange( min, max );
+		{
+			setup.setDisplayRange( min, max );			
+		}
 
 	}
-	
+		
 	
 	protected void updateGamma()
 	{
@@ -121,6 +169,18 @@ public class MinMaxGroupBT extends MinMaxGroup
 			if(setup instanceof GammaConverterSetup)
 			{
 				((GammaConverterSetup) setup).setDisplayGamma(gammaRange.getCurrentValue());
+				//System.out.println(gammaRange.getCurrentValue());
+			}
+		}
+	}
+	
+	protected void updateGammaAlpha()
+	{
+		for ( final ConverterSetup setup : setups )
+		{
+			if(setup instanceof GammaConverterSetup)
+			{
+				((GammaConverterSetup) setup).setAlphaGamma(gammaAlphaRange.getCurrentValue());
 				//System.out.println(gammaRange.getCurrentValue());
 			}
 		}
@@ -135,6 +195,15 @@ public class MinMaxGroupBT extends MinMaxGroup
 	{
 		return fullRangeMax;
 	}
+	public double getAlphaFullRangeMin()
+	{
+		return fullAlphaRangeMin;
+	}
+
+	public double getAlphaFullRangeMax()
+	{
+		return fullAlphaRangeMax;
+	}
 
 	public double getGammaFullRangeMin()
 	{
@@ -144,6 +213,16 @@ public class MinMaxGroupBT extends MinMaxGroup
 	public double getGammaFullRangeMax()
 	{
 		return gammaFullRangeMax;
+	}
+	
+	public double getGammaAlphaFullRangeMin()
+	{
+		return gammaAlphaFullRangeMin;
+	}
+
+	public double getGammaAlphaFullRangeMax()
+	{
+		return gammaAlphaFullRangeMax;
 	}
 	/**
 	 * Add a {@link ConverterSetup} which will have its

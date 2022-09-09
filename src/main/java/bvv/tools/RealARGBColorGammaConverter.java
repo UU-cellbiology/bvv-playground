@@ -38,7 +38,13 @@ class Instances
 
 		private double max = 1;
 		
+		private double minAlpha = 0;
+
+		private double maxAlpha = 1;
+		
 		private double gamma = 1;
+		
+		private double gammaAlpha = 1;
 
 		private final ARGBType color = new ARGBType( ARGBType.rgba( 255, 255, 255, 255 ) );
 
@@ -58,7 +64,10 @@ class Instances
 		{
 			this.min = min;
 			this.max = max;
+			this.minAlpha = min;
+			this.maxAlpha = max;
 			this.gamma = gamma;
+			this.gammaAlpha = gamma;
 			update();
 		}
 
@@ -94,9 +103,27 @@ class Instances
 		}
 		
 		@Override
+		public double getMinAlpha()
+		{
+			return minAlpha;
+		}
+
+		@Override
+		public double getMaxAlpha()
+		{
+			return maxAlpha;
+		}
+		
+		@Override
 		public double getGamma()
 		{
 			return gamma;
+		}
+		
+		@Override
+		public double getGammaAlpha()
+		{
+			return gammaAlpha;
 		}
 
 		@Override
@@ -114,17 +141,40 @@ class Instances
 		}
 		
 		@Override
+		public void setMaxAlpha( final double maxAlpha )
+		{
+			this.maxAlpha = maxAlpha;
+			update();
+		}
+
+		@Override
+		public void setMinAlpha( final double minAlpha )
+		{
+			this.minAlpha = minAlpha;
+			update();
+		}
+		
+		@Override
 		public void setGamma (final double gamma)
 		{
 			this.gamma = gamma;
 			update();
 		}
+		
+		@Override
+		public void setGammaAlpha(final double gammaAlpha)
+		{
+			this.gammaAlpha = gammaAlpha;
+			update();
+		}
+
 
 		private void update()
 		{
 			final double scale = 1.0 / ( max - min );
+			final double scaleAlpha = 1.0 / ( maxAlpha - minAlpha );
 			final int value = color.get();
-			scaleA = ARGBType.alpha( value );
+			scaleA = ARGBType.alpha( value ) * scaleAlpha;
 			scaleR = ARGBType.red( value ) * scale;
 			scaleG = ARGBType.green( value ) * scale;
 			scaleB = ARGBType.blue( value ) * scale;
@@ -144,7 +194,7 @@ class Instances
 				final int r0 = ( int ) ( scaleR * Math.pow(v, gamma) + 0.5 );
 				final int g0 = ( int ) ( scaleG * Math.pow(v, gamma) + 0.5 );
 				final int b0 = ( int ) ( scaleB * Math.pow(v, gamma) + 0.5 );
-				final int a0 = ( int ) ( scaleA * Math.pow(v, gamma) + 0.5 );
+				final int a0 = ( int ) ( scaleA * Math.pow(v, gammaAlpha) + 0.5 );
 				final int r = Math.min( 255, r0 );
 				final int g = Math.min( 255, g0 );
 				final int b = Math.min( 255, b0 );

@@ -9,6 +9,7 @@ import ij.IJ;
 import ij.ImagePlus;
 import ij.process.ByteProcessor;
 import net.imglib2.display.ColorConverter;
+import net.imglib2.display.LinearRange;
 import net.imglib2.type.numeric.ARGBType;
 
 public class RealARGBColorGammaConverterSetup implements GammaConverterSetup {
@@ -63,6 +64,35 @@ public class RealARGBColorGammaConverterSetup implements GammaConverterSetup {
 		if ( changed )
 			listeners.list.forEach( l -> l.setupParametersChanged( this ) );
 	}
+	
+	@Override
+	public void setAlphaRange( final double minAlpha, final double maxAlpha )
+	{
+		boolean changed = false;
+		for ( final ColorConverter converter : converters )
+		{
+			if(converter instanceof ColorGammaConverter)
+			{
+			
+				final ColorGammaConverter convgamma = (ColorGammaConverter)converter;
+				if ( convgamma.getMinAlpha() != minAlpha )
+				{
+					convgamma.setMinAlpha( minAlpha );
+					changed = true;
+				}
+				if ( convgamma.getMaxAlpha() != maxAlpha )
+				{
+					convgamma.setMaxAlpha( maxAlpha );
+					changed = true;
+				}
+			}
+		}
+		if ( changed )
+			listeners.list.forEach( l -> l.setupParametersChanged( this ) );
+	}
+	
+	
+	
 	@Override
 	public void setDisplayGamma(double gamma) {
 		boolean changed = false;
@@ -82,6 +112,26 @@ public class RealARGBColorGammaConverterSetup implements GammaConverterSetup {
 		if ( changed )
 			listeners.list.forEach( l -> l.setupParametersChanged( this ) );
 		
+	}
+	
+	@Override
+	public void setAlphaGamma(double gammaAlpha) {
+		boolean changed = false;
+		for ( final ColorConverter converter : converters )
+		{
+			if(converter instanceof ColorGammaConverter)
+			{
+				final ColorGammaConverter convgamma = (ColorGammaConverter)converter;
+							
+				if ( convgamma.getGammaAlpha()!= gammaAlpha)
+				{
+					convgamma.setGammaAlpha( gammaAlpha );
+					changed = true;				
+				}
+			}
+		}
+		if ( changed )
+			listeners.list.forEach( l -> l.setupParametersChanged( this ) );
 	}
 
 
@@ -143,6 +193,25 @@ public class RealARGBColorGammaConverterSetup implements GammaConverterSetup {
 	}
 	
 	@Override
+	public double getAlphaRangeMin()
+	{
+		if(converters.get(0) instanceof ColorGammaConverter)
+			return ((ColorGammaConverter)converters.get( 0 )).getMinAlpha();
+		else
+			return 0.0;
+	}
+
+	@Override
+	public double getAlphaRangeMax()
+	{
+		if(converters.get(0) instanceof ColorGammaConverter)
+			return ((ColorGammaConverter)converters.get( 0 )).getMaxAlpha();
+		else
+			return 1.0;
+		
+	}
+	
+	@Override
 	public double getDisplayGamma() {
 		if(converters.get(0) instanceof ColorGammaConverter)
 		{
@@ -154,6 +223,19 @@ public class RealARGBColorGammaConverterSetup implements GammaConverterSetup {
 			return 1.0;
 		}
 		
+	}
+	
+	@Override
+	public double getAlphaGamma() {
+		if(converters.get(0) instanceof ColorGammaConverter)
+		{
+			final ColorGammaConverter convgamma = (ColorGammaConverter)converters.get(0);
+			return convgamma.getGammaAlpha();
+		}
+		else
+		{
+			return 1.0;
+		}
 	}
 
 	@Override
@@ -232,7 +314,6 @@ public class RealARGBColorGammaConverterSetup implements GammaConverterSetup {
 
 	@Override
 	public void setRenderType(int nRender) {
-		// TODO Auto-generated method stub
 		if (nRender >=1)
 			nRenderType = 1;
 		else
@@ -241,7 +322,10 @@ public class RealARGBColorGammaConverterSetup implements GammaConverterSetup {
 
 	@Override
 	public int getRenderType() {
-		// TODO Auto-generated method stub
 		return nRenderType;
 	}
+
+
+
+
 }

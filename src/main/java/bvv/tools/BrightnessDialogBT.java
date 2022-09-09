@@ -352,6 +352,14 @@ public class BrightnessDialogBT extends DelayedPackDialog
 			gammaPanel.setBorder( BorderFactory.createEmptyBorder( 0, 10, 10, 10 ) );
 			sliders.add( gammaPanel);
 			
+			final RangeSliderPanelDouble alphaPanel = new RangeSliderPanelDouble( "α range ", group.alphaRange.getMinBoundedValue(), group.alphaRange.getMaxBoundedValue(), spinnerStepSize );
+			sliders.add( alphaPanel );
+			
+			final SliderPanelDouble gammaAlphaPanel = new SliderPanelDouble( "α γ", group.gammaAlphaRange, 0.02);
+			gammaAlphaPanel.setBorder( BorderFactory.createEmptyBorder( 0, 10, 10, 10 ) );
+			sliders.add( gammaAlphaPanel);
+			
+			
 			if ( rememberSizes && ! minMaxPanels.minMaxPanels.isEmpty() )
 			{
 				final Dimension dim = minMaxPanels.minMaxPanels.get( 0 ).sliders.getSize();
@@ -404,7 +412,16 @@ public class BrightnessDialogBT extends DelayedPackDialog
 			spinnerGammaRangeMin.sLimit =()->minMaxGroup.getGammaFullRangeMin();
 			final MaxSpinner spinnerGammaRangeMax = new MaxSpinner(minMaxGroup.gammaRange, null, ps);
 			spinnerGammaRangeMax.sLimit=()->minMaxGroup.getGammaFullRangeMax();
-
+			
+			final MinSpinner spinnerAlphaRangeMin = new MinSpinner(null, minMaxGroup.alphaRange, ps);
+			spinnerAlphaRangeMin.sLimit =()->minMaxGroup.getAlphaFullRangeMin();
+			final MaxSpinner spinnerAlphaRangeMax = new MaxSpinner(null, minMaxGroup.alphaRange, ps);
+			spinnerAlphaRangeMax.sLimit=()->minMaxGroup.getAlphaFullRangeMax();
+			
+			final MinSpinner spinnerAlphaGammaRangeMin = new MinSpinner(minMaxGroup.gammaAlphaRange, null, ps);
+			spinnerAlphaGammaRangeMin.sLimit =()->minMaxGroup.getGammaAlphaFullRangeMin();
+			final MaxSpinner spinnerAlphaGammaRangeMax = new MaxSpinner(minMaxGroup.gammaAlphaRange, null, ps);
+			spinnerAlphaGammaRangeMax.sLimit=()->minMaxGroup.getGammaAlphaFullRangeMax();
 			
 			final JButton advancedButton = new JButton( ">>" );
 			advancedButton.setBorder( BorderFactory.createEmptyBorder( 0, 10, 0, 10 ) );
@@ -428,6 +445,10 @@ public class BrightnessDialogBT extends DelayedPackDialog
 					advancedPanel.add( spinnerRangeMax );
 					advancedPanel.add( spinnerGammaRangeMin );
 					advancedPanel.add( spinnerGammaRangeMax );
+					advancedPanel.add( spinnerAlphaRangeMin );
+					advancedPanel.add( spinnerAlphaRangeMax );
+					advancedPanel.add( spinnerAlphaGammaRangeMin );
+					advancedPanel.add( spinnerAlphaGammaRangeMax );					
 					advancedButton.setText( "<<" );
 					isShowingAdvanced = true;
 				}
@@ -437,11 +458,15 @@ public class BrightnessDialogBT extends DelayedPackDialog
 			{
 				@Override
 				public void run()
-				{
+				{	
 					advancedPanel.remove( spinnerRangeMin );
 					advancedPanel.remove( spinnerRangeMax );
 					advancedPanel.remove( spinnerGammaRangeMin );
 					advancedPanel.remove( spinnerGammaRangeMax );
+					advancedPanel.remove( spinnerAlphaRangeMin );
+					advancedPanel.remove( spinnerAlphaRangeMax );
+					advancedPanel.remove( spinnerAlphaGammaRangeMin );
+					advancedPanel.remove( spinnerAlphaGammaRangeMax );		
 					advancedButton.setText( ">>" );
 					isShowingAdvanced = false;
 				}
@@ -460,7 +485,16 @@ public class BrightnessDialogBT extends DelayedPackDialog
 			lutPanel.addRangeListener( () -> spinnerRangeMax.setValue( minMaxGroup.getRangeMax() ) );
 			gammaPanel.setRangeListener(()-> spinnerGammaRangeMin.setValue(minMaxGroup.gammaRange.getRangeMin()));
 			gammaPanel.setRangeListener(()-> spinnerGammaRangeMax.setValue(minMaxGroup.gammaRange.getRangeMax()));
+			alphaPanel.addRangeListener( () -> spinnerAlphaRangeMin.setValue( minMaxGroup.alphaRange.getRangeMin() ) );
+			alphaPanel.addRangeListener( () -> spinnerAlphaRangeMax.setValue( minMaxGroup.alphaRange.getRangeMax() ) );
+			gammaAlphaPanel.setRangeListener(()-> spinnerAlphaGammaRangeMin.setValue(minMaxGroup.gammaAlphaRange.getRangeMin()));
+			gammaAlphaPanel.setRangeListener(()-> spinnerAlphaGammaRangeMax.setValue(minMaxGroup.gammaAlphaRange.getRangeMax()));
 
+			final JPanel westPanel = new JPanel();
+			westPanel.setLayout( new BoxLayout( westPanel, BoxLayout.LINE_AXIS ) );
+			final JCheckBox sincBox = new JCheckBox();
+			westPanel.add(sincBox,BorderLayout.CENTER);
+			add( westPanel, BorderLayout.WEST );
 			final JPanel eastPanel = new JPanel();
 			eastPanel.setLayout( new BoxLayout( eastPanel, BoxLayout.LINE_AXIS ) );
 			eastPanel.add( boxesPanel, BorderLayout.CENTER );

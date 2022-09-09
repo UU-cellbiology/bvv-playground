@@ -85,7 +85,7 @@ public class Example_gamma_lut_render
 		//final BvvStackSource source = BvvFunctions.showGamma( img, "test");
 		final BvvStackSource source = BvvFunctions.show( img, "test");
 		
-		source.setDisplayRange( 10000, 20000 );
+		//source.setDisplayRange( 10000, 20000 );
 		//source.setDisplayRangeBounds(0, 555);
 		//final BvvStackSource source2 = BvvFunctions.showGamma( Views.translate( img, 0, 0, 500 ), "view", Bvv.options().addTo( source ) );
 		//source2.setDisplayRange( 0, 455 );
