@@ -469,11 +469,11 @@ public class MultiVolumeShaderMip
 		{
 			final double fmin = converter.getDisplayRangeMin() / rangeScale;
 			final double fmax = converter.getDisplayRangeMax() / rangeScale;
-			uniformGamma.set(1.0f);
+			uniformGamma.set(2.0f);
 			uniformRenderType.set(1);
 			if (converter instanceof GammaConverterSetup)
-			{
-				uniformGamma.set((float)((GammaConverterSetup)converter).getDisplayGamma());
+			{		
+				uniformGamma.set((float)((GammaConverterSetup)converter).getDisplayGamma());				
 				uniformRenderType.set(((GammaConverterSetup)converter).getRenderType());
 			}
 			//final double fgamma = converter.getGamma();

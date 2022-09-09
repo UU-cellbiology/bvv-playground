@@ -111,6 +111,7 @@ void main()
 			}
 		}
 		//v = v/numSteps;
+		
 		FragColor = v;
 	}
 	else

@@ -165,7 +165,8 @@ public class BvvFunctions
 
 		WrapBasicImgLoader.wrapImgLoaderIfNecessary( spimData );
 		final ArrayList< SourceAndConverter< ? > > sources = new ArrayList<>();
-		BigDataViewer.initSetups( spimData, new ArrayList<>(), sources );
+		//BigDataViewer.initSetups( spimData, new ArrayList<>(), sources );
+		BvvGamma.initSetups(spimData, new ArrayList<>(), sources);
 
 		final List< BvvStackSource< ? > > bvvSources = new ArrayList<>();
 		for ( final SourceAndConverter< ? > source : sources )

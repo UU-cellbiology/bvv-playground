@@ -51,7 +51,7 @@ import com.jidesoft.swing.RangeSlider;
 
 import bdv.util.BoundedValue;
 import bdv.util.BoundedValueDouble;
-import bvv.tools.RangeSliderTF.Listener;
+
 
 /**
  * A {@link JSlider} with a {@link JSpinner} next to it, both modifying the same

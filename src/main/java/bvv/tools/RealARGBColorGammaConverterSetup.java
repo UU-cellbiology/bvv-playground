@@ -99,6 +99,20 @@ public class RealARGBColorGammaConverterSetup implements GammaConverterSetup {
 				converter.setColor( color );
 				changed = true;
 			}
+			if(converter instanceof ColorGammaConverter)
+			{
+				lut =new float[256][3];
+				int [] val = new int[3];
+				val[0] = ARGBType.red(color.get());
+				val[1] = ARGBType.green(color.get());
+				val[2] = ARGBType.blue(color.get());
+				for(int i=0;i<256;i++)
+					for(int j=0;j<3;j++)
+					{
+						lut [i][j]=Math.round(val[j]*((float)i)/255.0f);
+					}
+				iniLUT = true;
+			}
 		}
 		if ( changed )
 			listeners.list.forEach( l -> l.setupParametersChanged( this ) );

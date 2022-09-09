@@ -30,6 +30,7 @@ package bvv.examples;
 
 import bdv.spimdata.SpimDataMinimal;
 import bdv.spimdata.XmlIoSpimDataMinimal;
+import bvv.tools.RealARGBColorGammaConverterSetup;
 import bvv.util.BvvFunctions;
 import bvv.util.BvvStackSource;
 import java.util.List;
@@ -43,16 +44,23 @@ public class Example05
 	 */
 	public static void main( final String[] args ) throws SpimDataException
 	{
-		final String xmlFilename = "/Users/pietzsch/workspace/data/111010_weber_full.xml";
+		final String xmlFilename = "/home/eugene/Desktop/export.xml";
 		final SpimDataMinimal spimData = new XmlIoSpimDataMinimal().load( xmlFilename );
 
 		final List< BvvStackSource< ? > > sources = BvvFunctions.show( spimData );
-
+		RealARGBColorGammaConverterSetup conv1 = (RealARGBColorGammaConverterSetup) sources.get(0).getConverterSetups().get(0);
+		sources.get(0).setDisplayRange(104, 120);
+		conv1.setRenderType(1);
+		RealARGBColorGammaConverterSetup conv2 = (RealARGBColorGammaConverterSetup) sources.get(1).getConverterSetups().get(0);
+		conv2.setRenderType(1);
+		//conv1.setDisplayGamma(100.0);
+		/*
 		sources.get( 0 ).setDisplayRange( 0, 6000 );
 		sources.get( 1 ).setDisplayRange( 0, 6000 );
 		sources.get( 2 ).setDisplayRange( 0, 6000 );
 		sources.get( 0 ).setColor( new ARGBType( 0xffff0000 ) );
 		sources.get( 1 ).setColor( new ARGBType( 0xff00ff00 ) );
 		sources.get( 2 ).setColor( new ARGBType( 0xff0000ff ) );
+		*/
 	}
 }

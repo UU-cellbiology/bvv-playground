@@ -343,33 +343,15 @@ public class BrightnessDialogBT extends DelayedPackDialog
 
 			
 			final double spinnerStepSize = 1;
-			/*final SliderPanelDouble minPanel = new SliderPanelDouble( "min", group.getMinBoundedValue(), spinnerStepSize );
-			minPanel.setBorder( BorderFactory.createEmptyBorder( 0, 10, 10, 10 ) );
-			sliders.add( minPanel );
-			final SliderPanelDouble maxPanel = new SliderPanelDouble( "max", group.getMaxBoundedValue(), spinnerStepSize );
-			maxPanel.setBorder( BorderFactory.createEmptyBorder( 0, 10, 10, 10 ) );
-			sliders.add( maxPanel );*/
-			
-			//final RangeSliderPanelDouble lutPanel = new RangeSliderPanelDouble( "max", group.getMinBoundedValue(), group.getMaxBoundedValue(), spinnerStepSize );
-			
+				
 			final RangeSliderPanelDouble lutPanel = new RangeSliderPanelDouble( "LUT range ", group.getMinBoundedValue(), group.getMaxBoundedValue(), spinnerStepSize );
 			sliders.add( lutPanel );
 			
-			//RangeSlider testRange = new RangeSlider(0, 100);
-			//sliders.add( testRange  );
-			
-			gammaRange = new BoundedValueDouble( 0.01, 27.0, 1.0)
-			{
-				@Override
-				public void setCurrentValue( final double value )
-				{
-					super.setCurrentValue( value );
-					update();
-				}
-			};
-			final SliderPanelDouble gammaPanel = new SliderPanelDouble( "LUT γ", gammaRange, 0.02);
+	
+			final SliderPanelDouble gammaPanel = new SliderPanelDouble( "LUT γ", group.gammaRange, 0.02);
 			gammaPanel.setBorder( BorderFactory.createEmptyBorder( 0, 10, 10, 10 ) );
-			sliders.add( gammaPanel )	;
+			sliders.add( gammaPanel);
+			
 			if ( rememberSizes && ! minMaxPanels.minMaxPanels.isEmpty() )
 			{
 				final Dimension dim = minMaxPanels.minMaxPanels.get( 0 ).sliders.getSize();
@@ -411,45 +393,19 @@ public class BrightnessDialogBT extends DelayedPackDialog
 			dummy.setModel( new SpinnerNumberModel( minMaxGroup.getRangeMax(), minMaxGroup.getFullRangeMin(), minMaxGroup.getFullRangeMax(), 1 ) );
 			dummy.setBorder( BorderFactory.createEmptyBorder( 0, 10, 10, 10 ) );
 			final Dimension ps = dummy.getPreferredSize();
+			
+			
+			final MinSpinner spinnerRangeMin = new MinSpinner(null, minMaxGroup, ps);
+			spinnerRangeMin.sLimit =()->minMaxGroup.getFullRangeMin();
+			final MaxSpinner spinnerRangeMax = new MaxSpinner(null, minMaxGroup, ps);
+			spinnerRangeMax.sLimit=()->minMaxGroup.getFullRangeMax();
 
-			final JSpinner spinnerRangeMin = new JSpinner();
-			spinnerRangeMin.setModel( new SpinnerNumberModel( minMaxGroup.getRangeMin(), Integer.MIN_VALUE, Integer.MAX_VALUE, 1 ) );
-			spinnerRangeMin.addChangeListener( new ChangeListener()
-			{
-				@Override
-				public void stateChanged( final ChangeEvent e )
-				{
-					final double value = ( ( Number ) spinnerRangeMin.getValue() ).doubleValue();
-					if ( value < minMaxGroup.getFullRangeMin() )
-						spinnerRangeMin.setValue( minMaxGroup.getFullRangeMin() );
-					else if ( value > minMaxGroup.getRangeMax() - 1 )
-						spinnerRangeMin.setValue( minMaxGroup.getRangeMax() - 1);
-					else
-						minMaxGroup.setRange( value, minMaxGroup.getRangeMax() );
-				}
-			} );
-			spinnerRangeMin.setPreferredSize( ps );
-			spinnerRangeMin.setBorder( BorderFactory.createEmptyBorder( 0, 10, 10, 10 ) );
+			final MinSpinner spinnerGammaRangeMin = new MinSpinner(minMaxGroup.gammaRange, null, ps);
+			spinnerGammaRangeMin.sLimit =()->minMaxGroup.getGammaFullRangeMin();
+			final MaxSpinner spinnerGammaRangeMax = new MaxSpinner(minMaxGroup.gammaRange, null, ps);
+			spinnerGammaRangeMax.sLimit=()->minMaxGroup.getGammaFullRangeMax();
 
-			final JSpinner spinnerRangeMax = new JSpinner();
-			spinnerRangeMax.setModel( new SpinnerNumberModel( minMaxGroup.getRangeMax(), Integer.MIN_VALUE, Integer.MAX_VALUE, 1 ) );
-			spinnerRangeMax.addChangeListener( new ChangeListener()
-			{
-				@Override
-				public void stateChanged( final ChangeEvent e )
-				{
-					final double value = ( ( Number ) spinnerRangeMax.getValue() ).doubleValue();
-					if ( value < minMaxGroup.getRangeMin() + 1 )
-						spinnerRangeMax.setValue( minMaxGroup.getRangeMin() + 1 );
-					else if ( value > minMaxGroup.getFullRangeMax() )
-						spinnerRangeMax.setValue( minMaxGroup.getFullRangeMax() );
-					else
-						minMaxGroup.setRange( minMaxGroup.getRangeMin(), value );
-				}
-			} );
-			spinnerRangeMax.setPreferredSize( ps );
-			spinnerRangeMax.setBorder( BorderFactory.createEmptyBorder( 0, 10, 10, 10 ) );
-
+			
 			final JButton advancedButton = new JButton( ">>" );
 			advancedButton.setBorder( BorderFactory.createEmptyBorder( 0, 10, 0, 10 ) );
 			isShowingAdvanced = false;
@@ -470,6 +426,8 @@ public class BrightnessDialogBT extends DelayedPackDialog
 				{
 					advancedPanel.add( spinnerRangeMin );
 					advancedPanel.add( spinnerRangeMax );
+					advancedPanel.add( spinnerGammaRangeMin );
+					advancedPanel.add( spinnerGammaRangeMax );
 					advancedButton.setText( "<<" );
 					isShowingAdvanced = true;
 				}
@@ -482,6 +440,8 @@ public class BrightnessDialogBT extends DelayedPackDialog
 				{
 					advancedPanel.remove( spinnerRangeMin );
 					advancedPanel.remove( spinnerRangeMax );
+					advancedPanel.remove( spinnerGammaRangeMin );
+					advancedPanel.remove( spinnerGammaRangeMax );
 					advancedButton.setText( ">>" );
 					isShowingAdvanced = false;
 				}
@@ -498,9 +458,8 @@ public class BrightnessDialogBT extends DelayedPackDialog
 			
 			lutPanel.addRangeListener( () -> spinnerRangeMin.setValue( minMaxGroup.getRangeMin() ) );
 			lutPanel.addRangeListener( () -> spinnerRangeMax.setValue( minMaxGroup.getRangeMax() ) );
-			
-			//minPanel.setRangeListener( () -> spinnerRangeMin.setValue( minMaxGroup.getRangeMin() ) );
-			//maxPanel.setRangeListener( () -> spinnerRangeMax.setValue( minMaxGroup.getRangeMax() ) );
+			gammaPanel.setRangeListener(()-> spinnerGammaRangeMin.setValue(minMaxGroup.gammaRange.getRangeMin()));
+			gammaPanel.setRangeListener(()-> spinnerGammaRangeMax.setValue(minMaxGroup.gammaRange.getRangeMax()));
 
 			final JPanel eastPanel = new JPanel();
 			eastPanel.setLayout( new BoxLayout( eastPanel, BoxLayout.LINE_AXIS ) );
@@ -538,11 +497,6 @@ public class BrightnessDialogBT extends DelayedPackDialog
 					if ( s.getSetupId() == setupId )
 					{
 						b = true;
-						if(s instanceof GammaConverterSetup)
-						{
-							((GammaConverterSetup) s).setDisplayGamma(gammaRange.getCurrentValue());
-							//System.out.println(gammaRange.getCurrentValue());
-						}
 						break;
 					}
 				boxes.get( i ).setSelected( b );

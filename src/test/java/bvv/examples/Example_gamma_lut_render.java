@@ -29,11 +29,15 @@
 
 package bvv.examples;
 
+import java.util.List;
+
 import org.joml.Matrix4f;
 
 import com.jogamp.opengl.GL;
 
 import bdv.BigDataViewer;
+import bdv.spimdata.SpimDataMinimal;
+import bdv.spimdata.XmlIoSpimDataMinimal;
 import bdv.tools.brightness.ConverterSetup;
 import bdv.util.AxisOrder;
 import bdv.util.RandomAccessibleIntervalSource;
@@ -66,6 +70,8 @@ public class Example_gamma_lut_render
 	 */
 	public static void main( final String[] args )
 	{
+		
+		
 		//final ImagePlus imp = IJ.openImage( "https://imagej.nih.gov/ij/images/t1-head.zip" );
 		//final Img< UnsignedShortType > img = ImageJFunctions.wrapShort( imp );
 		final ImagePlus imp = IJ.openImage( "/home/eugene/Desktop/BigTrace_data/ExM_MT_8bit_blur.tif" );
@@ -98,15 +104,15 @@ public class Example_gamma_lut_render
 		//conv2.setRenderType(1);
 		
 		
-		final VolumeViewerPanel viewer = source.getBvvHandle().getViewerPanel();
-		//set background color
-		/*
-		viewer.setRenderScene( ( gl, data ) -> {
-			gl.glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
-			gl.glClear(GL.GL_COLOR_BUFFER_BIT);
-		} );
-		*/
-		viewer.requestRepaint();
+		
+		//final VolumeViewerPanel viewer = source.getBvvHandle().getViewerPanel();
+		////set background color
+		//viewer.setRenderScene( ( gl, data ) -> {
+		//	gl.glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+		//	gl.glClear(GL.GL_COLOR_BUFFER_BIT);
+		//} );
+	
+		//viewer.requestRepaint();
 
 	}
 }
