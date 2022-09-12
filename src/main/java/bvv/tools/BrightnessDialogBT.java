@@ -402,27 +402,28 @@ public class BrightnessDialogBT extends DelayedPackDialog
 			dummy.setBorder( BorderFactory.createEmptyBorder( 0, 10, 10, 10 ) );
 			final Dimension ps = dummy.getPreferredSize();
 			
-			
-			final MinSpinner spinnerRangeMin = new MinSpinner(null, minMaxGroup, ps);
+			final MinSpinner spinnerAlphaRangeMin = new MinSpinner(null, minMaxGroup.alphaRange, ps, null, false);
+			spinnerAlphaRangeMin.sLimit =()->minMaxGroup.getAlphaFullRangeMin();
+			final MinSpinner spinnerRangeMin = new MinSpinner(null, minMaxGroup, ps, spinnerAlphaRangeMin, true);
 			spinnerRangeMin.sLimit =()->minMaxGroup.getFullRangeMin();
-			final MaxSpinner spinnerRangeMax = new MaxSpinner(null, minMaxGroup, ps);
+			
+			final MaxSpinner spinnerAlphaRangeMax = new MaxSpinner(null, minMaxGroup.alphaRange, ps, null, false);
+			spinnerAlphaRangeMax.sLimit=()->minMaxGroup.getAlphaFullRangeMax();
+			final MaxSpinner spinnerRangeMax = new MaxSpinner(null, minMaxGroup, ps, spinnerAlphaRangeMax, true);
 			spinnerRangeMax.sLimit=()->minMaxGroup.getFullRangeMax();
 
-			final MinSpinner spinnerGammaRangeMin = new MinSpinner(minMaxGroup.gammaRange, null, ps);
+			
+			final MinSpinner spinnerAlphaGammaRangeMin = new MinSpinner(minMaxGroup.gammaAlphaRange, null, ps, null, false);
+			spinnerAlphaGammaRangeMin.sLimit =()->minMaxGroup.getGammaAlphaFullRangeMin();			
+			final MinSpinner spinnerGammaRangeMin = new MinSpinner(minMaxGroup.gammaRange, null, ps, spinnerAlphaGammaRangeMin, true);
 			spinnerGammaRangeMin.sLimit =()->minMaxGroup.getGammaFullRangeMin();
-			final MaxSpinner spinnerGammaRangeMax = new MaxSpinner(minMaxGroup.gammaRange, null, ps);
-			spinnerGammaRangeMax.sLimit=()->minMaxGroup.getGammaFullRangeMax();
 			
-			final MinSpinner spinnerAlphaRangeMin = new MinSpinner(null, minMaxGroup.alphaRange, ps);
-			spinnerAlphaRangeMin.sLimit =()->minMaxGroup.getAlphaFullRangeMin();
-			final MaxSpinner spinnerAlphaRangeMax = new MaxSpinner(null, minMaxGroup.alphaRange, ps);
-			spinnerAlphaRangeMax.sLimit=()->minMaxGroup.getAlphaFullRangeMax();
 			
-			final MinSpinner spinnerAlphaGammaRangeMin = new MinSpinner(minMaxGroup.gammaAlphaRange, null, ps);
-			spinnerAlphaGammaRangeMin.sLimit =()->minMaxGroup.getGammaAlphaFullRangeMin();
-			final MaxSpinner spinnerAlphaGammaRangeMax = new MaxSpinner(minMaxGroup.gammaAlphaRange, null, ps);
+			final MaxSpinner spinnerAlphaGammaRangeMax = new MaxSpinner(minMaxGroup.gammaAlphaRange, null, ps, null, false);
 			spinnerAlphaGammaRangeMax.sLimit=()->minMaxGroup.getGammaAlphaFullRangeMax();
-			
+			final MaxSpinner spinnerGammaRangeMax = new MaxSpinner(minMaxGroup.gammaRange, null, ps, spinnerAlphaGammaRangeMax, true);
+			spinnerGammaRangeMax.sLimit=()->minMaxGroup.getGammaFullRangeMax();
+					
 			final JButton advancedButton = new JButton( ">>" );
 			advancedButton.setBorder( BorderFactory.createEmptyBorder( 0, 10, 0, 10 ) );
 			isShowingAdvanced = false;
@@ -492,8 +493,24 @@ public class BrightnessDialogBT extends DelayedPackDialog
 
 			final JPanel westPanel = new JPanel();
 			westPanel.setLayout( new BoxLayout( westPanel, BoxLayout.LINE_AXIS ) );
-			final JCheckBox sincBox = new JCheckBox();
-			westPanel.add(sincBox,BorderLayout.CENTER);
+			final JCheckBox syncBox = new JCheckBox();
+			syncBox.setSelected(group.bSync);
+			syncBox.addActionListener(new ActionListener() {
+
+	            @Override
+	            public void actionPerformed(ActionEvent e) 
+	            {	
+	            	final boolean bSelected = syncBox.isSelected();
+	            	group.bSync = bSelected;
+	            	spinnerRangeMin.bSync = bSelected;
+	            	spinnerRangeMin.bSync  = bSelected;
+	            	spinnerGammaRangeMin.bSync = bSelected;
+	            	spinnerGammaRangeMax.bSync = bSelected;
+	            	
+	            }
+	        });
+			
+			westPanel.add(syncBox,BorderLayout.CENTER);
 			add( westPanel, BorderLayout.WEST );
 			final JPanel eastPanel = new JPanel();
 			eastPanel.setLayout( new BoxLayout( eastPanel, BoxLayout.LINE_AXIS ) );

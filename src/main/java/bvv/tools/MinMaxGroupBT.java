@@ -79,6 +79,8 @@ public class MinMaxGroupBT extends MinMaxGroup
 	public BoundedValueDouble gammaAlphaRange; 
 
 	public final Set< ConverterSetup > setups;
+	
+	public boolean bSync = true;
 
 	public interface UpdateListener
 	{
@@ -98,23 +100,26 @@ public class MinMaxGroupBT extends MinMaxGroup
 	{
 		super(fullRangeMin,fullRangeMax,rangeMin, rangeMax, currentMin,currentMax, minIntervalSize );
 		
+		
+
 		alphaRange = new BoundedIntervalDouble( rangeMin,  rangeMax,  currentMin, currentMax,  minIntervalSize )		
 		{
 			@Override
-			public void updateInterval( final double minAlpha, final double maxAlpha )
+			public void updateInterval( final double min, final double max  )
 			{
+
 				for ( final ConverterSetup setup : setups )
 				{
 					if(setup instanceof GammaConverterSetup)
 					{
-					
 						final GammaConverterSetup setupgamma = (GammaConverterSetup)setup;
-						setupgamma.setAlphaRange( minAlpha, maxAlpha );
+						setupgamma.setAlphaRange( min, max );
 					}
 				}
 
 			}
 		};
+		
 		
 		//super( rangeMin, rangeMax, currentMin, currentMax, minIntervalSize );
 		this.fullRangeMin = fullRangeMin;
@@ -133,7 +138,9 @@ public class MinMaxGroupBT extends MinMaxGroup
 			public void setCurrentValue( final double value )
 			{
 				super.setCurrentValue( value );
-				updateGamma();			
+				updateGamma();	
+				if(bSync)
+					gammaAlphaRange.setCurrentValue(value);
 			}
 		};
 		
@@ -158,8 +165,14 @@ public class MinMaxGroupBT extends MinMaxGroup
 		{
 			setup.setDisplayRange( min, max );			
 		}
-
+		if(bSync)
+		{
+			alphaRange.getMinBoundedValue().setCurrentValue(min);
+			alphaRange.getMaxBoundedValue().setCurrentValue(max);
+		}
 	}
+	
+
 		
 	
 	protected void updateGamma()

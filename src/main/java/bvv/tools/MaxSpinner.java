@@ -20,13 +20,17 @@ public class MaxSpinner extends JSpinner
 	private static final long serialVersionUID = -8267094624266181857L;
 	private BoundedValueDouble boundValue=null;
 	private BoundedIntervalDouble boundInterval=null;
+	private JSpinner syncSpinner;
 	public SpinnerLimit sLimit;
+	public boolean bSync;
 
-	public MaxSpinner(final BoundedValueDouble boundValue_, final BoundedIntervalDouble boundInterval_, final Dimension ps)
+	public MaxSpinner(BoundedValueDouble boundValue_, BoundedIntervalDouble boundInterval_,final Dimension ps, final JSpinner syncSpinner_, final boolean bSync_)
 	{
 		super();
 		boundValue = boundValue_;
 		boundInterval = boundInterval_;
+		syncSpinner = syncSpinner_;
+		bSync = bSync_;
 		setModel( new SpinnerNumberModel(getRangeMax(), Integer.MIN_VALUE, Integer.MAX_VALUE, 1 ) );
 		addChangeListener( new ChangeListener()
 		{
@@ -40,10 +44,13 @@ public class MaxSpinner extends JSpinner
 					setValue( sLimit.getFullRangeLimit() );
 				else
 					setRange( getRangeMin(), value );
+				if(bSync)
+					syncSpinner.setValue(getValue());
 			}
 		} );
 		setPreferredSize( ps );
 		setBorder( BorderFactory.createEmptyBorder( 0, 10, 10, 10 ) );
+
 	}
 	
 	

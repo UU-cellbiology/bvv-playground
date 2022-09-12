@@ -19,13 +19,17 @@ public class MinSpinner extends JSpinner
 	private static final long serialVersionUID = -1724117364653045101L;
 	private BoundedValueDouble boundValue=null;
 	private BoundedIntervalDouble boundInterval=null;
+	private JSpinner syncSpinner;
 	public SpinnerLimit sLimit;
+	public boolean bSync;
 
-	public MinSpinner(BoundedValueDouble boundValue_, BoundedIntervalDouble boundInterval_,final Dimension ps)
+	public MinSpinner(BoundedValueDouble boundValue_, BoundedIntervalDouble boundInterval_,final Dimension ps, final JSpinner syncSpinner_, final boolean bSync_)
 	{
 		super();
 		boundValue = boundValue_;
 		boundInterval = boundInterval_;
+		syncSpinner = syncSpinner_;
+		bSync = bSync_;
 		setModel( new SpinnerNumberModel(getRangeMin(), Integer.MIN_VALUE, Integer.MAX_VALUE, 1 ) );
 		addChangeListener( new ChangeListener()
 		{
@@ -39,6 +43,9 @@ public class MinSpinner extends JSpinner
 					setValue( getRangeMax() - 1);
 				else
 					setRange( value, getRangeMax() );
+				if(bSync)
+					syncSpinner.setValue(getValue());
+				
 			}
 		} );
 		setPreferredSize( ps );
