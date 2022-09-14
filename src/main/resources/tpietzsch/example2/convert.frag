@@ -35,9 +35,9 @@ vec4 convert(vec4 acc, float v )
 	{
 		finC = acc + (1.-acc.a) * vec4( finC.rgb, 1 ) *finC.a;
 		  				
-		if(finC.a>0.999)
+		if(finC.a>0.99)
 		{
-			finC.a = 100;
+			acc.a = 100;
 			return acc;
 		}
 		return finC;

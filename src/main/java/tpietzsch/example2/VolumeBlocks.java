@@ -254,8 +254,10 @@ public class VolumeBlocks
 	// TODO: revise / remove
 	public Matrix4f getIms()
 	{
-		return MatrixMath.affine( multiResolutionStack.getSourceTransform(), new Matrix4f() ).mul( getUpscale( baseLevel ) ).invert();
+		return MatrixMath.affine( multiResolutionStack.getSourceTransform(), new Matrix4f() ).mul( getUpscale( baseLevel ) ).invert();		
 	}
+	
+
 
 	// TODO: revise / remove
 	public Vector3f getSourceLevelMin()

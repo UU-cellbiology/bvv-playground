@@ -1,6 +1,8 @@
 package bvv.tools;
 
 import bdv.tools.brightness.ConverterSetup;
+import net.imglib2.FinalRealInterval;
+import net.imglib2.RealInterval;
 
 public interface GammaConverterSetup extends ConverterSetup {
 
@@ -16,6 +18,13 @@ public interface GammaConverterSetup extends ConverterSetup {
 	void setLUT(float [][] lut_in);
 	float [][] getLUT();	
 	boolean useLut();
+	
+	boolean cropActive();
+	void setCropInterval(RealInterval cropInt);
+	FinalRealInterval getCropInterval();
+	
+	
 	void setRenderType(int nRender);
 	int getRenderType ();
+	
 }

@@ -51,6 +51,8 @@ import bvv.util.BvvSource;
 import bvv.util.BvvStackSource;
 import ij.IJ;
 import ij.ImagePlus;
+import net.imglib2.FinalRealInterval;
+import net.imglib2.RealInterval;
 import net.imglib2.converter.Converter;
 import net.imglib2.converter.RealLUTConverter;
 import net.imglib2.display.ColorTable8;
@@ -101,12 +103,19 @@ public class Example_gamma_lut_render
 		//set LUT
 		//conv1.setLUT(RealARGBColorGammaConverterSetup.getRGBLutTable("Fire"));
 		//set render type (1 = transparency, 0 = max intensity projection)
-		conv1.setRenderType(0);
-	
+		conv1.setRenderType(1);
+		double [] minI = new double [3];
+		double [] maxI = new double [3];
+		for (int i=0;i<3;i++)
+		{
+			minI[i]=50.0;
+			maxI[i]=150.0;
+		}
+		conv1.setCropInterval(new FinalRealInterval(minI,maxI));
 
-		RealARGBColorGammaConverterSetup conv2 = (RealARGBColorGammaConverterSetup) source.getConverterSetups().get(1);		
-		//conv2.setLUT(RealARGBColorGammaConverterSetup.getRGBLutTable("Grays"));
-		conv2.setRenderType(0);
+		//RealARGBColorGammaConverterSetup conv2 = (RealARGBColorGammaConverterSetup) source.getConverterSetups().get(1);		
+	
+		//conv2.setRenderType(0);
 		
 		
 		

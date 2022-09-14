@@ -224,7 +224,7 @@ public class MultiVolumeShaderMip
 				volumeSegments[ i ] = new VolumeBlocksSegment( prog, sampleVolumeSegs[ i ] );
 				break;
 			}
-			converterSegments[ i ] = new ConverterSegment( prog, convertSegs[ i ], volumeSignature.getPixelType() );
+			converterSegments[ i ] = new ConverterSegment( prog, convertSegs[ i ], sampleVolumeSegs[ i ], volumeSignature.getPixelType() );
 		}
 
 		uniformTransform = prog.getUniformMatrix4f( "transform" );
@@ -247,11 +247,13 @@ public class MultiVolumeShaderMip
 
 		segments.put( SegmentType.SampleMultiresolutionVolume, new SegmentTemplate(
 				"sample_volume_blocks.frag",
-				"im", "sourcemin", "sourcemax", "intersectBoundingBox",
+				"im", "sourcemin", "sourcemax",
+				"cropactive", "cropmin", "cropmax",
+				"intersectBoundingBox",
 				"lutSampler", "blockScales", "lutSize", "lutOffset", "sampleVolume" ) );
 		segments.put( SegmentType.SampleVolume, new SegmentTemplate(
 				"sample_volume_simple.frag",
-				"im", "sourcemax", "intersectBoundingBox",
+				"im", "sourcemax", "cropactive", "cropmin", "cropmax", "intersectBoundingBox",
 				"volume", "sampleVolume" ) );
 		segments.put( SegmentType.SampleRGBAVolume, new SegmentTemplate(
 				"sample_volume_simple_rgba.frag",
@@ -439,19 +441,25 @@ public class MultiVolumeShaderMip
 		private final Uniform1i uniformUseLUT;
 		private final Uniform1i uniformRenderType;
 		private final Uniform3fv lut; 
+		private final Uniform1i uniformCropActive;
+		private final Uniform3f uniformCropMin;
+		private final Uniform3f uniformCropMax;
 
 		private final PixelType pixelType;
 		private final double rangeScale;
 
-		public ConverterSegment( final SegmentedShader prog, final Segment segment, final PixelType pixelType )
+		public ConverterSegment( final SegmentedShader prog, final Segment segmentConv, final Segment segmentVol, final PixelType pixelType )
 		{
-			uniformOffset = prog.getUniform4f( segment,"offset" );
-			uniformScale = prog.getUniform4f( segment,"scale" );
-			uniformGamma = prog.getUniform1f( segment,"gamma" );
-			uniformGammaAlpha = prog.getUniform1f( segment,"alphagamma" );
-			uniformRenderType = prog.getUniform1i( segment,"renderType" );
-			uniformUseLUT = prog.getUniform1i( segment,"useLUT" );
-			lut = prog.getUniform3fv(segment,"lut");
+			uniformOffset = prog.getUniform4f( segmentConv,"offset" );
+			uniformScale = prog.getUniform4f( segmentConv,"scale" );
+			uniformGamma = prog.getUniform1f( segmentConv,"gamma" );
+			uniformGammaAlpha = prog.getUniform1f( segmentConv,"alphagamma" );
+			uniformRenderType = prog.getUniform1i( segmentConv,"renderType" );
+			uniformUseLUT = prog.getUniform1i( segmentConv,"useLUT" );
+			lut = prog.getUniform3fv(segmentConv,"lut");
+			uniformCropActive = prog.getUniform1i( segmentVol,"cropactive" );
+			uniformCropMin = prog.getUniform3f( segmentVol,"cropmin" );
+			uniformCropMax = prog.getUniform3f( segmentVol,"cropmax" );
 					
 
 			this.pixelType = pixelType;
@@ -479,14 +487,24 @@ public class MultiVolumeShaderMip
 			uniformGamma.set(1.0f);
 			uniformGammaAlpha.set(1.0f);
 			uniformRenderType.set(0);
+			uniformCropActive.set(0);
+			//do we need it??
+			//uniformCropMin.set(100.0f,100.0f,100.0f);
+			//uniformCropMax.set(200.0f,200.0f,200.0f);
 			if (converter instanceof GammaConverterSetup)
-			{		
-				uniformGamma.set(1.0f/(float)((GammaConverterSetup)converter).getDisplayGamma());
-				uniformGammaAlpha.set(1.0f/(float)((GammaConverterSetup)converter).getAlphaGamma());
-				uniformRenderType.set(((GammaConverterSetup)converter).getRenderType());
-				fminA = ((GammaConverterSetup)converter).getAlphaRangeMin() / rangeScale;
-				fmaxA = ((GammaConverterSetup)converter).getAlphaRangeMax() / rangeScale;
-
+			{	
+				final GammaConverterSetup gconverter = ((GammaConverterSetup)converter);
+				uniformGamma.set(1.0f/(float)gconverter.getDisplayGamma());
+				uniformGammaAlpha.set(1.0f/(float)gconverter.getAlphaGamma());
+				uniformRenderType.set(gconverter.getRenderType());
+				fminA = gconverter.getAlphaRangeMin() / rangeScale;
+				fmaxA = gconverter.getAlphaRangeMax() / rangeScale;
+				if(gconverter.cropActive())
+				{
+					uniformCropActive.set(1);
+					uniformCropMin.set(gconverter.getCropInterval(),tpietzsch.shadergen.MinMax.MIN);
+					uniformCropMax.set(gconverter.getCropInterval(),tpietzsch.shadergen.MinMax.MAX);
+				}
 			}
 			//final double fgamma = converter.getGamma();
 			final double s = 1.0 / ( fmax - fmin );

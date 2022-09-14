@@ -8,6 +8,10 @@ import org.scijava.listeners.Listeners;
 import ij.IJ;
 import ij.ImagePlus;
 import ij.process.ByteProcessor;
+import net.imglib2.FinalInterval;
+import net.imglib2.FinalRealInterval;
+import net.imglib2.Interval;
+import net.imglib2.RealInterval;
 import net.imglib2.display.ColorConverter;
 import net.imglib2.display.LinearRange;
 import net.imglib2.type.numeric.ARGBType;
@@ -25,6 +29,10 @@ public class RealARGBColorGammaConverterSetup implements GammaConverterSetup {
 	private int nRenderType =0; 
 	
 	private boolean useLUT = false;
+	
+	private boolean cropActive = false;
+	
+	private FinalRealInterval cropInt = null;
 
 	public RealARGBColorGammaConverterSetup( final int setupId, final ColorConverter... converters )
 	{
@@ -271,6 +279,26 @@ public class RealARGBColorGammaConverterSetup implements GammaConverterSetup {
 	public boolean useLut() {
 
 		return useLUT;
+	}
+
+	@Override
+	public boolean cropActive() {
+		
+		return cropActive;
+	}
+
+	@Override
+	public void setCropInterval(RealInterval cropInt) {
+		this.cropInt = new FinalRealInterval(cropInt);
+		cropActive = true;
+	}
+
+	@Override
+	public FinalRealInterval getCropInterval() {
+		if(cropActive)
+			return cropInt;
+		else
+			return null;
 	}
 
 

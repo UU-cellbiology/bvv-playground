@@ -3,12 +3,17 @@
 uniform mat4 im;
 uniform vec3 sourcemin;
 uniform vec3 sourcemax;
+uniform int cropactive;
+uniform vec3 cropmin;
+uniform vec3 cropmax;
 
 void intersectBoundingBox( vec4 wfront, vec4 wback, out float tnear, out float tfar )
 {
 	vec4 mfront = im * wfront;
 	vec4 mback = im * wback;
+
 	intersectBox( mfront.xyz, (mback - mfront).xyz, sourcemin, sourcemax, tnear, tfar );
+	
 }
 
 uniform usampler3D lutSampler;
@@ -27,6 +32,12 @@ float sampleVolume( vec4 wpos, sampler3D volumeCache, vec3 cacheSize, vec3 block
 
 	vec3 c0 = B0 + mod( pos * sj, blockSize ) + 0.5 * sj;
 	                                       // + 0.5 ( sj - 1 )   + 0.5 for tex coord offset
-
-	return texture( volumeCache, c0 / cacheSize ).r;
+	float cropf = 1.0;
+	if(cropactive>0)
+	{
+		vec3 poscrop = (im * wpos).xyz ;
+		vec3 s = step((im*vec4(cropmin,0.0)).xyz, poscrop) - step((im*vec4(cropmax,0.0)).xyz, poscrop);		
+		cropf= s.x * s.y * s.z;
+	} 
+	return cropf*texture( volumeCache, c0 / cacheSize ).r;
 }
