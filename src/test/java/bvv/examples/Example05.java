@@ -33,6 +33,10 @@ import bdv.spimdata.XmlIoSpimDataMinimal;
 import bvv.tools.RealARGBColorGammaConverterSetup;
 import bvv.util.BvvFunctions;
 import bvv.util.BvvStackSource;
+import ij.IJ;
+import ij.ImagePlus;
+import ij.process.ByteProcessor;
+
 import java.util.List;
 import mpicbg.spim.data.SpimDataException;
 import net.imglib2.type.numeric.ARGBType;
@@ -44,23 +48,59 @@ public class Example05
 	 */
 	public static void main( final String[] args ) throws SpimDataException
 	{
-		final String xmlFilename = "/home/eugene/Desktop/export.xml";
+		//final String xmlFilename = "/home/eugene/Desktop/export.xml";
+		final String xmlFilename = "/home/eugene/Desktop/emma_test.xml";
 		final SpimDataMinimal spimData = new XmlIoSpimDataMinimal().load( xmlFilename );
 
 		final List< BvvStackSource< ? > > sources = BvvFunctions.show( spimData );
 		RealARGBColorGammaConverterSetup conv1 = (RealARGBColorGammaConverterSetup) sources.get(0).getConverterSetups().get(0);
 		sources.get(0).setDisplayRange(104, 120);
 		conv1.setRenderType(1);
+		conv1.setLUT(getRGBLutTable("Fire"));
 		RealARGBColorGammaConverterSetup conv2 = (RealARGBColorGammaConverterSetup) sources.get(1).getConverterSetups().get(0);
 		conv2.setRenderType(1);
-		//conv1.setDisplayGamma(100.0);
+		
+	}
+	
+	static public float [][]  getRGBLutTable(String sLUTName)
+	{
+		int i,j;
+	
+		int [] onepix; 
+		float [][] RGBLutTable = new float[256][3];
+		ByteProcessor ish = new ByteProcessor(256,1);
+		for ( i=0; i<256; i++)
+			for (j=0; j<10; j++)
+				ish.putPixel(i, j, i);
+		ImagePlus ccc = new ImagePlus("test",ish);
+		ccc.show();
+		IJ.run(sLUTName);
+		IJ.run("RGB Color");
+		//ipLUT= (ColorProcessor) ccc.getProcessor();
+		ccc.setSlice(1);
+		for(i=0;i<256;i++)
+		{
+			
+			onepix= ccc.getPixel(i, 0);
+			//rgbtable[i]=ccc.getPixel(i, 1);
+			//java.awt.Color.RGBtoHSB(onepix[0], onepix[1], onepix[2], hsbvals);
+			RGBLutTable[i][0]=(float)(onepix[0]/255.0f);
+			RGBLutTable[i][1]=(float)(onepix[1]/255.0f);
+			RGBLutTable[i][2]=(float)(onepix[2]/255.0f);
+		}
+
+		ccc.changes=false;
+		ccc.close();
+		return RGBLutTable;
+		
 		/*
-		sources.get( 0 ).setDisplayRange( 0, 6000 );
-		sources.get( 1 ).setDisplayRange( 0, 6000 );
-		sources.get( 2 ).setDisplayRange( 0, 6000 );
-		sources.get( 0 ).setColor( new ARGBType( 0xffff0000 ) );
-		sources.get( 1 ).setColor( new ARGBType( 0xff00ff00 ) );
-		sources.get( 2 ).setColor( new ARGBType( 0xff0000ff ) );
-		*/
+		float [][] RGBLutTable = new float[256][3];
+		for(int i=0;i<256;i++)
+			for(int j=0;j<3;j++)
+			{
+				RGBLutTable [i][j]=i/255.0f;
+			}
+		return RGBLutTable;*/
+		//return;
 	}
 }

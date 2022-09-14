@@ -24,7 +24,7 @@ public class RealARGBColorGammaConverterSetup implements GammaConverterSetup {
 	/**0 = maximum intensity projection; 1 = transparency **/
 	private int nRenderType =0; 
 	
-	private boolean iniLUT = false;
+	private boolean useLUT = false;
 
 	public RealARGBColorGammaConverterSetup( final int setupId, final ColorConverter... converters )
 	{
@@ -151,22 +151,13 @@ public class RealARGBColorGammaConverterSetup implements GammaConverterSetup {
 			}
 			if(converter instanceof ColorGammaConverter)
 			{
-				lut =new float[256][3];
-				int [] val = new int[3];
-				val[0] = ARGBType.red(color.get());
-				val[1] = ARGBType.green(color.get());
-				val[2] = ARGBType.blue(color.get());
-				for(int i=0;i<256;i++)
-					for(int j=0;j<3;j++)
-					{
-						lut [i][j]=Math.round(val[j]*((float)i)/255.0f);
-					}
-				iniLUT = true;
+				useLUT=false;
 			}
 		}
 		if ( changed )
 			listeners.list.forEach( l -> l.setupParametersChanged( this ) );
 	}
+	
 
 	@Override
 	public boolean supportsColor()
@@ -250,67 +241,18 @@ public class RealARGBColorGammaConverterSetup implements GammaConverterSetup {
 		lut =new float[lut_in.length][];
 		for(int i=0;i<lut_in.length;i++)
 			lut[i]=lut_in[i].clone();
-		iniLUT = true;
+		useLUT = true;
 	}
 
 	@Override
 	public float[][] getLUT() {
 		
-		//return grayscale
-		if(!iniLUT)
-		{
-			lut =new float[256][3];
-			for(int i=0;i<256;i++)
-				for(int j=0;j<3;j++)
-				{
-					lut [i][j]=i/255.0f;
-				}
-		}
-		return lut;
+		if(!useLUT)
+			return null;
+		else
+			return lut;
 	}
 
-	/** function gets LUT specified by sZLUTName in settings
-	 * and returns 256x3 table map in HSB format */
-	static public float [][]  getRGBLutTable(String sLUTName)
-	{
-		/*int i,j;
-	
-		int [] onepix; 
-		float [][] RGBLutTable = new float[256][3];
-		ByteProcessor ish = new ByteProcessor(256,1);
-		for ( i=0; i<256; i++)
-			for (j=0; j<10; j++)
-				ish.putPixel(i, j, i);
-		ImagePlus ccc = new ImagePlus("test",ish);
-		ccc.show();
-		IJ.run(sLUTName);
-		IJ.run("RGB Color");
-		//ipLUT= (ColorProcessor) ccc.getProcessor();
-		ccc.setSlice(1);
-		for(i=0;i<256;i++)
-		{
-			
-			onepix= ccc.getPixel(i, 0);
-			//rgbtable[i]=ccc.getPixel(i, 1);
-			//java.awt.Color.RGBtoHSB(onepix[0], onepix[1], onepix[2], hsbvals);
-			RGBLutTable[i][0]=(float)(onepix[0]/255.0f);
-			RGBLutTable[i][1]=(float)(onepix[1]/255.0f);
-			RGBLutTable[i][2]=(float)(onepix[2]/255.0f);
-		}
-
-		ccc.changes=false;
-		ccc.close();
-		*/
-		
-		float [][] RGBLutTable = new float[256][3];
-		for(int i=0;i<256;i++)
-			for(int j=0;j<3;j++)
-			{
-				RGBLutTable [i][j]=i/255.0f;
-			}
-		return RGBLutTable;
-		//return;
-	}
 
 	@Override
 	public void setRenderType(int nRender) {
@@ -323,6 +265,12 @@ public class RealARGBColorGammaConverterSetup implements GammaConverterSetup {
 	@Override
 	public int getRenderType() {
 		return nRenderType;
+	}
+
+	@Override
+	public boolean useLut() {
+
+		return useLUT;
 	}
 
 

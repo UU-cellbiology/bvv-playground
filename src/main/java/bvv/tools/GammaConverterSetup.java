@@ -15,6 +15,7 @@ public interface GammaConverterSetup extends ConverterSetup {
 	double getAlphaGamma();
 	void setLUT(float [][] lut_in);
 	float [][] getLUT();	
+	boolean useLut();
 	void setRenderType(int nRender);
 	int getRenderType ();
 }

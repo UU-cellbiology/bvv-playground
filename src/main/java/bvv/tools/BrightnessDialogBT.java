@@ -503,7 +503,7 @@ public class BrightnessDialogBT extends DelayedPackDialog
 	            	final boolean bSelected = syncBox.isSelected();
 	            	group.bSync = bSelected;
 	            	spinnerRangeMin.bSync = bSelected;
-	            	spinnerRangeMin.bSync  = bSelected;
+	            	spinnerRangeMax.bSync  = bSelected;
 	            	spinnerGammaRangeMin.bSync = bSelected;
 	            	spinnerGammaRangeMax.bSync = bSelected;
 	            	

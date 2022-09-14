@@ -41,6 +41,7 @@ import bdv.spimdata.XmlIoSpimDataMinimal;
 import bdv.tools.brightness.ConverterSetup;
 import bdv.util.AxisOrder;
 import bdv.util.RandomAccessibleIntervalSource;
+import bdv.viewer.Interpolation;
 import bdv.viewer.SourceAndConverter;
 import bvv.tools.RealARGBColorGammaConverterSetup;
 import bvv.util.Bvv;
@@ -74,8 +75,12 @@ public class Example_gamma_lut_render
 		
 		//final ImagePlus imp = IJ.openImage( "https://imagej.nih.gov/ij/images/t1-head.zip" );
 		//final Img< UnsignedShortType > img = ImageJFunctions.wrapShort( imp );
-		final ImagePlus imp = IJ.openImage( "/home/eugene/Desktop/BigTrace_data/ExM_MT_8bit_blur.tif" );
+		//final ImagePlus imp = IJ.openImage( "/home/eugene/Desktop/BigTrace_data/ExM_MT_8bit_blur.tif" );
+		final ImagePlus imp = IJ.openImage( "/home/eugene/Desktop/emma8bit.tif" );
 		final Img< UnsignedByteType > img = ImageJFunctions.wrapByte( imp );
+
+		//final ImagePlus imp = IJ.openImage( "/home/eugene/Desktop/emma16bit.tif" );
+		//final Img< UnsignedShortType > img = ImageJFunctions.wrapShort( imp );
 		//final ImagePlus imp = IJ.openImage( "/home/eugene/Desktop/BigTrace_data/ch2.tif" );
 		//final Img< UnsignedByteType > img = ImageJFunctions.wrapByte( imp );
 		//final ImagePlus imp2 = IJ.openImage( "/home/eugene/Desktop/BigTrace_data/ch1.tif" );
@@ -94,18 +99,19 @@ public class Example_gamma_lut_render
 		RealARGBColorGammaConverterSetup conv1 = (RealARGBColorGammaConverterSetup) source.getConverterSetups().get(0);
 		
 		//set LUT
-		conv1.setLUT(RealARGBColorGammaConverterSetup.getRGBLutTable("Fire"));
+		//conv1.setLUT(RealARGBColorGammaConverterSetup.getRGBLutTable("Fire"));
 		//set render type (1 = transparency, 0 = max intensity projection)
-		conv1.setRenderType(1);
+		conv1.setRenderType(0);
 	
 
-		//RealARGBColorGammaConverterSetup conv2 = (RealARGBColorGammaConverterSetup) source2.getConverterSetups().get(0);		
+		RealARGBColorGammaConverterSetup conv2 = (RealARGBColorGammaConverterSetup) source.getConverterSetups().get(1);		
 		//conv2.setLUT(RealARGBColorGammaConverterSetup.getRGBLutTable("Grays"));
-		//conv2.setRenderType(1);
+		conv2.setRenderType(0);
 		
 		
 		
 		//final VolumeViewerPanel viewer = source.getBvvHandle().getViewerPanel();
+		//viewer.state().setInterpolation(Interpolation.NLINEAR);
 		////set background color
 		//viewer.setRenderScene( ( gl, data ) -> {
 		//	gl.glClearColor(1.0f, 1.0f, 1.0f, 1.0f);

@@ -259,7 +259,7 @@ public class MultiVolumeShaderMip
 				"volume", "sampleVolume" ) );
 		segments.put( SegmentType.Convert, new SegmentTemplate(
 				"convert.frag",
-				"convert", "offset", "scale", "gamma", "alphagamma","renderType","lut" ) );
+				"convert", "offset", "scale", "gamma", "alphagamma","renderType","useLUT","lut" ) );
 		segments.put( SegmentType.ConvertRGBA, new SegmentTemplate(
 				"convert_rgba.frag",
 				"convert", "offset", "scale" ) );
@@ -436,7 +436,7 @@ public class MultiVolumeShaderMip
 		private final Uniform4f uniformScale;
 		private final Uniform1f uniformGamma;
 		private final Uniform1f uniformGammaAlpha;
-		
+		private final Uniform1i uniformUseLUT;
 		private final Uniform1i uniformRenderType;
 		private final Uniform3fv lut; 
 
@@ -450,6 +450,7 @@ public class MultiVolumeShaderMip
 			uniformGamma = prog.getUniform1f( segment,"gamma" );
 			uniformGammaAlpha = prog.getUniform1f( segment,"alphagamma" );
 			uniformRenderType = prog.getUniform1i( segment,"renderType" );
+			uniformUseLUT = prog.getUniform1i( segment,"useLUT" );
 			lut = prog.getUniform3fv(segment,"lut");
 					
 
@@ -480,8 +481,8 @@ public class MultiVolumeShaderMip
 			uniformRenderType.set(0);
 			if (converter instanceof GammaConverterSetup)
 			{		
-				uniformGamma.set((float)((GammaConverterSetup)converter).getDisplayGamma());
-				uniformGammaAlpha.set((float)((GammaConverterSetup)converter).getAlphaGamma());
+				uniformGamma.set(1.0f/(float)((GammaConverterSetup)converter).getDisplayGamma());
+				uniformGammaAlpha.set(1.0f/(float)((GammaConverterSetup)converter).getAlphaGamma());
 				uniformRenderType.set(((GammaConverterSetup)converter).getRenderType());
 				fminA = ((GammaConverterSetup)converter).getAlphaRangeMin() / rangeScale;
 				fmaxA = ((GammaConverterSetup)converter).getAlphaRangeMax() / rangeScale;
@@ -500,34 +501,49 @@ public class MultiVolumeShaderMip
 			}
 			else
 			{
-				//TODO change it to LUT vs no LUT, for now like this
-				final int color = converter.getColor().get();
-				final double r = ( double ) ARGBType.red( color ) / 255.0;
-				final double g = ( double ) ARGBType.green( color ) / 255.0;
-				final double b = ( double ) ARGBType.blue( color ) / 255.0;
-
-//				final double l = 0.2126 * r + 0.7152 * g + 0.0722 * b;
-//				final double l = 0.299 * r + 0.587 * g + 0.114 * b;
-
-				uniformOffset.set(
-						( float ) ( o * r ),
-						( float ) ( o * g ),
-						( float ) ( o * b ),
-						( float ) ( oA ) );
-				uniformScale.set(
-						( float ) ( s * r ),
-						( float ) ( s * g ),
-						( float ) ( s * b ),
-						( float ) ( sA ) );
-
+				boolean bUseLUT = false;
+				
 				if (converter instanceof GammaConverterSetup)
 				{
-					lut.set(((GammaConverterSetup) converter).getLUT());
-					//lut.set(getRGBLutTable("Fire"));
+					if(((GammaConverterSetup) converter).useLut())
+					{
+						lut.set(((GammaConverterSetup) converter).getLUT());
+						bUseLUT = true;
+						uniformUseLUT.set(1);
+						uniformOffset.set(
+								( float ) ( o * 1.0 ),
+								( float ) ( o * 1.0 ),
+								( float ) ( o * 1.0 ),
+								( float ) ( oA ) );
+						uniformScale.set(
+								( float ) ( s * 1.0 ),
+								( float ) ( s * 1.0 ),
+								( float ) ( s * 1.0 ),
+								( float ) ( sA ) );
+					}
+					
 				}
-				else
+				
+				
+				if(!bUseLUT)
 				{
-					lut.set(RealARGBColorGammaConverterSetup.getRGBLutTable("Grays"));
+					uniformUseLUT.set(0);
+				
+					final int color = converter.getColor().get();
+					final double r = ( double ) ARGBType.red( color ) / 255.0;
+					final double g = ( double ) ARGBType.green( color ) / 255.0;
+					final double b = ( double ) ARGBType.blue( color ) / 255.0;
+
+					uniformOffset.set(
+							( float ) ( o * r ),
+							( float ) ( o * g ),
+							( float ) ( o * b ),
+							( float ) ( oA ) );
+					uniformScale.set(
+							( float ) ( s * r ),
+							( float ) ( s * g ),
+							( float ) ( s * b ),
+							( float ) ( sA ) );
 				}
 			}
 		}
