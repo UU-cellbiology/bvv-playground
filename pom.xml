@@ -10,10 +10,10 @@
 
 	<groupId>sc.fiji</groupId>
 	<artifactId>bvv-playground</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>0.0.2-SNAPSHOT</version>
 
 	<name>BVV-playground</name>
-	<description>Volume rendering of bdv datasets</description>
+	<description>Volume rendering of bdv datasets with gamma and transparency option</description>
 	<url>https://github.com/ekatrukha/bvv-playground</url>
 	<inceptionYear>2018</inceptionYear>
 	<organization>

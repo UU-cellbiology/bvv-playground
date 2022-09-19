@@ -40,7 +40,6 @@ import ij.process.ByteProcessor;
 import java.util.List;
 import mpicbg.spim.data.SpimDataException;
 import net.imglib2.FinalRealInterval;
-import net.imglib2.type.numeric.ARGBType;
 
 public class Example05
 {
@@ -65,7 +64,7 @@ public class Example05
 			minI[i]=50.0;
 			maxI[i]=150.0;
 		}
-		//conv1.setCropInterval(new FinalRealInterval(minI,maxI));
+		conv1.setCropInterval(new FinalRealInterval(minI,maxI));
 		
 		RealARGBColorGammaConverterSetup conv2 = (RealARGBColorGammaConverterSetup) sources.get(1).getConverterSetups().get(0);
 		conv2.setRenderType(1);

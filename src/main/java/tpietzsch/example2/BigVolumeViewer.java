@@ -28,16 +28,15 @@
  */
 package tpietzsch.example2;
 
-import static bdv.BigDataViewer.initSetups;
 
 import bdv.viewer.ConverterSetups;
 import bdv.viewer.SynchronizedViewerState;
 import bdv.viewer.ViewerState;
 import bvv.tools.BrightnessDialogBT;
 import bvv.tools.BvvGamma;
+import bvv.tools.GammaConverterSetup;
 import bvv.tools.MinMaxGroupBT;
 import bvv.tools.SetupAssignmentsBT;
-import ij.ImageJ;
 
 import com.jogamp.opengl.GL3;
 
@@ -193,6 +192,7 @@ public class BigVolumeViewer
 		actions.namedAction( new ToggleDialogAction( "toggle brightness dialog", brightnessDialog ), "S" );
 		actions.namedAction( new ToggleDialogAction( "toggle active sources dialog", activeSourcesDialog ), "F6" );
 		actions.runnableAction( manualTransformationEditor::toggle, "toggle manual transformation", "T" );
+		actions.runnableAction( this::toggleRender, "toggle rendertype", "P" );
 		actions.runnableAction( this::loadSettings, "load settings", "F12" );
 		actions.runnableAction( this::saveSettings, "save settings", "F11" );
 	}
@@ -453,6 +453,22 @@ public class BigVolumeViewer
 			cubeAndTransforms.add( new CubeAndTransform( cube, model ) );
 		}
 		viewer.requestRepaint();
+	}
+	
+	void toggleRender()
+	{
+		for ( final ConverterSetup setup : setupAssignments.getConverterSetups() )
+			if (setup instanceof GammaConverterSetup)
+			{
+				if(((GammaConverterSetup)setup).getRenderType()==0)
+				{
+					((GammaConverterSetup)setup).setRenderType(1);
+				}
+				else
+				{
+					((GammaConverterSetup)setup).setRenderType(0);
+				}
+			}
 	}
 
 	// -------------------------------------------------------------------------------------------------------

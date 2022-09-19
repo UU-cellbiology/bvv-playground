@@ -34,7 +34,7 @@ import org.scijava.command.Command;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
 
-@Plugin(type = Command.class, menuPath = "Plugins>BigDataViewer>Volume Rendering Tech Demo")
+@Plugin(type = Command.class, menuPath = "Plugins>BigDataViewer>BVV-playground")
 public class BigVolumeViewerCommand implements Command
 {
 
