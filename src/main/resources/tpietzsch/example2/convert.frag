@@ -11,6 +11,7 @@ vec4 convert(vec4 acc, float v )
 	vec4 finC = vec4(0);
 	
 	finC.a = pow(clamp(offset.a + scale.a * v,0.0,1.0),alphagamma);		
+	//finC.a = clamp(pow(offset.a + scale.a * v,alphagamma),0.0,1.0);		
 
 	if(useLUT >0)
 	{
@@ -37,8 +38,9 @@ vec4 convert(vec4 acc, float v )
 		  				
 		if(finC.a>0.99)
 		{
-			acc.a = 100;
-			return acc;
+			//finC=acc;
+			finC.a = 100;
+			//return acc;
 		}
 		return finC;
 		

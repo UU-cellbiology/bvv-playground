@@ -35,7 +35,7 @@ float sampleVolume( vec4 wpos, sampler3D volumeCache, vec3 cacheSize, vec3 block
 	float cropf = 1.0;
 	if(cropactive>0)
 	{
-		vec3 poscrop = (im * wpos).xyz ;
+		vec3 poscrop = pos - 0.5;
 		vec3 s = step((im*vec4(cropmin,0.0)).xyz, poscrop) - step((im*vec4(cropmax,0.0)).xyz, poscrop);		
 		cropf= s.x * s.y * s.z;
 	} 
