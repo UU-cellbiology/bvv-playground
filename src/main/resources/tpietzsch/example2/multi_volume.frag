@@ -83,8 +83,9 @@ void main()
 
 		float step = tnear;
 		vec4 v = vec4(0);
+		vec4 vold = vec4(0);
+		
 		//vec4 newval;
-
 		//vec4 vold;
 		//step=tfar;
 		//for (int i = numSteps-1; i >=0 ; --i, step -= nw + step * fwnw)
@@ -104,7 +105,7 @@ void main()
 			}
 			*/
 
-			if(v.a>99)
+			if(v.a>0.99)
 			{
 				v.a=1.0;
 				i=numSteps;

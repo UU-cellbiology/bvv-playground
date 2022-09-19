@@ -49,8 +49,8 @@ public class Example05
 	 */
 	public static void main( final String[] args ) throws SpimDataException
 	{
-		//final String xmlFilename = "/home/eugene/Desktop/export.xml";
-		final String xmlFilename = "/home/eugene/Desktop/emma_test.xml";
+		final String xmlFilename = "/home/eugene/Desktop/export.xml";
+		//final String xmlFilename = "/home/eugene/Desktop/emma_test.xml";
 		final SpimDataMinimal spimData = new XmlIoSpimDataMinimal().load( xmlFilename );
 
 		final List< BvvStackSource< ? > > sources = BvvFunctions.show( spimData );
@@ -65,7 +65,7 @@ public class Example05
 			minI[i]=50.0;
 			maxI[i]=150.0;
 		}
-		conv1.setCropInterval(new FinalRealInterval(minI,maxI));
+		//conv1.setCropInterval(new FinalRealInterval(minI,maxI));
 		
 		RealARGBColorGammaConverterSetup conv2 = (RealARGBColorGammaConverterSetup) sources.get(1).getConverterSetups().get(0);
 		conv2.setRenderType(1);
