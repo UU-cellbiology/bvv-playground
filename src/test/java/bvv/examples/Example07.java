@@ -28,9 +28,8 @@
  */
 package bvv.examples;
 
-import bvv.util.Bvv;
-import bvv.util.BvvFunctions;
-import bvv.util.BvvSource;
+import bvvbigtrace.example2.VolumeViewerPanel;
+import bvvbigtrace.scene.TexturedUnitCube;
 import ij.IJ;
 import ij.ImagePlus;
 import net.imglib2.img.Img;
@@ -39,8 +38,10 @@ import net.imglib2.realtransform.AffineTransform3D;
 import net.imglib2.type.numeric.ARGBType;
 import net.imglib2.type.numeric.integer.UnsignedShortType;
 import org.joml.Matrix4f;
-import tpietzsch.example2.VolumeViewerPanel;
-import tpietzsch.scene.TexturedUnitCube;
+
+import btbvv.util.Bvv;
+import btbvv.util.BvvFunctions;
+import btbvv.util.BvvSource;
 
 public class Example07
 {

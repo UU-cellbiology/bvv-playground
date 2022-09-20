@@ -30,9 +30,9 @@ package bvv.examples;
 
 import bdv.spimdata.SpimDataMinimal;
 import bdv.spimdata.XmlIoSpimDataMinimal;
-import bvv.tools.RealARGBColorGammaConverterSetup;
-import bvv.util.BvvFunctions;
-import bvv.util.BvvStackSource;
+import btbvv.tools.RealARGBColorGammaConverterSetup;
+import btbvv.util.BvvFunctions;
+import btbvv.util.BvvStackSource;
 import ij.IJ;
 import ij.ImagePlus;
 import ij.process.ByteProcessor;
@@ -48,8 +48,8 @@ public class Example05
 	 */
 	public static void main( final String[] args ) throws SpimDataException
 	{
-		final String xmlFilename = "/home/eugene/Desktop/export.xml";
-		//final String xmlFilename = "/home/eugene/Desktop/emma_test.xml";
+		//final String xmlFilename = "/home/eugene/Desktop/export.xml";
+		final String xmlFilename = "/home/eugene/Desktop/emma_test.xml";
 		final SpimDataMinimal spimData = new XmlIoSpimDataMinimal().load( xmlFilename );
 
 		final List< BvvStackSource< ? > > sources = BvvFunctions.show( spimData );

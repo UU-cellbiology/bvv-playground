@@ -5,12 +5,12 @@
 	<parent>
 		<groupId>org.scijava</groupId>
 		<artifactId>pom-scijava</artifactId>
-		<version>30.0.0</version>
+		<version>33.2.0</version>
 	</parent>
 
 	<groupId>sc.fiji</groupId>
 	<artifactId>bvv-playground</artifactId>
-	<version>0.0.2-SNAPSHOT</version>
+	<version>0.0.2</version>
 
 	<name>BVV-playground</name>
 	<description>Volume rendering of bdv datasets with gamma and transparency option</description>
@@ -78,11 +78,11 @@
 	</ciManagement>
 
 	<properties>
-		<package-name>tpietzsch</package-name>
+		<package-name>bvvplayground</package-name>
 		<license.licenseName>bsd_2</license.licenseName>
 		<license.copyrightOwners>Tobias Pietzsch</license.copyrightOwners>
 
-		<bigdataviewer-core.version>10.2.0</bigdataviewer-core.version>
+		<bigdataviewer-core.version>10.4.3</bigdataviewer-core.version>
 		<bigdataviewer-vistools.version>1.0.0-beta-28</bigdataviewer-vistools.version>
 		<imglib2-cache.version>1.0.0-beta-16</imglib2-cache.version>
 		<ST4.version>4.0.8</ST4.version>
@@ -141,10 +141,12 @@
 		<dependency>
 			<groupId>org.jogamp.gluegen</groupId>
 			<artifactId>gluegen-rt-main</artifactId>
+			<version>2.4.0-rc-20210111</version>
 		</dependency>
 		<dependency>
 			<groupId>org.jogamp.jogl</groupId>
 			<artifactId>jogl-all-main</artifactId>
+			<version>2.4.0-rc-20210111</version>
 		</dependency>
 		<dependency>
 			<groupId>org.joml</groupId>

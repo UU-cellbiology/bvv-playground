@@ -43,12 +43,13 @@ import bdv.util.AxisOrder;
 import bdv.util.RandomAccessibleIntervalSource;
 import bdv.viewer.Interpolation;
 import bdv.viewer.SourceAndConverter;
-import bvv.tools.RealARGBColorGammaConverterSetup;
-import bvv.util.Bvv;
-import bvv.util.BvvFunctions;
-import bvv.util.BvvHandle;
-import bvv.util.BvvSource;
-import bvv.util.BvvStackSource;
+import btbvv.tools.RealARGBColorGammaConverterSetup;
+import btbvv.util.Bvv;
+import btbvv.util.BvvFunctions;
+import btbvv.util.BvvHandle;
+import btbvv.util.BvvSource;
+import btbvv.util.BvvStackSource;
+import bvvbigtrace.example2.VolumeViewerPanel;
 import ij.IJ;
 import ij.ImagePlus;
 import net.imglib2.FinalRealInterval;
@@ -63,7 +64,6 @@ import net.imglib2.type.numeric.ARGBType;
 import net.imglib2.type.numeric.integer.UnsignedByteType;
 import net.imglib2.type.numeric.integer.UnsignedShortType;
 import net.imglib2.view.Views;
-import tpietzsch.example2.VolumeViewerPanel;
 
 
 public class Example_gamma_lut_render

@@ -29,8 +29,8 @@
 
 package bvv.examples;
 
-import bvv.util.BvvFunctions;
-import bvv.util.BvvSource;
+import btbvv.util.BvvFunctions;
+import btbvv.util.BvvSource;
 import ij.IJ;
 import ij.ImagePlus;
 import net.imglib2.img.Img;

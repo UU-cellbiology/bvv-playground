@@ -28,8 +28,8 @@
  */
 package bvv.examples;
 
-import bvv.util.Bvv;
-import bvv.util.BvvFunctions;
+import btbvv.util.Bvv;
+import btbvv.util.BvvFunctions;
 import ij.IJ;
 import ij.ImagePlus;
 import net.imglib2.img.Img;
