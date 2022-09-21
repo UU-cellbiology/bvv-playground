@@ -26,7 +26,6 @@
  * POSSIBILITY OF SUCH DAMAGE.
  * #L%
  */
-
 package bvv.examples;
 
 import btbvv.util.BvvFunctions;
@@ -35,7 +34,6 @@ import ij.IJ;
 import ij.ImagePlus;
 import net.imglib2.img.Img;
 import net.imglib2.img.display.imagej.ImageJFunctions;
-import net.imglib2.realtransform.AffineTransform3D;
 import net.imglib2.type.numeric.integer.UnsignedShortType;
 
 public class Example01
@@ -49,9 +47,6 @@ public class Example01
 		final Img< UnsignedShortType > img = ImageJFunctions.wrapShort( imp );
 
 		final BvvSource source = BvvFunctions.show( img, "t1-head" );
-		AffineTransform3D transform = new AffineTransform3D();
-		
-		source.getBvvHandle().getViewerPanel().state().getViewerTransform(transform);
 
 		// source handle can be used to set color, display range, visibility, ...
 		source.setDisplayRange( 0, 555 );

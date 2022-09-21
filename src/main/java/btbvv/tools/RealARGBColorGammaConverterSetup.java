@@ -243,6 +243,8 @@ public class RealARGBColorGammaConverterSetup implements GammaConverterSetup {
 		for(int i=0;i<lut_in.length;i++)
 			lut[i]=lut_in[i].clone();
 		useLUT = true;
+		
+		listeners.list.forEach( l -> l.setupParametersChanged( this ) );
 	}
 
 	@Override
@@ -261,6 +263,7 @@ public class RealARGBColorGammaConverterSetup implements GammaConverterSetup {
 			nRenderType = 1;
 		else
 			nRenderType = 0;
+		listeners.list.forEach( l -> l.setupParametersChanged( this ) );
 	}
 
 	@Override
@@ -284,6 +287,7 @@ public class RealARGBColorGammaConverterSetup implements GammaConverterSetup {
 	public void setCropInterval(RealInterval cropInt) {
 		this.cropInt = new FinalRealInterval(cropInt);
 		cropActive = true;
+		listeners.list.forEach( l -> l.setupParametersChanged( this ) );
 	}
 
 	@Override

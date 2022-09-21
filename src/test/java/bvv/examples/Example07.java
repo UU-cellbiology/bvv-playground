@@ -28,20 +28,18 @@
  */
 package bvv.examples;
 
-import bvvbigtrace.example2.VolumeViewerPanel;
-import bvvbigtrace.scene.TexturedUnitCube;
+import btbvv.util.Bvv;
+import btbvv.util.BvvFunctions;
+import btbvv.util.BvvSource;
 import ij.IJ;
 import ij.ImagePlus;
 import net.imglib2.img.Img;
 import net.imglib2.img.display.imagej.ImageJFunctions;
-import net.imglib2.realtransform.AffineTransform3D;
 import net.imglib2.type.numeric.ARGBType;
 import net.imglib2.type.numeric.integer.UnsignedShortType;
 import org.joml.Matrix4f;
-
-import btbvv.util.Bvv;
-import btbvv.util.BvvFunctions;
-import btbvv.util.BvvSource;
+import bvvbigtrace.example2.VolumeViewerPanel;
+import bvvbigtrace.scene.TexturedUnitCube;
 
 public class Example07
 {
@@ -66,7 +64,5 @@ public class Example07
 		} );
 
 		viewer.requestRepaint();
-		
-		
 	}
 }
