@@ -9,7 +9,9 @@ import ij.process.ByteProcessor;
 import net.imglib2.FinalRealInterval;
 import net.imglib2.img.Img;
 import net.imglib2.img.display.imagej.ImageJFunctions;
+import net.imglib2.type.numeric.ARGBType;
 import net.imglib2.type.numeric.integer.UnsignedShortType;
+
 
 public class BT_Example01 {
 	
@@ -18,11 +20,13 @@ public class BT_Example01 {
 	 */
 	public static void main( final String[] args )
 	{
-		final ImagePlus imp = IJ.openImage( "https://imagej.nih.gov/ij/images/t1-head.zip" );
-		final Img< UnsignedShortType > img = ImageJFunctions.wrapShort( imp );
+		final ImagePlus imp = IJ.openImage( "/home/eugene/Desktop/t1-head_RGB.tif" );
+		//final ImagePlus imp = IJ.openImage( "https://imagej.nih.gov/ij/images/t1-head.zip" );
+		final Img< ARGBType > img = ImageJFunctions.wrapRGBA( imp );
 		
-		final BvvStackSource<UnsignedShortType> source = BvvFunctions.show( img, "t1-head" );
+		final BvvStackSource<ARGBType> source = BvvFunctions.show( img, "t1-head" );
 	
+		
 		//get the converter setup from the source
 		RealARGBColorGammaConverterSetup converterSetup = (RealARGBColorGammaConverterSetup) source.getConverterSetups().get(0);
 		
@@ -50,6 +54,7 @@ public class BT_Example01 {
 		minI[2]=0.5*maxI[2];
 		
 		converterSetup.setCropInterval(new FinalRealInterval(minI,maxI));
+		
 	}
 	
 	//a helper function to get LUT array from ImageJ

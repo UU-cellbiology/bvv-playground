@@ -8,7 +8,6 @@ import bdv.ViewerImgLoader;
 import bdv.ViewerSetupImgLoader;
 import bdv.VolatileSpimSource;
 import bdv.tools.brightness.ConverterSetup;
-import bdv.tools.brightness.RealARGBColorConverterSetup;
 import bdv.viewer.SourceAndConverter;
 import mpicbg.spim.data.generic.AbstractSpimData;
 import mpicbg.spim.data.generic.sequence.BasicViewSetup;
@@ -28,12 +27,12 @@ public class BvvGamma {
 	/**
 	 * Create standard converter from the given {@code type} to ARGB:
 	 * <ul>
-	 * <li>For {@code RealType}s a {@link RealARGBColorConverter} is
+	 * <li>For {@code RealType}s a {@link RealARGBColorGammaConverter} is
 	 * returned.</li>
-	 * <li>For {@code ARGBType}s a {@link ScaledARGBConverter.ARGB} is
+	 * <li>For {@code ARGBType}s a {@link ScaledARGBGammaConverter.ARGB} is
 	 * returned.</li>
 	 * <li>For {@code VolatileARGBType}s a
-	 * {@link ScaledARGBConverter.VolatileARGB} is returned.</li>
+	 * {@link ScaledARGBGammaConverter.VolatileARGB} is returned.</li>
 	 * </ul>
 	 */
 	@SuppressWarnings( "unchecked" )
@@ -47,9 +46,9 @@ public class BvvGamma {
 			return ( Converter< T, ARGBType > ) RealARGBColorGammaConverter.create( t, typeMin, typeMax, 1.0 );
 		}
 		else if ( type instanceof ARGBType )
-			return ( Converter< T, ARGBType > ) new ScaledARGBConverter.ARGB( 0, 255 );
+			return ( Converter< T, ARGBType > ) new ScaledARGBGammaConverter.ARGB( 0, 255, 1.0);
 		else if ( type instanceof VolatileARGBType )
-			return ( Converter< T, ARGBType > ) new ScaledARGBConverter.VolatileARGB( 0, 255 );
+			return ( Converter< T, ARGBType > ) new ScaledARGBGammaConverter.VolatileARGB( 0, 255, 1.0 );
 		else
 			throw new IllegalArgumentException( "ImgLoader of type " + type.getClass() + " not supported." );
 	}

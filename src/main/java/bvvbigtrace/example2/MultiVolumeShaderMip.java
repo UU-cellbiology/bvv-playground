@@ -253,14 +253,14 @@ public class MultiVolumeShaderMip
 				"volume", "sampleVolume" ) );
 		segments.put( SegmentType.SampleRGBAVolume, new SegmentTemplate(
 				"sample_volume_simple_rgba.frag",
-				"im", "sourcemax", "intersectBoundingBox",
+				"im", "sourcemax", "cropactive", "cropmin", "cropmax", "intersectBoundingBox",
 				"volume", "sampleVolume" ) );
 		segments.put( SegmentType.Convert, new SegmentTemplate(
 				"convert.frag",
 				"convert", "offset", "scale", "gamma", "alphagamma","renderType","useLUT","lut" ) );
 		segments.put( SegmentType.ConvertRGBA, new SegmentTemplate(
 				"convert_rgba.frag",
-				"convert", "offset", "scale" ) );
+				"convert", "offset", "scale", "gamma", "alphagamma","renderType","useLUT","lut" ) );
 		segments.put( SegmentType.MaxDepth, new SegmentTemplate(
 				useDepthTexture ? "maxdepthtexture.frag" : "maxdepthone.frag" ) );
 		segments.put( SegmentType.VertexShader, new SegmentTemplate( "multi_volume.vert" ) );
@@ -510,6 +510,7 @@ public class MultiVolumeShaderMip
 
 			if ( pixelType == ARGB )
 			{
+				uniformUseLUT.set(0);
 				uniformOffset.set( ( float ) o, ( float ) o, ( float ) o, ( float ) oA );
 				uniformScale.set( ( float ) s, ( float ) s, ( float ) s, ( float ) sA );
 			}

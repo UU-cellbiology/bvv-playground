@@ -83,7 +83,6 @@ void main()
 
 		float step = tnear;
 		vec4 v = vec4(0);
-		vec4 vold = vec4(0);
 		
 		//vec4 newval;
 		//vec4 vold;
