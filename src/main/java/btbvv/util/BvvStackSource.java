@@ -34,6 +34,7 @@ import bdv.util.Bounds;
 import bdv.viewer.ConverterSetupBounds;
 import bdv.viewer.SourceAndConverter;
 import btbvv.tools.GammaConverterSetup;
+import btbvv.tools.MinMaxGroupBT;
 import btbvv.tools.SetupAssignmentsBT;
 import bvvbigtrace.multires.SourceStacks;
 
@@ -184,6 +185,51 @@ public class BvvStackSource< T > extends BvvSource
 			groups.add( sa.getMinMaxGroup( setup ) );
 		for ( final MinMaxGroup group : groups )
 			group.setRange( min, max );
+	}
+	
+	@Override
+	public void setDisplayGammaRangeBounds( final double min, final double max )
+	{
+		// TODO: REMOVE
+		final HashSet< MinMaxGroup > groups = new HashSet<>();
+		final SetupAssignmentsBT sa = getBvvHandle().getSetupAssignments();
+		for ( final ConverterSetup setup : converterSetups )
+			groups.add( sa.getMinMaxGroup( setup ) );
+		for ( final MinMaxGroup group : groups )
+		{
+			if(group instanceof MinMaxGroupBT)
+				((MinMaxGroupBT)group).gammaRange.setRange(min, max);
+		}
+	}
+	
+	@Override
+	public void setAlphaRangeBounds(final double min, final double max)
+	{
+		// TODO: REMOVE
+		final HashSet< MinMaxGroup > groups = new HashSet<>();
+		final SetupAssignmentsBT sa = getBvvHandle().getSetupAssignments();
+		for ( final ConverterSetup setup : converterSetups )
+			groups.add( sa.getMinMaxGroup( setup ) );
+		for ( final MinMaxGroup group : groups )
+		{
+			if(group instanceof MinMaxGroupBT)
+				((MinMaxGroupBT)group).alphaRange.setRange(min, max);
+		}
+	}
+	
+	@Override
+	public void setAlphaGammaRangeBounds(final double min, final double max)
+	{
+		// TODO: REMOVE
+		final HashSet< MinMaxGroup > groups = new HashSet<>();
+		final SetupAssignmentsBT sa = getBvvHandle().getSetupAssignments();
+		for ( final ConverterSetup setup : converterSetups )
+			groups.add( sa.getMinMaxGroup( setup ) );
+		for ( final MinMaxGroup group : groups )
+		{
+			if(group instanceof MinMaxGroupBT)
+				((MinMaxGroupBT)group).gammaAlphaRange.setRange(min, max);
+		}
 	}
 
 	@Override

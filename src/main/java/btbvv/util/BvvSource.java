@@ -50,13 +50,19 @@ public abstract class BvvSource implements Bvv
 
 	public abstract void setDisplayRange( final double min, final double max );
 	
+	public abstract void setDisplayRangeBounds( final double min, final double max );
+	
 	public abstract void setDisplayGamma( final double gamma );
 
-	public abstract void setDisplayRangeBounds( final double min, final double max );
+	public abstract void setDisplayGammaRangeBounds( final double min, final double max );
 	
 	public abstract void setAlphaRange(final double minAlpha, final double maxAlpha);
 	
+	public abstract void setAlphaRangeBounds(final double min, final double max);
+	
 	public abstract void setAlphaGamma( final double gammaAlpha );
+	
+	public abstract void setAlphaGammaRangeBounds(final double min, final double max);
 	
 	public abstract void setRenderType(final int nRenderType);
 	

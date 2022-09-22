@@ -1,9 +1,8 @@
 package bvv.examples;
 
-import btbvv.tools.RealARGBColorGammaConverterSetup;
+
 import btbvv.util.BvvFunctions;
 import btbvv.util.BvvSource;
-import btbvv.util.BvvStackSource;
 import ij.IJ;
 import ij.ImagePlus;
 import ij.process.ByteProcessor;
@@ -20,8 +19,8 @@ public class BT_Example01 {
 	 */
 	public static void main( final String[] args )
 	{
-		final ImagePlus imp = IJ.openImage( "/home/eugene/Desktop/t1-head.tif" );
-		//final ImagePlus imp = IJ.openImage( "https://imagej.nih.gov/ij/images/t1-head.zip" );
+		//final ImagePlus imp = IJ.openImage( "/home/eugene/Desktop/t1-head.tif" );
+		final ImagePlus imp = IJ.openImage( "https://imagej.nih.gov/ij/images/t1-head.zip" );
 		final Img< UnsignedShortType > img = ImageJFunctions.wrapShort( imp );
 		
 		final BvvSource source = BvvFunctions.show( img, "t1-head" );
