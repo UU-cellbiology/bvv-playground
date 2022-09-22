@@ -2,6 +2,7 @@ package bvv.examples;
 
 import btbvv.tools.RealARGBColorGammaConverterSetup;
 import btbvv.util.BvvFunctions;
+import btbvv.util.BvvSource;
 import btbvv.util.BvvStackSource;
 import ij.IJ;
 import ij.ImagePlus;
@@ -19,32 +20,31 @@ public class BT_Example01 {
 	 */
 	public static void main( final String[] args )
 	{
-		//final ImagePlus imp = IJ.openImage( "/home/eugene/Desktop/t1-head_RGB.tif" );
-		final ImagePlus imp = IJ.openImage( "https://imagej.nih.gov/ij/images/t1-head.zip" );
+		final ImagePlus imp = IJ.openImage( "/home/eugene/Desktop/t1-head.tif" );
+		//final ImagePlus imp = IJ.openImage( "https://imagej.nih.gov/ij/images/t1-head.zip" );
 		final Img< UnsignedShortType > img = ImageJFunctions.wrapShort( imp );
 		
-		final BvvStackSource<UnsignedShortType> source = BvvFunctions.show( img, "t1-head" );
+		final BvvSource source = BvvFunctions.show( img, "t1-head" );
 	
+		source.setDisplayRange(0, 655);
 		
-		//get the converter setup from the source
-		RealARGBColorGammaConverterSetup converterSetup = (RealARGBColorGammaConverterSetup) source.getConverterSetups().get(0);
-		
+			
 		//set volumetric rendering (1), instead of max intensity max intensity (0)
-		converterSetup.setRenderType(1);
+		source.setRenderType(1);
 		
 		//DisplayRange maps colors (or LUT values) to intensity values
-		converterSetup.setDisplayRange(0, 400);
+		source.setDisplayRange(0, 400);
 		//it is also possible to change LUT gamma value
-		//converterSetup.setDisplayGamma(0.9);
+		//source.setDisplayGamma(0.9);
 		
 		//alpha channel to intensity mapping can be changed independently
-		converterSetup.setAlphaRange(0, 500);
+		source.setAlphaRange(0, 500);
 		//it is also possible to change alpha-channel gamma value
-		//converterSetup.setAlphaGamma(0.9);
+		//source.setAlphaGamma(0.9);
 		
 		//assign a "Fire" lookup table to this source
 		//(input: float [256][3], the last index (color component) changes from 0 to 1)
-		converterSetup.setLUT(getRGBLutTable("Fire"));
+		source.setLUT(getRGBLutTable("Fire"));
 		
 		//crop half of the volume along Z axis in the shaders
 		//cropInterval is defined inside the "raw", non-transformed data interval
@@ -52,7 +52,7 @@ public class BT_Example01 {
 		double [] maxI = img.maxAsDoubleArray();
 		minI[2]=0.5*maxI[2];
 		
-		converterSetup.setCropInterval(new FinalRealInterval(minI,maxI));
+		source.setCropInterval(new FinalRealInterval(minI,maxI));
 		
 	}
 	

@@ -28,6 +28,7 @@
  */
 package btbvv.util;
 
+import net.imglib2.RealInterval;
 import net.imglib2.type.numeric.ARGBType;
 
 public abstract class BvvSource implements Bvv
@@ -48,10 +49,22 @@ public abstract class BvvSource implements Bvv
 	public abstract void removeFromBdv();
 
 	public abstract void setDisplayRange( final double min, final double max );
+	
+	public abstract void setDisplayGamma( final double gamma );
 
 	public abstract void setDisplayRangeBounds( final double min, final double max );
-
+	
+	public abstract void setAlphaRange(final double minAlpha, final double maxAlpha);
+	
+	public abstract void setAlphaGamma( final double gammaAlpha );
+	
+	public abstract void setRenderType(final int nRenderType);
+	
+	public abstract void setLUT(final float[][] lut_in);
+		
 	public abstract void setColor( final ARGBType color );
+	
+	public abstract void setCropInterval(RealInterval cropInt);
 
 	public abstract void setCurrent();
 

@@ -33,11 +33,14 @@ import bdv.tools.brightness.MinMaxGroup;
 import bdv.util.Bounds;
 import bdv.viewer.ConverterSetupBounds;
 import bdv.viewer.SourceAndConverter;
+import btbvv.tools.GammaConverterSetup;
 import btbvv.tools.SetupAssignmentsBT;
 import bvvbigtrace.multires.SourceStacks;
 
 import java.util.HashSet;
 import java.util.List;
+
+import net.imglib2.RealInterval;
 import net.imglib2.type.numeric.ARGBType;
 
 public class BvvStackSource< T > extends BvvSource
@@ -87,6 +90,84 @@ public class BvvStackSource< T > extends BvvSource
 	{
 		for ( final ConverterSetup setup : converterSetups )
 			setup.setDisplayRange( min, max );
+	}
+	
+	@Override
+	public void setDisplayGamma( final double gamma )
+	{
+		for ( final ConverterSetup setup : converterSetups )
+		{
+			if (setup instanceof GammaConverterSetup)
+			{
+				final GammaConverterSetup gconverter = ((GammaConverterSetup)setup);
+				gconverter.setDisplayGamma(gamma);
+			}
+		}
+	}
+	
+	@Override
+	public void setAlphaRange( final double minAlpha, final double maxAlpha )
+	{
+		for ( final ConverterSetup setup : converterSetups )
+		{
+			if (setup instanceof GammaConverterSetup)
+			{
+				final GammaConverterSetup gconverter = ((GammaConverterSetup)setup);
+				gconverter.setAlphaRange(minAlpha, maxAlpha);
+			}
+		}
+	}
+	
+	@Override
+	public void setAlphaGamma( final double gammaAlpha )
+	{
+		for ( final ConverterSetup setup : converterSetups )
+		{
+			if (setup instanceof GammaConverterSetup)
+			{
+				final GammaConverterSetup gconverter = ((GammaConverterSetup)setup);
+				gconverter.setAlphaGamma(gammaAlpha);
+			}
+		}
+	}
+	
+	@Override
+	public void setRenderType(final int nRenderType)
+	{
+		for ( final ConverterSetup setup : converterSetups )
+		{
+			if (setup instanceof GammaConverterSetup)
+			{
+				final GammaConverterSetup gconverter = ((GammaConverterSetup)setup);
+				gconverter.setRenderType(nRenderType);
+			}
+		}
+	}
+	
+	@Override
+	public void setLUT(final float[][] lut_in)
+	{
+		for ( final ConverterSetup setup : converterSetups )
+		{
+			if (setup instanceof GammaConverterSetup)
+			{
+				final GammaConverterSetup gconverter = ((GammaConverterSetup)setup);
+				gconverter.setLUT(lut_in);
+			}
+		}
+	}
+	
+	@Override
+	public void setCropInterval(RealInterval cropInt)
+	{
+		for ( final ConverterSetup setup : converterSetups )
+		{
+			if (setup instanceof GammaConverterSetup)
+			{
+				final GammaConverterSetup gconverter = ((GammaConverterSetup)setup);
+				gconverter.setCropInterval(cropInt);
+			}
+		}
 	}
 
 	@Override
