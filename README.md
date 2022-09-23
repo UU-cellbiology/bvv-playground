@@ -22,6 +22,8 @@ First of all, "Brightness and Color" dialog (shortcut <kbd>S</kbd>) is different
 
 ![brighntess dialog](https://katpyxa.info/software/bvv_playground/bvvPG_brightness.png)
 
+It uses range sliders (and one can pull the range by dragging the middle interval).
+
 A standard "brightness" is now called "LUT range", it maps image intensity values to specific colors. This mapping can be done non-linearly by adjusting "LUT **γ**", [gamma](https://en.wikipedia.org/wiki/Gamma_correction) value (a power-law).  
 
 In addition to color, one can also independently map intensity values to an opacity of voxel using "**α** range" (with a corresponding "**α γ**" gamma adjustment slider below).
@@ -38,11 +40,13 @@ Displaying volumes with LUTs and crop view at the current stage are available on
 
 ## For developers
 
-Since it is not in maven repository, to use this package in your own project, you would have to manually install it to the local maven repository using
+Since it is not in maven repository, to use this package in your own project,  
+you would have to manually install it to the local maven repository using
 ```
 mvn org.apache.maven.plugins:maven-install-plugin:2.5.2:install-file -Dfile=put_here_path_to_jar/bvv-playground-X.X.X.jar
 ```
-and add to pom.xml
+This jar you can build yourself or take from the release files.  
+You project will need an addition to pom.xml:
 ```
 		<dependency>
 			<groupId>sc.fiji</groupId>
