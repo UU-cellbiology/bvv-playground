@@ -1,3 +1,4 @@
+[![Java CI with Maven](https://github.com/ekatrukha/bvv-playground/actions/workflows/build-maven.yml/badge.svg)](https://github.com/ekatrukha/bvv-playground/actions/workflows/build-maven.yml) [![Maven Package](https://github.com/ekatrukha/bvv-playground/actions/workflows/maven-publish.yml/badge.svg)](https://github.com/ekatrukha/bvv-playground/actions/workflows/maven-publish.yml)
 # BigVolumeViewer-playground
 
 This is a fork of [BVV](https://github.com/tpietzsch/jogl-minimal) to play around with some new features:
@@ -40,20 +41,26 @@ Displaying volumes with LUTs and crop view at the current stage are available on
 
 ## For developers
 
-Since it is not in maven repository, to use this package in your own project,  
-you would have to manually install it to the local maven repository using
+This project is not in _scijava.public_ maven repository (well, not yet), but is published as [GitHub Package](https://github.com/ekatrukha?tab=packages&repo_name=bvv-playground).  
+To use it in your own project, first you will need to add to your _pom.xml_ github maven:
 ```
-mvn org.apache.maven.plugins:maven-install-plugin:2.5.2:install-file -Dfile=put_here_path_to_jar/bvv-playground-X.X.X.jar
+<repositories>
+....	
+	<repository>
+   		<id>github</id>
+    		<name>GitHub Packages</name>
+    		<url>https://maven.pkg.github.com/ekatrukha/bvv-playground</url>
+	</repository>
+</repositories>
 ```
-This jar you can build yourself or take from the release files.  
-You project will need an addition to pom.xml:
+and add corresponding dependency:
 ```
-		<dependency>
-			<groupId>sc.fiji</groupId>
-			<artifactId>bvv-playground</artifactId>
-			<version>0.0.3</version>
-		</dependency>
- ```
+<dependency>
+	<groupId>fiji.experimental</groupId>
+	<artifactId>bvv-playground</artifactId>
+	<version>X.X.X</version>
+</dependency>
+```
  
 A list of additional methods (adding LUTs and volume crop) is illustrated by [this example](https://github.com/ekatrukha/bvv-playground/blob/master/src/test/java/bvv/examples/BT_Example01.java).
 The project is currently under development and has a lot of "experimental" code (i.e. not clean and in the state of "well, at least it works". So comments and optimization suggestions are welcome. 
