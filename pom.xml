@@ -76,6 +76,13 @@
 		<system>Travis CI</system>
 		<url>https://travis-ci.org/ekatrukha/bvv-playground</url>
 	</ciManagement>
+	<distributionManagement>
+    	<repository>
+      		<id>github</id>
+      		<name>GitHub Packages</name>
+      		<url>https://maven.pkg.github.com/ekatrukha/bvv-playground</url>
+    	</repository>
+  	</distributionManagement>
 
 	<properties>
 		<package-name>bvvplayground</package-name>
