@@ -41,6 +41,10 @@ Displaying volumes with LUTs and crop view at the current stage are available on
 
 ## For developers
 
+A list of additional methods (adding LUTs and volume crop) is illustrated by [this example](https://github.com/ekatrukha/bvv-playground/blob/master/src/test/java/bvv/examples/BT_Example01.java).
+The project is currently under development and has a lot of "experimental" code (i.e. not clean and in the state of "well, at least it works". So comments and optimization suggestions are welcome.
+
+### Adding project in maven
 This project is not in _scijava.public_ maven repository (well, not yet), but is published as [GitHub Package](https://github.com/ekatrukha?tab=packages&repo_name=bvv-playground).  
 To use it in your own project, first you will need to add to your _pom.xml_ github maven:
 ```
@@ -61,9 +65,15 @@ and add corresponding dependency:
 	<version>X.X.X</version>
 </dependency>
 ```
+If you are using Github Actions to automate the build, you would need to add authentification to the ".yml" file:
+```
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+```
+
  
-A list of additional methods (adding LUTs and volume crop) is illustrated by [this example](https://github.com/ekatrukha/bvv-playground/blob/master/src/test/java/bvv/examples/BT_Example01.java).
-The project is currently under development and has a lot of "experimental" code (i.e. not clean and in the state of "well, at least it works". So comments and optimization suggestions are welcome. 
- 
+
+
+----------
 Developed in <a href='http://cellbiology.science.uu.nl/'>Cell Biology group</a> of Utrecht University.  
 <a href="mailto:katpyxa@gmail.com">E-mail</a> for any questions.
