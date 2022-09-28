@@ -51,7 +51,7 @@ You project will need an addition to pom.xml:
 		<dependency>
 			<groupId>sc.fiji</groupId>
 			<artifactId>bvv-playground</artifactId>
-			<version>0.0.2</version>
+			<version>0.0.3</version>
 		</dependency>
  ```
  
