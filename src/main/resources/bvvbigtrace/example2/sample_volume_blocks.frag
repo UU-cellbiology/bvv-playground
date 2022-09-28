@@ -11,10 +11,11 @@ void intersectBoundingBox( vec4 wfront, vec4 wback, out float tnear, out float t
 {
 	vec4 mfront = im * wfront;
 	vec4 mback = im * wback;
-
-	intersectBox( mfront.xyz, (mback - mfront).xyz, sourcemin, sourcemax, tnear, tfar );
-	
+	vec3 rangemin = vec3((im*vec4(cropmin,0.0)).xyz*cropactive+(1-cropactive)*sourcemin);
+	vec3 rangemax = vec3((im*vec4(cropmax,0.0)).xyz*cropactive+(1-cropactive)*sourcemax);
+	intersectBox( mfront.xyz, (mback - mfront).xyz, rangemin, rangemax, tnear, tfar );
 }
+
 
 uniform usampler3D lutSampler;
 uniform vec3 blockScales[ NUM_BLOCK_SCALES ];
@@ -24,6 +25,15 @@ uniform vec3 lutOffset;
 float sampleVolume( vec4 wpos, sampler3D volumeCache, vec3 cacheSize, vec3 blockSize, vec3 paddedBlockSize, vec3 padOffset )
 {
 	vec3 pos = (im * wpos).xyz + 0.5;
+	
+	if(cropactive>0)
+	{
+		
+		vec3 poscrop = pos - 0.5;
+		vec3 s = step((im*vec4(cropmin,0.0)).xyz, poscrop) - step((im*vec4(cropmax,0.0)).xyz, poscrop);		
+		if(s.x * s.y * s.z==0.0)
+			return 0.0;
+	} 
 	vec3 q = floor( pos / blockSize ) - lutOffset + 0.5;
 
 	uvec4 lutv = texture( lutSampler, q / lutSize );
@@ -32,12 +42,6 @@ float sampleVolume( vec4 wpos, sampler3D volumeCache, vec3 cacheSize, vec3 block
 
 	vec3 c0 = B0 + mod( pos * sj, blockSize ) + 0.5 * sj;
 	                                       // + 0.5 ( sj - 1 )   + 0.5 for tex coord offset
-	float cropf = 1.0;
-	if(cropactive>0)
-	{
-		vec3 poscrop = pos - 0.5;
-		vec3 s = step((im*vec4(cropmin,0.0)).xyz, poscrop) - step((im*vec4(cropmax,0.0)).xyz, poscrop);		
-		cropf= s.x * s.y * s.z;
-	} 
-	return cropf*texture( volumeCache, c0 / cacheSize ).r;
+	
+	return texture( volumeCache, c0 / cacheSize ).r;
 }

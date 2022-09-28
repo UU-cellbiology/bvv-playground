@@ -9,7 +9,7 @@ This is a fork of [BVV](https://github.com/tpietzsch/jogl-minimal) to play aroun
 ## How to install it for users
 
 Download latest jar files from <a href="https://github.com/ekatrukha/bvv-playground/releases">releases</a>  
-(you will need bvv-playground-0.0.2.jar and jide-oss-3.7.12.jar)  
+(you will need bvv-playground-0.0.3.jar and jide-oss-3.7.12.jar)  
 and put them to the _jar_ folder of the _latest_ FIJI installation.
 
 The plugin should appear in the _Plugins>BigDataViewer>BVV-playground_

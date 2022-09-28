@@ -1,11 +1,17 @@
 package bvv.examples;
 
 
+import java.util.List;
+
+import bdv.spimdata.SpimDataMinimal;
+import bdv.spimdata.XmlIoSpimDataMinimal;
 import btbvv.util.BvvFunctions;
 import btbvv.util.BvvSource;
+import btbvv.util.BvvStackSource;
 import ij.IJ;
 import ij.ImagePlus;
 import ij.process.ByteProcessor;
+import mpicbg.spim.data.SpimDataException;
 import net.imglib2.FinalRealInterval;
 import net.imglib2.img.Img;
 import net.imglib2.img.display.imagej.ImageJFunctions;
@@ -19,11 +25,25 @@ public class BT_Example01 {
 	 */
 	public static void main( final String[] args )
 	{
-		//final ImagePlus imp = IJ.openImage( "/home/eugene/Desktop/t1-head.tif" );
+		//regular tif
 		final ImagePlus imp = IJ.openImage( "https://imagej.nih.gov/ij/images/t1-head.zip" );
+		//final ImagePlus imp = IJ.openImage( "/home/eugene/Desktop/t1-head.tif" );
 		final Img< UnsignedShortType > img = ImageJFunctions.wrapShort( imp );
-		
 		final BvvSource source = BvvFunctions.show( img, "t1-head" );
+		
+		//BDV XML test
+		/*
+		final String xmlFilename = "/home/eugene/Desktop/emma_test.xml";
+		SpimDataMinimal spimData = null;
+		try {
+			spimData = new XmlIoSpimDataMinimal().load( xmlFilename );
+		} catch (SpimDataException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		final List< BvvStackSource< ? > > sources = BvvFunctions.show( spimData );
+		final BvvSource source = sources.get(0);
+		*/
 	
 		source.setDisplayRange(0, 655);
 		
@@ -47,8 +67,15 @@ public class BT_Example01 {
 		
 		//crop half of the volume along Z axis in the shaders
 		//cropInterval is defined inside the "raw", non-transformed data interval
+		
+		//regular tif
 		double [] minI = img.minAsDoubleArray();
 		double [] maxI = img.maxAsDoubleArray();
+		//BDV XML
+		//double [] minI = spimData.getSequenceDescription().getImgLoader().getSetupImgLoader(0).getImage(0).minAsDoubleArray();
+		//double [] maxI = spimData.getSequenceDescription().getImgLoader().getSetupImgLoader(0).getImage(0).maxAsDoubleArray();
+	
+		
 		minI[2]=0.5*maxI[2];
 		
 		source.setCropInterval(new FinalRealInterval(minI,maxI));
