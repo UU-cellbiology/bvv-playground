@@ -91,6 +91,17 @@ public class BvvStackSource< T > extends BvvSource
 	{
 		for ( final ConverterSetup setup : converterSetups )
 			setup.setDisplayRange( min, max );
+		
+		// TODO: REMOVE
+		final HashSet< MinMaxGroup > groups = new HashSet<>();
+		final SetupAssignmentsBT sa = getBvvHandle().getSetupAssignments();
+		for ( final ConverterSetup setup : converterSetups )
+			groups.add( sa.getMinMaxGroup( setup ) );
+		for ( final MinMaxGroup group : groups )
+		{
+			group.getMinBoundedValue().setCurrentValue(min);
+			group.getMaxBoundedValue().setCurrentValue(max);
+		}
 	}
 	
 	@Override
