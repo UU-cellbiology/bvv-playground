@@ -148,7 +148,22 @@ public class RangeSliderPanelDouble extends JPanel implements BoundedValueDouble
 			public void stateChanged( final ChangeEvent e )
 			{
 				final double value = ( ( Double ) spinnerMin.getValue() ).doubleValue();
-				modelMin.setCurrentValue( value );
+				if(value>modelMin.getRangeMin())
+				{
+					if(value<modelMax.getCurrentValue())
+					{
+						modelMin.setCurrentValue( value );
+					}
+					else
+					{
+						modelMin.setCurrentValue(modelMax.getCurrentValue());
+					}
+				}
+				else
+				{
+					modelMin.setCurrentValue( modelMin.getRangeMin() );
+				}
+				update();
 			}
 		} );
 		spinnerMax.addChangeListener( new ChangeListener()
@@ -157,7 +172,21 @@ public class RangeSliderPanelDouble extends JPanel implements BoundedValueDouble
 			public void stateChanged( final ChangeEvent e )
 			{
 				final double value = ( ( Double ) spinnerMax.getValue() ).doubleValue();
-				modelMax.setCurrentValue( value );
+				if(value<modelMax.getRangeMax())
+				{
+					if(value<modelMin.getCurrentValue())
+					{
+						modelMax.setCurrentValue(modelMin.getCurrentValue());
+					}
+					else
+					{
+						modelMax.setCurrentValue( value );
+					}
+				}
+				else
+				{
+					modelMax.setCurrentValue( modelMax.getRangeMax() );
+				}
 				update();
 			}
 		} );
@@ -218,8 +247,8 @@ public class RangeSliderPanelDouble extends JPanel implements BoundedValueDouble
 	@Override
 	public void update()
 	{
-		final double valueMin = modelMin.getCurrentValue();
-		final double valueMax = modelMax.getCurrentValue();
+		double valueMin = modelMin.getCurrentValue();
+		double valueMax = modelMax.getCurrentValue();
 		final double min = modelMin.getRangeMin();
 		final double max = modelMax.getRangeMax();
 
@@ -235,6 +264,8 @@ public class RangeSliderPanelDouble extends JPanel implements BoundedValueDouble
 			spinnerModelMax.setMinimum( min);
 			spinnerModelMax.setMaximum( max );
 		}
+
+		
 		slider.setLowValue(toSlider( valueMin ) );
 		slider.setHighValue(toSlider( valueMax ) );
 		spinnerMin.setValue( valueMin );
