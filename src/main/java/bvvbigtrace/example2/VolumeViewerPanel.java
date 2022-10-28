@@ -960,7 +960,7 @@ public class VolumeViewerPanel
 		this.maxAllowedStepInVoxels = maxAllowedStepInVoxels;
 	}
 
-	public void setScreenSize(final double screenWidth, final double screenHeight)
+	private void setScreenSize(final double screenWidth, final double screenHeight)
 	{
 		this.screenWidth = screenWidth;
 		this.screenHeight = screenHeight;
