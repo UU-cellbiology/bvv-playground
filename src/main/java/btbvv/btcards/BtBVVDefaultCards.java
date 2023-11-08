@@ -20,6 +20,7 @@ import bdv.ui.viewermodepanel.DisplaySettingsPanel;
 import bdv.viewer.AbstractViewerPanel;
 import bdv.viewer.ConverterSetups;
 import bdv.viewer.ViewerState;
+import btbvv.btuitools.ConverterSetupsBT;
 
 public class BtBVVDefaultCards {
 	public static final String DEFAULT_SOURCES_CARD = "default bdv sources card";
@@ -28,7 +29,7 @@ public class BtBVVDefaultCards {
 
 	public static final String DEFAULT_VIEWERMODES_CARD = "default bdv viewer modes card";
 
-	public static void setup( final CardPanel cards, final AbstractViewerPanel viewer, final ConverterSetups converterSetups )
+	public static void setup( final CardPanel cards, final AbstractViewerPanel viewer, final ConverterSetupsBT converterSetups )
 	{
 		final ViewerState state = viewer.state();
 

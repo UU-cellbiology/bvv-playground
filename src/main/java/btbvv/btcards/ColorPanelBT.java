@@ -57,8 +57,11 @@ public class ColorPanelBT extends JPanel
 		colorButton.setBorderPainted( false );
 		colorButton.setFocusPainted( false );
 		colorButton.setContentAreaFilled( false );
-		colorButton.setMinimumSize( new Dimension( 46, 42 ) );
-		colorButton.setPreferredSize( new Dimension( 46, 42 ) );
+		//colorButton.setMinimumSize( new Dimension( 46, 42 ) );
+		//colorButton.setPreferredSize( new Dimension( 46, 42 ) );
+		colorButton.setMinimumSize( new Dimension( 32, 30 ) );
+		colorButton.setPreferredSize( new Dimension( 32, 30 ) );
+
 		setColor( null );
 	}
 
@@ -111,7 +114,8 @@ public class ColorPanelBT extends JPanel
 			this.color.set( 0xffaaaaaa );
 		else
 			this.color.set( color );
-		colorButton.setIcon( new ColorIcon( new Color( this.color.get() ), 30, 30, 10, 10, true ) );
+		//colorButton.setIcon( new ColorIcon( new Color( this.color.get() ), 30, 30, 10, 10, true ) );
+		colorButton.setIcon( new ColorIcon( new Color( this.color.get() ), 21, 21, 7, 7, true ) );
 	}
 
 	public ARGBType getColor()

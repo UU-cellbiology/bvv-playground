@@ -59,6 +59,7 @@ import bdv.viewer.render.PainterThread;
 import bdv.viewer.state.SourceGroup;
 import bdv.viewer.state.ViewerState;
 import bdv.viewer.state.XmlIoViewerState;
+import btbvv.btuitools.ConverterSetupsBT;
 import btbvv.core.multires.SourceStacks;
 import btbvv.core.multires.Stack3D;
 import btbvv.core.offscreen.OffScreenFrameBuffer;
@@ -169,7 +170,7 @@ public class VolumeViewerPanel
 	 */
 	protected final ViewerState state;
 
-	private final ConverterSetups setups;
+	private final ConverterSetupsBT setups;
 
 	/**
 	 * Renders the current state to gl context.
@@ -302,7 +303,7 @@ public class VolumeViewerPanel
 		sourceInfoOverlayRenderer = new SourceInfoOverlayRenderer();
 		scaleBarOverlayRenderer = new ScaleBarOverlayRenderer();
 
-		setups = new ConverterSetups( state() );
+		setups = new ConverterSetupsBT( state() );
 		setups.listeners().add( s -> requestRepaint() );
 
 		threadGroup = new ThreadGroup( this.toString() );
@@ -792,7 +793,7 @@ public class VolumeViewerPanel
 		return transformEventHandler;
 	}
 
-	public ConverterSetups getConverterSetups()
+	public ConverterSetupsBT getConverterSetups()
 	{
 		return setups;
 	}

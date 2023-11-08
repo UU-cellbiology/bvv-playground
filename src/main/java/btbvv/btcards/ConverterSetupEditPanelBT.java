@@ -3,11 +3,10 @@ package btbvv.btcards;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-import bdv.tools.brightness.SliderPanelDouble;
 import bdv.ui.sourcegrouptree.SourceGroupTree;
 import bdv.ui.sourcetable.SourceTable;
 import bdv.util.BoundedValueDouble;
-import bdv.viewer.ConverterSetups;
+import btbvv.btuitools.ConverterSetupsBT;
 import net.miginfocom.swing.MigLayout;
 
 public class ConverterSetupEditPanelBT extends JPanel
@@ -17,22 +16,25 @@ public class ConverterSetupEditPanelBT extends JPanel
 
 	private final BoundedRangePanelBT rangePanel;
 	private final BoundedValuePanelBT gammaPanel;
+	private final BoundedRangePanelBT rangeAlphaPanel;
 
 	public ConverterSetupEditPanelBT(
 			final SourceGroupTree tree,
-			final ConverterSetups converterSetups )
+			final ConverterSetupsBT converterSetups )
 	{
 		this();
-		new BoundedRangeEditorBT( tree, converterSetups, rangePanel, gammaPanel, converterSetups.getBounds() );
+		new BoundedRangeEditorBT( tree, converterSetups, rangePanel, gammaPanel, rangeAlphaPanel, 
+				converterSetups.getBounds(), converterSetups.getBoundsAlpha() );
 		new ColorEditorBT( tree, converterSetups, colorPanel );
 	}
 
 	public ConverterSetupEditPanelBT(
 			final SourceTable table,
-			final ConverterSetups converterSetups )
+			final ConverterSetupsBT converterSetups )
 	{
 		this();
-		new BoundedRangeEditorBT( table, converterSetups, rangePanel, gammaPanel, converterSetups.getBounds() );
+		new BoundedRangeEditorBT( table, converterSetups, rangePanel, gammaPanel, rangeAlphaPanel, 
+				converterSetups.getBounds(), converterSetups.getBoundsAlpha());
 		new ColorEditorBT( table, converterSetups, colorPanel );
 	}
 
@@ -42,14 +44,22 @@ public class ConverterSetupEditPanelBT extends JPanel
 		colorPanel = new ColorPanelBT();
 		rangePanel = new BoundedRangePanelBT();
 		gammaPanel= new BoundedValuePanelBT( new BoundedValueDouble(0.1,5.0,1.0));
+		rangeAlphaPanel = new BoundedRangePanelBT();
 		//gammaPanel = new BoundedRangePanelBT();
 
 		//( ( MigLayout ) rangePanel.getLayout() ).setLayoutConstraints( "fillx, filly, hidemode 3" );
-		( ( MigLayout ) rangePanel.getLayout() ).setLayoutConstraints( "ins 5 5 5 10, fillx, filly, hidemode 3" );
+		String sLayoutConstraints = "ins 0 5 0 10, fillx, filly, hidemode 3" ;
+		( ( MigLayout ) rangePanel.getLayout() ).setLayoutConstraints( sLayoutConstraints );
+		( ( MigLayout ) gammaPanel.getLayout() ).setLayoutConstraints( sLayoutConstraints );
+		( ( MigLayout ) rangeAlphaPanel.getLayout() ).setLayoutConstraints(sLayoutConstraints );
+		//( ( MigLayout ) rangePanel.getLayout() ).setLayoutConstraints( sLayoutConstraints );
 		//( ( MigLayout ) gammaPanel.getLayout() ).setLayoutConstraints( "ins 5 5 5 10, fillx, filly, hidemode 3" );
 		add( colorPanel, "growy" );
 		add( rangePanel, "growx, wrap" );
 		add( new JLabel("γ LUT"), "growy" );
-		add( gammaPanel, "growx" );
+		add( gammaPanel, "growx, wrap" );
+		add( new JLabel("α"), "growy" );
+		add( rangeAlphaPanel, "growx" );
+		
 	}
 }
