@@ -45,7 +45,7 @@ Displaying volumes with LUTs and crop view at the current stage are available on
 
 ## For developers
 
-A list of additional methods (adding LUTs and volume crop) is illustrated by [this example](https://github.com/ekatrukha/bvv-playground/blob/master/src/test/java/bvv/examples/BT_Example01.java).
+A list of additional methods (adding LUTs and volume crop) is illustrated by [this example](https://github.com/ekatrukha/bvv-playground/blob/master/src/test/java/bvv/vistools/examples/BT_Example01.java).
 The project is currently under development and has a lot of "experimental" code (i.e. not clean and in the state of "well, at least it works"). So comments and optimization suggestions are welcome.
 
 ### Adding project in maven
