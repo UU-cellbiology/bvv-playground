@@ -17,14 +17,14 @@ public class ConverterSetupEditPanelBT extends JPanel
 	private final BoundedRangePanelBT rangePanel;
 	private final BoundedValuePanelBT gammaPanel;
 	private final BoundedRangePanelBT rangeAlphaPanel;
+	private final BoundedValuePanelBT gammaAlphaPanel;
 
 	public ConverterSetupEditPanelBT(
 			final SourceGroupTree tree,
 			final ConverterSetupsBT converterSetups )
 	{
 		this();
-		new BoundedRangeEditorBT( tree, converterSetups, rangePanel, gammaPanel, rangeAlphaPanel, 
-				converterSetups.getBounds(), converterSetups.getBoundsAlpha() );
+		new BoundedRangeEditorBT( tree, converterSetups, rangePanel, gammaPanel, rangeAlphaPanel, gammaAlphaPanel);
 		new ColorEditorBT( tree, converterSetups, colorPanel );
 	}
 
@@ -33,8 +33,7 @@ public class ConverterSetupEditPanelBT extends JPanel
 			final ConverterSetupsBT converterSetups )
 	{
 		this();
-		new BoundedRangeEditorBT( table, converterSetups, rangePanel, gammaPanel, rangeAlphaPanel, 
-				converterSetups.getBounds(), converterSetups.getBoundsAlpha());
+		new BoundedRangeEditorBT( table, converterSetups, rangePanel, gammaPanel, rangeAlphaPanel,gammaAlphaPanel);
 		new ColorEditorBT( table, converterSetups, colorPanel );
 	}
 
@@ -45,6 +44,7 @@ public class ConverterSetupEditPanelBT extends JPanel
 		rangePanel = new BoundedRangePanelBT();
 		gammaPanel= new BoundedValuePanelBT( new BoundedValueDouble(0.1,5.0,1.0));
 		rangeAlphaPanel = new BoundedRangePanelBT();
+		gammaAlphaPanel = new BoundedValuePanelBT( new BoundedValueDouble(0.1,5.0,1.0));
 		//gammaPanel = new BoundedRangePanelBT();
 
 		//( ( MigLayout ) rangePanel.getLayout() ).setLayoutConstraints( "fillx, filly, hidemode 3" );
@@ -52,14 +52,17 @@ public class ConverterSetupEditPanelBT extends JPanel
 		( ( MigLayout ) rangePanel.getLayout() ).setLayoutConstraints( sLayoutConstraints );
 		( ( MigLayout ) gammaPanel.getLayout() ).setLayoutConstraints( sLayoutConstraints );
 		( ( MigLayout ) rangeAlphaPanel.getLayout() ).setLayoutConstraints(sLayoutConstraints );
+		( ( MigLayout ) gammaAlphaPanel.getLayout() ).setLayoutConstraints(sLayoutConstraints );
 		//( ( MigLayout ) rangePanel.getLayout() ).setLayoutConstraints( sLayoutConstraints );
 		//( ( MigLayout ) gammaPanel.getLayout() ).setLayoutConstraints( "ins 5 5 5 10, fillx, filly, hidemode 3" );
 		add( colorPanel, "growy" );
 		add( rangePanel, "growx, wrap" );
-		add( new JLabel("γ LUT"), "growy" );
+		add( new JLabel(" γ"), "growy" );
 		add( gammaPanel, "growx, wrap" );
-		add( new JLabel("α"), "growy" );
-		add( rangeAlphaPanel, "growx" );
+		add( new JLabel(" α"), "growy" );
+		add( rangeAlphaPanel, "growx, wrap" );
+		add( new JLabel(" γ α"), "growy" );
+		add( gammaAlphaPanel, "growx" );
 		
 	}
 }

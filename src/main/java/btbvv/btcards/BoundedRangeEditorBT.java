@@ -16,8 +16,9 @@ import bdv.util.BoundedRange;
 import bdv.util.BoundedValueDouble;
 import bdv.util.Bounds;
 import bdv.viewer.ConverterSetupBounds;
-import bdv.viewer.ConverterSetups;
-import btbvv.btuitools.ConverterSetupBoundsAlphaBT;
+import btbvv.btuitools.ConverterSetupBoundsAlpha;
+import btbvv.btuitools.ConverterSetupBoundsGammaAlpha;
+import btbvv.btuitools.ConverterSetupBoundsGamma;
 import btbvv.btuitools.ConverterSetupsBT;
 import btbvv.btuitools.GammaConverterSetup;
 
@@ -27,10 +28,12 @@ public class BoundedRangeEditorBT {
 	private final BoundedRangePanelBT rangePanel;
 	private final BoundedValuePanelBT gammaPanel;
 	private final BoundedRangePanelBT rangeAlphaPanel;
+	private final BoundedValuePanelBT gammaAlphaPanel;
 
 	private final ConverterSetupBounds converterSetupBounds;
-
-	private final ConverterSetupBoundsAlphaBT converterSetupBoundsAlpha;
+	private final ConverterSetupBoundsGamma converterSetupBoundsGamma;
+	private final ConverterSetupBoundsAlpha converterSetupBoundsAlpha;
+	private final ConverterSetupBoundsGammaAlpha converterSetupBoundsGammaAlpha;
 
 	public BoundedRangeEditorBT(
 			final SourceTable table,
@@ -38,11 +41,9 @@ public class BoundedRangeEditorBT {
 			final BoundedRangePanelBT rangePanel,
 			final BoundedValuePanelBT gammaPanel,
 			final BoundedRangePanelBT rangeAlphaPanel,
-			final ConverterSetupBounds converterSetupBounds,
-			final ConverterSetupBoundsAlphaBT converterSetupBoundsAlpha )
+			final BoundedValuePanelBT gammaAlphaPanel)
 	{
-		this( table::getSelectedConverterSetups, converterSetups, rangePanel, gammaPanel, rangeAlphaPanel,
-				converterSetupBounds, converterSetupBoundsAlpha );
+		this( table::getSelectedConverterSetups, converterSetups, rangePanel, gammaPanel, rangeAlphaPanel, gammaAlphaPanel);
 		table.getSelectionModel().addListSelectionListener( e -> updateSelection() );
 	}
 
@@ -52,13 +53,11 @@ public class BoundedRangeEditorBT {
 			final BoundedRangePanelBT rangePanel,
 			final BoundedValuePanelBT gammaPanel,
 			final BoundedRangePanelBT rangeAlphaPanel,
-			final ConverterSetupBounds converterSetupBounds,
-			final ConverterSetupBoundsAlphaBT converterSetupBoundsAlpha)
+			final BoundedValuePanelBT gammaAlphaPanel)
 	{
 		this(
 				() -> converterSetups.getConverterSetups( tree.getSelectedSources() ),
-				converterSetups, rangePanel, gammaPanel, rangeAlphaPanel, 
-				converterSetupBounds, converterSetupBoundsAlpha );
+				converterSetups, rangePanel, gammaPanel, rangeAlphaPanel,gammaAlphaPanel);
 		tree.getSelectionModel().addTreeSelectionListener( e -> updateSelection() );
 		tree.getModel().addTreeModelListener( new TreeModelListener()
 		{
@@ -94,23 +93,27 @@ public class BoundedRangeEditorBT {
 			final BoundedRangePanelBT rangePanel, 
 			final BoundedValuePanelBT gammaPanel, 
 			final BoundedRangePanelBT rangeAlphaPanel,
-			final ConverterSetupBounds converterSetupBounds,
-			final ConverterSetupBoundsAlphaBT converterSetupBoundsAlpha)
+			final BoundedValuePanelBT gammaAlphaPanel)
 	{
 		this.selectedConverterSetups = selectedConverterSetups;
 		this.rangePanel = rangePanel;
 		this.gammaPanel = gammaPanel;
 		this.rangeAlphaPanel = rangeAlphaPanel;
-		this.converterSetupBounds = converterSetupBounds;
-		this.converterSetupBoundsAlpha = converterSetupBoundsAlpha;
+		this.gammaAlphaPanel = gammaAlphaPanel;
+		this.converterSetupBounds = converterSetups.getBounds();
+		this.converterSetupBoundsGamma = converterSetups.getBoundsGamma();
+		this.converterSetupBoundsAlpha = converterSetups.getBoundsAlpha();
+		this.converterSetupBoundsGammaAlpha = converterSetups.getBoundsGammaAlpha();
 
 		rangePanel.changeListeners().add( this::updateConverterSetupRanges );
 		gammaPanel.changeListeners().add( this::updateConverterSetupGamma);
 		rangeAlphaPanel.changeListeners().add( this::updateConverterSetupRangesAlpha );
+		gammaAlphaPanel.changeListeners().add( this::updateConverterSetupGammaAlpha);
 
 		converterSetups.listeners().add( s -> updateRangePanel() );
 		converterSetups.listeners().add( s -> updateGammaPanel() );
 		converterSetups.listeners().add( s -> updateRangeAlphaPanel() );
+		converterSetups.listeners().add( s -> updateGammaAlphaPanel() );
 
 		final JPopupMenu menu = new JPopupMenu();
 		menu.add( runnableItem(  "set bounds ...", rangePanel::setBoundsDialog ) );
@@ -136,6 +139,13 @@ public class BoundedRangeEditorBT {
 		menuA.add( runnableAlphaItem(  "shrink bounds to selection", rangeAlphaPanel::shrinkBoundsToRange ) );
 		rangeAlphaPanel.setPopup( () -> menuA );
 		updateRangeAlphaPanel();
+		
+		final JPopupMenu menuGA = new JPopupMenu();
+		menuGA.add( runnableGammaAlphaItem(  "set bounds ...", gammaAlphaPanel::setBoundsDialog ) );
+		menuGA.add( setBoundsGammaAlphaItem( "set bounds 0.01..5", 0.01, 5 ) );
+		menuGA.add( setBoundsGammaAlphaItem( "set bounds 0.1..50", 0.1, 50 ) );
+		gammaAlphaPanel.setPopup( () -> menuGA );
+		updateGammaAlphaPanel();
 		
 	}
 
@@ -166,6 +176,7 @@ public class BoundedRangeEditorBT {
 		item.addActionListener( e -> action.run() );
 		return item;
 	}
+	
 	private JMenuItem setBoundsAlphaItem( final String text, final double min, final double max )
 	{
 		final JMenuItem item = new JMenuItem( text );
@@ -174,6 +185,20 @@ public class BoundedRangeEditorBT {
 	}
 
 	private JMenuItem runnableAlphaItem( final String text, final Runnable action )
+	{
+		final JMenuItem item = new JMenuItem( text );
+		item.addActionListener( e -> action.run() );
+		return item;
+	}
+	
+	private JMenuItem setBoundsGammaAlphaItem( final String text, final double min, final double max )
+	{
+		final JMenuItem item = new JMenuItem( text );
+		item.addActionListener( e -> setBoundsGammaAlpha( new Bounds( min, max ) ) );
+		return item;
+	}
+
+	private JMenuItem runnableGammaAlphaItem( final String text, final Runnable action )
 	{
 		final JMenuItem item = new JMenuItem( text );
 		item.addActionListener( e -> action.run() );
@@ -200,21 +225,10 @@ public class BoundedRangeEditorBT {
 	{
 		if ( converterSetups == null || converterSetups.isEmpty() )
 			return;
-
-		double gammaFullRangeMin = bounds.getMinBound();
-		double gammaFullRangeMax = bounds.getMaxBound();
-		gammaPanel.setValue(new BoundedValueDouble(gammaFullRangeMin,gammaFullRangeMax,gammaPanel.getValue().getCurrentValue()));
+		
 		for ( final ConverterSetup converterSetup : converterSetups )
 		{
-			if(converterSetup instanceof GammaConverterSetup)
-			{
-		
-				final double gamma = ((GammaConverterSetup)converterSetup).getDisplayGamma();
-				if(gamma<gammaFullRangeMin)
-					((GammaConverterSetup)converterSetup).setDisplayGamma(gammaFullRangeMin);
-				if(gamma>gammaFullRangeMax)
-					((GammaConverterSetup)converterSetup).setDisplayGamma(gammaFullRangeMax);
-			}
+			converterSetupBoundsGamma.setBounds( converterSetup, bounds );
 		}
 		
 		updateGammaPanel();
@@ -231,6 +245,19 @@ public class BoundedRangeEditorBT {
 
 		updateRangeAlphaPanel();
 	}
+	
+	private synchronized void setBoundsGammaAlpha( final Bounds bounds )
+	{
+		if ( converterSetups == null || converterSetups.isEmpty() )
+			return;
+		
+		for ( final ConverterSetup converterSetup : converterSetups )
+		{
+			converterSetupBoundsGammaAlpha.setBounds( converterSetup, bounds );
+		}
+		
+		updateGammaAlphaPanel();
+	}
 	private synchronized void updateConverterSetupRanges()
 	{
 		if ( blockUpdates || converterSetups == null || converterSetups.isEmpty() )
@@ -245,6 +272,27 @@ public class BoundedRangeEditorBT {
 		}
 
 		updateRangePanel();
+	}
+	
+	private synchronized void updateConverterSetupGamma()
+	{
+		if ( blockUpdates || converterSetups == null || converterSetups.isEmpty() )
+			return;
+		
+		//final BoundedRange range = gammaPanel.getRange();
+
+		final BoundedValueDouble model = gammaPanel.getValue();
+
+		for ( final ConverterSetup converterSetup : converterSetups )
+		{
+			if(converterSetup instanceof GammaConverterSetup)
+			{		
+				((GammaConverterSetup)converterSetup).setDisplayGamma(model.getCurrentValue());
+				converterSetupBoundsGamma.setBounds(converterSetup, new Bounds(model.getRangeMin(),model.getRangeMax()));
+			}
+		}
+
+		updateGammaPanel();
 	}
 	private synchronized void updateConverterSetupRangesAlpha()
 	{
@@ -263,22 +311,25 @@ public class BoundedRangeEditorBT {
 		updateRangeAlphaPanel();
 	}
 	
-	private synchronized void updateConverterSetupGamma()
+	private synchronized void updateConverterSetupGammaAlpha()
 	{
 		if ( blockUpdates || converterSetups == null || converterSetups.isEmpty() )
 			return;
+		
+		//final BoundedRange range = gammaPanel.getRange();
 
-		final BoundedValueDouble model = gammaPanel.getValue();
+		final BoundedValueDouble model = gammaAlphaPanel.getValue();
 
 		for ( final ConverterSetup converterSetup : converterSetups )
 		{
 			if(converterSetup instanceof GammaConverterSetup)
 			{		
-				((GammaConverterSetup)converterSetup).setDisplayGamma(model.getCurrentValue());
+				((GammaConverterSetup)converterSetup).setAlphaGamma(model.getCurrentValue());
+				converterSetupBoundsGammaAlpha.setBounds(converterSetup, new Bounds(model.getRangeMin(),model.getRangeMax()));
 			}
 		}
 
-		updateGammaPanel();
+		updateGammaAlphaPanel();
 	}
 
 	private synchronized void updateSelection()
@@ -287,6 +338,7 @@ public class BoundedRangeEditorBT {
 		updateRangePanel();
 		updateGammaPanel();
 		updateRangeAlphaPanel();
+		updateGammaAlphaPanel();
 	}
 
 	private synchronized void updateRangePanel()
@@ -391,37 +443,30 @@ public class BoundedRangeEditorBT {
 		else
 		{
 			BoundedValueDouble model = null;
-			//ArrayList<Double> gammavals = new ArrayList<Double>(); 
+			boolean allValuesEqual = true;
 			double aver_gamma = 0.0;
 			int nCScount = 0;
-			double gammaFullRangeMin = gammaPanel.getValue().getRangeMin();
-			double gammaFullRangeMax = gammaPanel.getValue().getRangeMax();
 			for ( final ConverterSetup converterSetup : converterSetups )
 			{
 				if(converterSetup instanceof GammaConverterSetup)
 				{
-			
+					final Bounds bounds = converterSetupBoundsGamma.getBounds( converterSetup );
 					final double gamma = ((GammaConverterSetup)converterSetup).getDisplayGamma();
 					aver_gamma += gamma;
 					nCScount++;
-					if(gamma<gammaFullRangeMin)
+					final BoundedValueDouble converterSetupGammaModel = new BoundedValueDouble( bounds.getMinBound(),bounds.getMaxBound(), gamma);
+					if(model == null)
 					{
-						gammaFullRangeMin = gamma*0.5;
+						model = converterSetupGammaModel;
 					}
-					if(gamma>gammaFullRangeMax)
+					else
 					{
-						gammaFullRangeMax = gamma*2.0;
+						allValuesEqual &= (Math.abs((aver_gamma/nCScount)-gamma)<0.00001);
+						model = new BoundedValueDouble(Math.min(model.getRangeMin(),converterSetupGammaModel.getRangeMin()),
+								Math.max(model.getRangeMax(),converterSetupGammaModel.getRangeMax()),
+								aver_gamma/nCScount);
+						//range = range.join( converterSetupRange );
 					}
-					//final double max = converterSetup.getDisplayRangeMax();
-	
-					final BoundedValueDouble converterSetupGammaRange = new BoundedValueDouble( gammaFullRangeMin, gammaFullRangeMax, gamma);
-					if ( model == null )
-						model = converterSetupGammaRange;
-					//else
-					//{
-					//	allRangesEqual &= range.equals( converterSetupRange );
-					//	range = range.join( converterSetupRange );
-				//	}
 				}
 			}
 			if(model==null)
@@ -430,11 +475,8 @@ public class BoundedRangeEditorBT {
 			}
 			else
 			{
-				aver_gamma /= nCScount;				
-				model.setCurrentValue(aver_gamma);
-				final BoundedValueDouble finalModel = model;
-				
-				final boolean isConsistent = true;
+				final BoundedValueDouble finalModel = model;				
+				final boolean isConsistent = allValuesEqual;
 				SwingUtilities.invokeLater( () -> {
 					synchronized ( BoundedRangeEditorBT.this )
 					{
@@ -442,6 +484,65 @@ public class BoundedRangeEditorBT {
 						gammaPanel.setEnabled( true );
 						gammaPanel.setValue( finalModel );
 						gammaPanel.setConsistent( isConsistent );
+						blockUpdates = false;
+					}
+				} );
+			}
+		}
+	}
+	private synchronized void updateGammaAlphaPanel()
+	{
+		if ( converterSetups == null || converterSetups.isEmpty() )
+		{
+			SwingUtilities.invokeLater( () -> {
+				gammaAlphaPanel.setEnabled(false);
+				gammaAlphaPanel.setConsistent( true );
+			} );
+		}
+		else
+		{
+			BoundedValueDouble model = null;
+			boolean allValuesEqual = true;
+			double aver_gamma = 0.0;
+			int nCScount = 0;
+			for ( final ConverterSetup converterSetup : converterSetups )
+			{
+				if(converterSetup instanceof GammaConverterSetup)
+				{
+					final Bounds bounds = converterSetupBoundsGammaAlpha.getBounds( converterSetup );
+					final double gamma = ((GammaConverterSetup)converterSetup).getAlphaGamma();
+					aver_gamma += gamma;
+					nCScount++;
+					final BoundedValueDouble converterSetupGammaModel = new BoundedValueDouble( bounds.getMinBound(),bounds.getMaxBound(), gamma);
+					if(model == null)
+					{
+						model = converterSetupGammaModel;
+					}
+					else
+					{
+						allValuesEqual &= (Math.abs((aver_gamma/nCScount)-gamma)<0.00001);
+						model = new BoundedValueDouble(Math.min(model.getRangeMin(),converterSetupGammaModel.getRangeMin()),
+								Math.max(model.getRangeMax(),converterSetupGammaModel.getRangeMax()),
+								aver_gamma/nCScount);
+						//range = range.join( converterSetupRange );
+					}
+				}
+			}
+			if(model==null)
+			{
+				//no gamma converters
+			}
+			else
+			{
+				final BoundedValueDouble finalModel = model;				
+				final boolean isConsistent = allValuesEqual;
+				SwingUtilities.invokeLater( () -> {
+					synchronized ( BoundedRangeEditorBT.this )
+					{
+						blockUpdates = true;
+						gammaAlphaPanel.setEnabled( true );
+						gammaAlphaPanel.setValue( finalModel );
+						gammaAlphaPanel.setConsistent( isConsistent );
 						blockUpdates = false;
 					}
 				} );

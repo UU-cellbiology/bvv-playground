@@ -12,13 +12,13 @@ import net.imglib2.type.numeric.ARGBType;
 import net.imglib2.type.numeric.IntegerType;
 import net.imglib2.type.volatiles.VolatileARGBType;
 
-public class ConverterSetupBoundsAlphaBT 
+public class ConverterSetupBoundsAlpha 
 {
 	private final SourceToConverterSetupBimap bimap;
 
 	private final Map< ConverterSetup, Bounds > setupToBounds = new HashMap<>();
 
-	ConverterSetupBoundsAlphaBT( final SourceToConverterSetupBimap bimap )
+	ConverterSetupBoundsAlpha( final SourceToConverterSetupBimap bimap )
 	{
 		this.bimap = bimap;
 	}

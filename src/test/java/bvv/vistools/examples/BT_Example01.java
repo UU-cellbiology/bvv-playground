@@ -26,24 +26,33 @@ public class BT_Example01 {
 	public static void main( final String[] args )
 	{
 		//regular tif
-		//final ImagePlus imp = IJ.openImage( "https://imagej.nih.gov/ij/images/t1-head.zip" );
-		final ImagePlus imp = IJ.openImage( "/home/eugene/Desktop/t1-head.tif" );
+		/*
+		final ImagePlus imp = IJ.openImage( "https://imagej.nih.gov/ij/images/t1-head.zip" );
+		//final ImagePlus imp = IJ.openImage( "/home/eugene/Desktop/head/t1-head.tif" );
 		final Img< UnsignedShortType > img = ImageJFunctions.wrapShort( imp );
 		final BvvSource source = BvvFunctions.show( img, "t1-head" );
-		
+	
+//		double [] minI = img.minAsDoubleArray();
+//		double [] maxI = img.maxAsDoubleArray();
+		*/
 		//BDV XML test
-		/*
-		final String xmlFilename = "/home/eugene/Desktop/emma_test.xml";
+		/**/
+		final String xmlFilename = "/home/eugene/Desktop/head/export.xml";
 		SpimDataMinimal spimData = null;
 		try {
 			spimData = new XmlIoSpimDataMinimal().load( xmlFilename );
 		} catch (SpimDataException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}
+		}//		//BDV XML
+//		double [] minI = spimData.getSequenceDescription().getImgLoader().getSetupImgLoader(0).getImage(0).minAsDoubleArray();
+//		double [] maxI = spimData.getSequenceDescription().getImgLoader().getSetupImgLoader(0).getImage(0).maxAsDoubleArray();
 		final List< BvvStackSource< ? > > sources = BvvFunctions.show( spimData );
 		final BvvSource source = sources.get(0);
-		*/
+		//BDV XML
+		double [] minI = spimData.getSequenceDescription().getImgLoader().getSetupImgLoader(0).getImage(0).minAsDoubleArray();
+		double [] maxI = spimData.getSequenceDescription().getImgLoader().getSetupImgLoader(0).getImage(0).maxAsDoubleArray();
+		/**/
 	
 		source.setDisplayRange(0, 655);
 		source.setDisplayGamma(0.5);
@@ -69,12 +78,8 @@ public class BT_Example01 {
 		//crop half of the volume along Z axis in the shaders
 		//cropInterval is defined inside the "raw", non-transformed data interval
 		
-		//regular tif
-		double [] minI = img.minAsDoubleArray();
-		double [] maxI = img.maxAsDoubleArray();
-		//BDV XML
-		//double [] minI = spimData.getSequenceDescription().getImgLoader().getSetupImgLoader(0).getImage(0).minAsDoubleArray();
-		//double [] maxI = spimData.getSequenceDescription().getImgLoader().getSetupImgLoader(0).getImage(0).maxAsDoubleArray();
+
+
 	
 		
 		minI[2]=0.5*maxI[2];
