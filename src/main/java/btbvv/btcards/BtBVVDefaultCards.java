@@ -38,14 +38,12 @@ public class BtBVVDefaultCards {
 		table.setPreferredScrollableViewportSize( new Dimension( 300, 200 ) );
 		table.setFillsViewportHeight( true );
 		table.setDragEnabled( true );
-		//final ConverterSetupEditPanel editPanelTable = new ConverterSetupEditPanel( table, converterSetups );
 		final ConverterSetupEditPanelBT editPanelTableBT = new ConverterSetupEditPanelBT( table, converterSetups );
 		final JPanel tablePanel = new JPanel( new BorderLayout() );
 		//final JPanel tablePanel = new JPanel( );
 		final JScrollPane scrollPaneTable = new MyScrollPane( table, "Table.background" );
 		scrollPaneTable.addMouseWheelListener( new MouseWheelScrollListener( scrollPaneTable ) );
 		tablePanel.add( scrollPaneTable, BorderLayout.CENTER );
-		//tablePanel.add( editPanelTable, BorderLayout.CENTER );
 		tablePanel.add( editPanelTableBT, BorderLayout.SOUTH );
 		tablePanel.setPreferredSize( new Dimension( 300, 285 ) );
 
@@ -59,7 +57,8 @@ public class BtBVVDefaultCards {
 		tree.setShowsRootHandles( true );
 		tree.setExpandsSelectedPaths( true );
 		tree.getSelectionModel().setSelectionMode( TreeSelectionModel.DISCONTIGUOUS_TREE_SELECTION );
-		final ConverterSetupEditPanel editPanelTree = new ConverterSetupEditPanel( tree, converterSetups );
+		final ConverterSetupEditPanelBT editPanelTree = new ConverterSetupEditPanelBT( tree, converterSetups );
+		//final ConverterSetupEditPanel editPanelTree = new ConverterSetupEditPanel( tree, converterSetups );
 		final JPanel treePanel = new JPanel( new BorderLayout() );
 		final JScrollPane scrollPaneTree = new MyScrollPane( tree, "Tree.background" );
 		scrollPaneTree.addMouseWheelListener( new MouseWheelScrollListener( scrollPaneTree ) );
