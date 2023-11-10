@@ -34,7 +34,6 @@ import bdv.cache.CacheControl;
 import bdv.tools.brightness.ConverterSetup;
 import bdv.util.Prefs;
 import bdv.viewer.AbstractViewerPanel;
-import bdv.viewer.ConverterSetups;
 import bdv.viewer.DisplayMode;
 import bdv.viewer.NavigationActions;
 import bdv.viewer.OverlayRenderer;

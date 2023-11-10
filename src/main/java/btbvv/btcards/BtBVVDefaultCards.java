@@ -5,7 +5,6 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Insets;
 
-import javax.swing.BoxLayout;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.UIManager;
@@ -13,12 +12,10 @@ import javax.swing.border.MatteBorder;
 import javax.swing.tree.TreeSelectionModel;
 
 import bdv.ui.CardPanel;
-import bdv.ui.convertersetupeditor.ConverterSetupEditPanel;
 import bdv.ui.sourcegrouptree.SourceGroupTree;
 import bdv.ui.sourcetable.SourceTable;
 import bdv.ui.viewermodepanel.DisplaySettingsPanel;
 import bdv.viewer.AbstractViewerPanel;
-import bdv.viewer.ConverterSetups;
 import bdv.viewer.ViewerState;
 import btbvv.btuitools.ConverterSetupsBT;
 

@@ -29,10 +29,7 @@ import javax.swing.text.NumberFormatter;
 import org.scijava.listeners.Listeners;
 
 import bdv.ui.UIUtils;
-import bdv.ui.rangeslider.RangeSlider;
-import bdv.util.BoundedRange;
 import bdv.util.BoundedValueDouble;
-import btbvv.btcards.BoundedRangePanelBT.ChangeListener;
 import net.miginfocom.swing.MigLayout;
 
 public class BoundedValuePanelBT extends JPanel {

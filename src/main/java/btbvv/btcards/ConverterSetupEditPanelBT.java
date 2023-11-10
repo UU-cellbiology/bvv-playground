@@ -44,9 +44,9 @@ public class ConverterSetupEditPanelBT extends JPanel
 		super( new MigLayout( "ins 0, fillx, hidemode 3", "[min!]0[]0[]", "[]2[]2[]2[]2[]" ) );
 		colorPanel = new ColorPanelBT();
 		rangePanel = new BoundedRangePanelBT();
-		gammaPanel= new BoundedValuePanelBT( new BoundedValueDouble(0.1,5.0,1.0));
+		gammaPanel= new BoundedValuePanelBT( new BoundedValueDouble(0.01,5.0,1.0));
 		rangeAlphaPanel = new BoundedRangePanelBT();
-		gammaAlphaPanel = new BoundedValuePanelBT( new BoundedValueDouble(0.1,5.0,1.0));
+		gammaAlphaPanel = new BoundedValuePanelBT( new BoundedValueDouble(0.01,5.0,1.0));
 		cbSync = new JCheckBox();
 		cbSync.setSelected(true);
 

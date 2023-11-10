@@ -8,13 +8,12 @@ import bdv.util.Bounds;
 import bdv.viewer.SourceToConverterSetupBimap;
 
 public class ConverterSetupBoundsGammaAlpha {
-	private final SourceToConverterSetupBimap bimap;
 
 	private final Map< ConverterSetup, Bounds > setupToBounds = new HashMap<>();
 
-	ConverterSetupBoundsGammaAlpha( final SourceToConverterSetupBimap bimap )
+	ConverterSetupBoundsGammaAlpha( )
 	{
-		this.bimap = bimap;
+
 	}
 
 	public Bounds getBounds( final ConverterSetup setup )

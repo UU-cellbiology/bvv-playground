@@ -13,8 +13,8 @@ public class ConverterSetupsBT extends ConverterSetups {
 	{
 		super(state);
 		boundsAlpha = new ConverterSetupBoundsAlpha( this );
-		boundsGamma = new ConverterSetupBoundsGamma( this );
-		boundsGammaAlpha = new ConverterSetupBoundsGammaAlpha( this );
+		boundsGamma = new ConverterSetupBoundsGamma();
+		boundsGammaAlpha = new ConverterSetupBoundsGammaAlpha();
 	}
 
 	public ConverterSetupBoundsGamma getBoundsGamma()

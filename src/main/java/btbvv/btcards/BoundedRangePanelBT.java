@@ -69,6 +69,7 @@ import bdv.util.BoundedRange;
  * display (for setting {@code ConverterSetup} display range).
  *
  * @author Tobias Pietzsch
+ * @author Eugene Katrukha
  */
 class BoundedRangePanelBT extends JPanel
 {

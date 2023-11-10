@@ -4,22 +4,17 @@ import java.util.HashMap;
 import java.util.Map;
 
 import bdv.tools.brightness.ConverterSetup;
-import bdv.util.BoundedRange;
 import bdv.util.Bounds;
-import bdv.viewer.SourceAndConverter;
-import bdv.viewer.SourceToConverterSetupBimap;
-import net.imglib2.type.numeric.ARGBType;
-import net.imglib2.type.numeric.IntegerType;
-import net.imglib2.type.volatiles.VolatileARGBType;
+
 
 public class ConverterSetupBoundsGamma {
-	private final SourceToConverterSetupBimap bimap;
+
 
 	private final Map< ConverterSetup, Bounds > setupToBounds = new HashMap<>();
 
-	ConverterSetupBoundsGamma( final SourceToConverterSetupBimap bimap )
+	ConverterSetupBoundsGamma()
 	{
-		this.bimap = bimap;
+		
 	}
 
 	public Bounds getBounds( final ConverterSetup setup )
