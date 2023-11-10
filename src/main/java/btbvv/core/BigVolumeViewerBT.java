@@ -305,10 +305,12 @@ public class BigVolumeViewerBT
 				if(((GammaConverterSetup)setup).getRenderType()==0)
 				{
 					((GammaConverterSetup)setup).setRenderType(1);
+					viewer.showMessage("volumetric");
 				}
 				else
 				{
 					((GammaConverterSetup)setup).setRenderType(0);
+					viewer.showMessage("maximum intensity");
 				}
 			}
 		
