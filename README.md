@@ -1,11 +1,13 @@
 [![Java CI with Maven](https://github.com/ekatrukha/bvv-playground/actions/workflows/build-maven.yml/badge.svg)](https://github.com/ekatrukha/bvv-playground/actions/workflows/build-maven.yml) [![Maven Package](https://github.com/ekatrukha/bvv-playground/actions/workflows/maven-publish.yml/badge.svg)](https://github.com/ekatrukha/bvv-playground/actions/workflows/maven-publish.yml)
 # BigVolumeViewer-playground
 
-This is a fork of [BVV](https://github.com/tpietzsch/jogl-minimal) to play around with some new features:
+This is a fork of [BVV](https://github.com/bigdataviewer/bigvolumeviewer-core) to play around with some new features:
 - using LUTs;
 - using gamma correction;
 - using different volume render methods (transparency/illumination);
 - cropping displayed sources in shaders without reloading them.
+
+Currently synced to BVV version 0.3.3 (this [commit](https://github.com/bigdataviewer/bigvolumeviewer-core/commit/60fe3d0595f1a68dd45f85e216f09b369eaa165d)).
 
 ## How to install it for users
 
@@ -21,7 +23,9 @@ It works in the same way as BigVolumeViewer, but there are some new additional f
 
 First of all, "Brightness and Color" dialog (shortcut <kbd>S</kbd>) is different:
 
-![brighntess dialog](https://katpyxa.info/software/bvv_playground/bvvPG_brightness.png)
+![brighntess dialog](https://katpyxa.info/software/bvv_playground/bvvPG_brightness.png)  
+
+*(works also with Cards panel, activated by shortcut <kbd>P</kbd>)
 
 It uses range sliders (and one can pull the range by dragging the middle interval).
 
@@ -31,7 +35,7 @@ In addition to color, one can also independently map intensity values to an opac
 
 A new additional checkbox on the left is used to synchronize top pair of sliders (LUT) with the bottom pair (**α**), but not the other way around. It also synchronizes ranges in the extended view (<kbd>>></kbd> button).
 
-A new shortcut <kbd>P</kbd> is used to switch between "Maximum intensity projection" and "Volumetric" rendering. By "volumetric" I mean "transparency" or "alpha-blending" ray-casting. These two different render methods are illustrated below:  
+A new shortcut <kbd>O</kbd> (letter) is used to switch between "Maximum intensity projection" and "Volumetric" rendering. By "volumetric" I mean "transparency" or "alpha-blending" ray-casting. These two different render methods are illustrated below:  
 _Maximum intensity_  
 ![Maximum intensity render](https://katpyxa.info/software/bvv_playground/bvvPG_maximum_intensity_render.png)  
 _Volumetric_  
