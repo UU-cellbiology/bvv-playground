@@ -120,8 +120,6 @@ public class BoundedRangeEditorBT {
             @Override
             public void actionPerformed(ActionEvent e) 
             {	
-//            	final boolean bSelected = cbSync.isSelected();
-//            	bSync = bSelected;
             	bSync = cbSync.isSelected();
             	
             }
