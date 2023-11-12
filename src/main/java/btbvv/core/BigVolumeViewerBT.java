@@ -213,7 +213,6 @@ public class BigVolumeViewerBT
 		final Actions bvvActions = new Actions( inputTriggerConfig, KeyConfigContexts.BIGVOLUMEVIEWER );
 		bvvActions.install( viewerFrame.getKeybindings(), "bdv" );
 		BigVolumeViewerActions.install( bvvActions, this );
-		bvvActions.runnableAction(this::toggleRender, "toggle rendertype", "O");
 
 		keymap.updateListeners().add( () -> {
 			navActions.updateKeyConfig( keymap.getConfig() );
@@ -272,7 +271,27 @@ public class BigVolumeViewerBT
 	{
 		return appearanceManager;
 	}
-
+	//------------RENDER SETTINGS
+	void toggleRender()
+	{
+		for ( final ConverterSetup setup : setupAssignments.getConverterSetups() )
+			if (setup instanceof GammaConverterSetup)
+			{
+				if(((GammaConverterSetup)setup).getRenderType()==0)
+				{
+					((GammaConverterSetup)setup).setRenderType(1);
+					viewer.showMessage("volumetric");
+				}
+				else
+				{
+					((GammaConverterSetup)setup).setRenderType(0);
+					viewer.showMessage("maximum intensity");
+				}
+			}
+		
+		viewer.requestRepaint();
+	}
+	
 	// -------------------------------------------------------------------------------------------------------
 	// BDV ViewerPanel equivalents
 
@@ -294,25 +313,7 @@ public class BigVolumeViewerBT
 		}
 	}
 	
-	void toggleRender()
-	{
-		for ( final ConverterSetup setup : setupAssignments.getConverterSetups() )
-			if (setup instanceof GammaConverterSetup)
-			{
-				if(((GammaConverterSetup)setup).getRenderType()==0)
-				{
-					((GammaConverterSetup)setup).setRenderType(1);
-					viewer.showMessage("volumetric");
-				}
-				else
-				{
-					((GammaConverterSetup)setup).setRenderType(0);
-					viewer.showMessage("maximum intensity");
-				}
-			}
-		
-		viewer.requestRepaint();
-	}
+
 
 	public void loadSettings( final String xmlFilename ) throws IOException, JDOMException
 	{

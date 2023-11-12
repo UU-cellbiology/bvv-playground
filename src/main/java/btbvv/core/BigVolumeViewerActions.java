@@ -141,6 +141,10 @@ import static bdv.viewer.NavigationActions.TOGGLE_SOURCE_VISIBILITY_KEYS_FORMAT;
 
 public class BigVolumeViewerActions
 {
+	
+	public static final String TOGGLE_RENDER_TYPE = "Render mode";
+
+	public static final String[] TOGGLE_RENDER_TYPE_KEYS         = new String[] { "O" };
 	/**
 	 * Command descriptions for commands re-used from {@link
 	 * BigVolumeViewerActions}, {@link bdv.tools.CloseWindowActions}, {@link
@@ -172,6 +176,7 @@ public class BigVolumeViewerActions
 			descriptions.add( GO_TO_BOOKMARK_ROTATION, GO_TO_BOOKMARK_ROTATION_KEYS, "Retrieve a labeled bookmark, set only the orientation." );
 			descriptions.add( PREFERENCES_DIALOG, PREFERENCES_DIALOG_KEYS, "Show the Preferences dialog." );
 
+			descriptions.add( TOGGLE_RENDER_TYPE, TOGGLE_RENDER_TYPE_KEYS, "Change volume rendering mode." );
 
 
 			// Commands re-used from bdv.tools.CloseWindowActions
@@ -256,5 +261,6 @@ public class BigVolumeViewerActions
 		actions.runnableAction( bvv::saveSettings, SAVE_SETTINGS, SAVE_SETTINGS_KEYS );
 		actions.runnableAction( bvv::expandAndFocusCardPanel, EXPAND_CARDS, EXPAND_CARDS_KEYS );
 		actions.runnableAction( bvv::collapseCardPanel, COLLAPSE_CARDS, COLLAPSE_CARDS_KEYS );
+		actions.runnableAction( bvv::toggleRender, TOGGLE_RENDER_TYPE, TOGGLE_RENDER_TYPE_KEYS );
 	}
 }

@@ -53,6 +53,7 @@ public class BT_Example01 {
 		double [] maxI = spimData.getSequenceDescription().getImgLoader().getSetupImgLoader(0).getImage(0).maxAsDoubleArray();
 		*/
 	
+		
 		source.setDisplayRange(0, 655);
 		source.setDisplayGamma(0.5);
 		
