@@ -83,6 +83,7 @@ public class BigVolumeViewerBTCommand implements Command
 	public void run()
 	{
 		final String xmlFilename = xmlFile.getAbsolutePath();
+		//final String xmlFilename = "/home/eugene/Desktop/head/export.xml";
 		//"/Users/pietzsch/workspace/data/111010_weber_full.xml";
 //		final String xmlFilename = "/Users/pietzsch/Desktop/data/TGMM_METTE/Pdu_H2BeGFP_CAAXmCherry_0123_20130312_192018.corrected/dataset_hdf5.xml";
 //		final String xmlFilename = "/Users/pietzsch/Desktop/data/MAMUT/MaMuT_demo_dataset/MaMuT_Parhyale_demo.xml";

@@ -28,7 +28,6 @@
  */
 package btbvv.core;
 
-import static bdv.BigDataViewer.initSetups;
 
 import bdv.tools.PreferencesDialog;
 import bdv.tools.bookmarks.BookmarksEditor;
@@ -443,14 +442,15 @@ public class BigVolumeViewerBT
 		}, "reset transform", "R" );
 
 		if ( ! bvv.tryLoadSettings( xmlFilename ) )
-			InitializeViewerState.initBrightness( 0.001, 0.999, viewer.state(), viewer.getConverterSetups() );
+			//InitializeViewerState.initBrightness( 0.001, 0.999, viewer.state(), viewer.getConverterSetups() );
+			BvvGamma.initBrightness( 0.001, 0.999, viewer.state(), viewer.getConverterSetups() );
 
 		frame.setVisible( true );
 	}
 
 	public static void main( final String[] args ) throws SpimDataException
 	{
-		final String xmlFilename = "/Users/pietzsch/workspace/data/111010_weber_full.xml";
+		final String xmlFilename = "/home/eugene/Desktop/head/export.xml";
 //		final String xmlFilename = "/Users/pietzsch/Desktop/data/TGMM_METTE/Pdu_H2BeGFP_CAAXmCherry_0123_20130312_192018.corrected/dataset_hdf5.xml";
 //		final String xmlFilename = "/Users/pietzsch/Desktop/data/MAMUT/MaMuT_demo_dataset/MaMuT_Parhyale_demo.xml";
 
@@ -469,7 +469,7 @@ public class BigVolumeViewerBT
 		final int ditherWidth = 8;
 		final int numDitherSamples = 8;
 		final int cacheBlockSize = 64;
-		final int maxCacheSizeInMB = 4000;
+		final int maxCacheSizeInMB = 300;
 		final double dCam = 2000;
 		final double dClip = 1000;
 

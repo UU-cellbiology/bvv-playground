@@ -8,9 +8,13 @@ import bdv.SpimSource;
 import bdv.ViewerImgLoader;
 import bdv.ViewerSetupImgLoader;
 import bdv.VolatileSpimSource;
+import bdv.tools.InitializeViewerState;
 import bdv.tools.brightness.ConverterSetup;
-
+import bdv.util.Bounds;
+import bdv.viewer.ConverterSetups;
+import bdv.viewer.Source;
 import bdv.viewer.SourceAndConverter;
+import bdv.viewer.ViewerState;
 import mpicbg.spim.data.generic.AbstractSpimData;
 import mpicbg.spim.data.generic.sequence.BasicViewSetup;
 import mpicbg.spim.data.sequence.Angle;
@@ -148,6 +152,25 @@ public class BvvGamma {
 			name += ( name.isEmpty() ? "" : " " ) + "c " + channel.getName();
 
 		return name;
+	}
+	
+	public static void initBrightness( final double cumulativeMinCutoff, final double cumulativeMaxCutoff, final ViewerState state, final ConverterSetups converterSetups )
+	{
+		final SourceAndConverter< ? > current = state.getCurrentSource();
+		if ( current == null )
+			return;
+		final Source< ? > source = current.getSpimSource();
+		final int timepoint = state.getCurrentTimepoint();
+		final Bounds bounds = InitializeViewerState.estimateSourceRange( source, timepoint, cumulativeMinCutoff, cumulativeMaxCutoff );
+		for ( final SourceAndConverter< ? > s : state.getSources() )
+		{
+			final ConverterSetup setup = converterSetups.getConverterSetup( s );
+			setup.setDisplayRange( bounds.getMinBound(), bounds.getMaxBound() );
+			if(setup instanceof GammaConverterSetup)
+			{
+				((GammaConverterSetup)setup).setAlphaRange( bounds.getMinBound(), bounds.getMaxBound() );
+			}
+		}
 	}
 	
 
