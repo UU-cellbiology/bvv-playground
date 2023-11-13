@@ -242,6 +242,15 @@ public class BoundedRangeEditorBT {
 		}
 
 		updateRangePanel();
+		if(bSync)
+		{
+			for ( final ConverterSetup converterSetup : converterSetups )
+			{
+				converterSetupBoundsAlpha.setBounds( converterSetup, bounds );
+			}
+
+			updateRangeAlphaPanel();
+		}
 	}
 	private synchronized void setBoundsGamma( final Bounds bounds )
 	{
@@ -254,6 +263,15 @@ public class BoundedRangeEditorBT {
 		}
 		
 		updateGammaPanel();
+		if(bSync)
+		{
+			for ( final ConverterSetup converterSetup : converterSetups )
+			{
+				converterSetupBoundsGammaAlpha.setBounds( converterSetup, bounds );
+			}
+			
+			updateGammaAlphaPanel();
+		}
 	}
 	private synchronized void setBoundsAlpha( final Bounds bounds )
 	{
