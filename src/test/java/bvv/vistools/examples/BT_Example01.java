@@ -3,6 +3,12 @@ package bvv.vistools.examples;
 
 import java.util.List;
 
+import javax.swing.UIManager;
+
+import org.fusesource.jansi.Ansi.Color;
+
+import com.formdev.flatlaf.FlatIntelliJLaf;
+
 import bdv.spimdata.SpimDataMinimal;
 import bdv.spimdata.XmlIoSpimDataMinimal;
 import btbvv.vistools.BvvFunctions;
@@ -25,18 +31,18 @@ public class BT_Example01 {
 	 */
 	public static void main( final String[] args )
 	{
+		
 		//regular tif init
 		/**/
 		final ImagePlus imp = IJ.openImage( "https://imagej.nih.gov/ij/images/t1-head.zip" );
-		//final ImagePlus imp = IJ.openImage( "/home/eugene/Desktop/head/t1-head.tif" );
+		//final ImagePlus imp = IJ.openImage( "/home/eugene/Desktop/head/t1-head_2sources.tif" );
 		final Img< UnsignedShortType > img = ImageJFunctions.wrapShort( imp );
 		final BvvSource source = BvvFunctions.show( img, "t1-head" );
 	
 		double [] minI = img.minAsDoubleArray();
 		double [] maxI = img.maxAsDoubleArray();
 		/**/
-		
-		
+
 		//BDV XML init
 		/*
 		final String xmlFilename = "/home/eugene/Desktop/head/export.xml";

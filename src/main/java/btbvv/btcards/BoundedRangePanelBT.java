@@ -116,6 +116,7 @@ class BoundedRangePanelBT extends JPanel
 	/**
 	 * Panel background if range reflects a set of sources all having the same range
 	 */
+	//private Color consistentBg = Color.WHITE;
 	private Color consistentBg = Color.WHITE;
 
 	/**
@@ -205,8 +206,8 @@ class BoundedRangePanelBT extends JPanel
 		super.setBackground( bg );
 		if ( minSpinner != null )
 			minSpinner.setBackground( bg );
-		if ( rangeSlider != null )
-			rangeSlider.setBackground( bg );
+		//if ( rangeSlider != null )
+			//rangeSlider.setBackground( bg );
 		if ( maxSpinner != null )
 			maxSpinner.setBackground( bg );
 		if ( upperBoundLabel != null )

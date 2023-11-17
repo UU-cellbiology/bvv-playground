@@ -158,8 +158,8 @@ public class BoundedValuePanelBT extends JPanel {
 	public void setBackground( final Color bg )
 	{
 		super.setBackground( bg );
-		if ( slider != null )
-			slider.setBackground( bg );
+//		if ( slider != null )
+//			slider.setBackground( bg );
 		if ( spinner != null )
 			spinner.setBackground( bg );
 		if ( upperBoundLabel != null )
