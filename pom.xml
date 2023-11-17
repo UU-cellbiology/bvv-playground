@@ -8,7 +8,7 @@
 		<version>36.0.0</version>
 	</parent>
 
-	<groupId>sc.fiji</groupId>
+	<groupId>fiji.experimental</groupId>
 	<artifactId>bvv-playground</artifactId>
 	<version>0.1.0</version>
 
