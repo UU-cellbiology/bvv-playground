@@ -43,6 +43,7 @@ import java.util.HashSet;
 import java.util.List;
 
 import net.imglib2.RealInterval;
+import net.imglib2.realtransform.AffineTransform3D;
 import net.imglib2.type.numeric.ARGBType;
 
 public class BvvStackSource< T > extends BvvSource
@@ -330,5 +331,19 @@ public class BvvStackSource< T > extends BvvSource
 		final BvvHandle bvv = getBvvHandle();
 		if ( bvv != null )
 			bvv.getViewerPanel().requestRepaint();
+	}
+
+	@Override
+	public void setCropTransform(AffineTransform3D cropTransform) 
+	{
+		for ( final ConverterSetup setup : converterSetups )
+		{
+			if (setup instanceof GammaConverterSetup)
+			{
+				final GammaConverterSetup gconverter = ((GammaConverterSetup)setup);
+				gconverter.setCropTransform(cropTransform);
+			}
+		}
+		
 	}
 }

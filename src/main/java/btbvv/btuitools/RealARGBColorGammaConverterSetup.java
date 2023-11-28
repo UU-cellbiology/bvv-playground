@@ -7,6 +7,7 @@ import org.scijava.listeners.Listeners;
 import net.imglib2.FinalRealInterval;
 import net.imglib2.RealInterval;
 import net.imglib2.display.ColorConverter;
+import net.imglib2.realtransform.AffineTransform3D;
 import net.imglib2.type.numeric.ARGBType;
 
 public class RealARGBColorGammaConverterSetup implements GammaConverterSetup {
@@ -26,6 +27,8 @@ public class RealARGBColorGammaConverterSetup implements GammaConverterSetup {
 	private boolean cropActive = false;
 	
 	private FinalRealInterval cropInt = null;
+	
+	private AffineTransform3D cropTransform = new AffineTransform3D();
 
 	public RealARGBColorGammaConverterSetup( final int setupId, final ColorConverter... converters )
 	{
@@ -296,6 +299,19 @@ public class RealARGBColorGammaConverterSetup implements GammaConverterSetup {
 			return cropInt;
 		else
 			return null;
+	}
+
+	@Override
+	public AffineTransform3D getCropTransform() {
+		
+		return cropTransform;
+	}
+
+	@Override
+	public void setCropTransform(AffineTransform3D t) {
+		
+		cropTransform = t.copy();
+		
 	}
 
 

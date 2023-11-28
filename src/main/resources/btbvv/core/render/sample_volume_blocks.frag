@@ -6,14 +6,13 @@ uniform vec3 sourcemax;
 uniform int cropactive;
 uniform vec3 cropmin;
 uniform vec3 cropmax;
+uniform mat4 croptransform;
 
 void intersectBoundingBox( vec4 wfront, vec4 wback, out float tnear, out float tfar )
 {
 	vec4 mfront = im * wfront;
 	vec4 mback = im * wback;
-	vec3 rangemin = vec3((im*vec4(cropmin,0.0)).xyz*cropactive+(1-cropactive)*sourcemin);
-	vec3 rangemax = vec3((im*vec4(cropmax,0.0)).xyz*cropactive+(1-cropactive)*sourcemax);
-	intersectBox( mfront.xyz, (mback - mfront).xyz, rangemin, rangemax, tnear, tfar );
+	intersectBox( mfront.xyz, (mback - mfront).xyz, sourcemin, sourcemax, tnear, tfar );
 }
 
 
@@ -28,9 +27,15 @@ float sampleVolume( vec4 wpos, sampler3D volumeCache, vec3 cacheSize, vec3 block
 	
 	if(cropactive>0)
 	{
-		
-		vec3 poscrop = pos - 0.5;
-		vec3 s = step((im*vec4(cropmin,0.0)).xyz, poscrop) - step((im*vec4(cropmax,0.0)).xyz, poscrop);		
+		mat4 temp = croptransform*im;
+		vec3 poscrop = (croptransform*vec4(pos-0.5,1.0)).xyz;
+		vec3 cmin = (temp*vec4(cropmin,1.0)).xyz;
+		vec3 cmax = (temp*vec4(cropmax,1.0)).xyz;
+		vec3 s = step(cmin, poscrop) - step(cmax, poscrop);
+		//vec3 poscrop = pos - 0.5;
+		//vec3 s = step((im*vec4(cropmin,0.0)).xyz, poscrop) - step((im*vec4(cropmax,0.0)).xyz, poscrop);	
+		//vec3 poscrop = wpos.xyz;
+		//vec3 s = step(cropmin, poscrop) - step(cropmax, poscrop);			
 		if(s.x * s.y * s.z==0.0)
 			return 0.0;
 	} 

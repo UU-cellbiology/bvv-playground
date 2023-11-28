@@ -50,6 +50,7 @@ import btbvv.core.shadergen.generate.SegmentTemplate;
 import btbvv.core.shadergen.generate.SegmentType;
 import btbvv.core.shadergen.generate.SegmentedShader;
 import btbvv.core.shadergen.generate.SegmentedShaderBuilder;
+import btbvv.core.util.MatrixMath;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -261,16 +262,20 @@ public class MultiVolumeShaderMip
 		segments.put( SegmentType.SampleMultiresolutionVolume, new SegmentTemplate(
 				"sample_volume_blocks.frag",
 				"im", "sourcemin", "sourcemax", 
-				"cropactive", "cropmin", "cropmax",
+				"cropactive", "cropmin", "cropmax", "croptransform",
 				"intersectBoundingBox",
 				"lutSampler", "blockScales", "lutSize", "lutOffset", "sampleVolume" ) );
 		segments.put( SegmentType.SampleVolume, new SegmentTemplate(
 				"sample_volume_simple.frag",
-				"im", "sourcemax", "cropactive", "cropmin", "cropmax", "intersectBoundingBox",
+				"im", "sourcemax", 
+				"cropactive", "cropmin", "cropmax", "croptransform",
+				"intersectBoundingBox",
 				"volume", "sampleVolume" ) );
 		segments.put( SegmentType.SampleRGBAVolume, new SegmentTemplate(
 				"sample_volume_simple_rgba.frag",
-				"im", "sourcemax", "cropactive", "cropmin", "cropmax", "intersectBoundingBox",
+				"im", "sourcemax", 
+				"cropactive", "cropmin", "cropmax", "croptransform",
+				"intersectBoundingBox",
 				"volume", "sampleVolume" ) );
 		segments.put( SegmentType.Convert, new SegmentTemplate(
 				"convert.frag",
@@ -525,6 +530,7 @@ public class MultiVolumeShaderMip
 		private final Uniform1i uniformCropActive;
 		private final Uniform3f uniformCropMin;
 		private final Uniform3f uniformCropMax;
+		private final UniformMatrix4f uniformCropTransform;
 		
 		private final VolumeShaderSignature.PixelType pixelType;
 		private final double rangeScale;
@@ -541,6 +547,7 @@ public class MultiVolumeShaderMip
 			uniformCropActive = prog.getUniform1i( segmentVol,"cropactive" );
 			uniformCropMin = prog.getUniform3f( segmentVol,"cropmin" );
 			uniformCropMax = prog.getUniform3f( segmentVol,"cropmax" );
+			uniformCropTransform = prog.getUniformMatrix4f(segmentVol,"croptransform" );
 
 			this.pixelType = pixelType;
 
@@ -581,8 +588,10 @@ public class MultiVolumeShaderMip
 				{
 					uniformCropActive.set(1);
 					uniformCropMin.set(gconverter.getCropInterval(),btbvv.core.shadergen.MinMax.MIN);
-					uniformCropMax.set(gconverter.getCropInterval(),btbvv.core.shadergen.MinMax.MAX);
+					uniformCropMax.set(gconverter.getCropInterval(),btbvv.core.shadergen.MinMax.MAX);				
+					uniformCropTransform.set(MatrixMath.affine(gconverter.getCropTransform(), new Matrix4f()));
 				}
+				
 			}
 			
 			final double s = 1.0 / ( fmax - fmin );

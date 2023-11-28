@@ -8,6 +8,7 @@ public interface ColorGammaConverter extends ColorConverter
 	public double getGamma();
 	public void setGamma(final double gamma);
 	
+	//alpha channel: opacity/transparency 
 	public double getMinAlpha();
 	public double getMaxAlpha();
 	public void setMinAlpha( double minAlpha );
