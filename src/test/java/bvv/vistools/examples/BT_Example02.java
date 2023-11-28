@@ -39,7 +39,7 @@ public class BT_Example02 {
 
 		source.setColor(new ARGBType(ARGBType.rgba(255, 0.0, 0.0, 255.0)));
 		source.setDisplayRange(0, 2100);
-		source2.setColor(new ARGBType(ARGBType.rgba(0.0,255.0, 0.0, 255.0)));
+		source2.setColor(new ARGBType(ARGBType.rgba(0.0, 255.0, 0.0, 255.0)));
 		source2.setDisplayRange(0, 2100);
 
 		source.setCropTransform(deskew);
@@ -49,11 +49,16 @@ public class BT_Example02 {
 		FinalRealInterval finRealAfter = deskew.estimateBounds(new FinalInterval(minI,maxI));
 		double [] newMin =  finRealAfter.minAsDoubleArray();
 		double [] newMax =  finRealAfter.maxAsDoubleArray();
-		int nAxes = 2;
+		int nAxes = 1;
 		newMin[nAxes]=newMin[nAxes]+0.5*(newMax[nAxes]-newMin[nAxes]);		
 		source.setCropInterval(new FinalRealInterval(newMin,newMax));
 		
+		//crop source 2 in 'data' coordinates
 		
+		double [] newMin2 =  img.minAsDoubleArray();
+		double [] newMax2 =  img.maxAsDoubleArray();
+		newMin2[nAxes]=newMin2[nAxes]+0.5*(newMax2[nAxes]-newMin2[nAxes]);
+		source2.setCropInterval(new FinalRealInterval(newMin2,newMax2));
 	}
 	
 	/** function assigns new LLS7 transform to bt.afDataTransform (using provided voxel size of original data) 
