@@ -29,7 +29,7 @@ vec4 sampleVolume( vec4 wpos )
 		//vec3 poscrop = wpos.xyz;
 		//vec3 s = step(cropmin, poscrop) - step(cropmax, poscrop);
 		if(s.x * s.y * s.z==0.0)
-			return 0.0;
+			return vec4(0.0,0.0,0.0,0.0);
 	} 
 	return texture( volume, (pos+0.5) / textureSize( volume, 0 ) );
 }
