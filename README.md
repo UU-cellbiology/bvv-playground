@@ -41,7 +41,7 @@ _Maximum intensity_
 _Volumetric_  
 ![Maximum intensity render](https://katpyxa.info/software/bvv_playground/bvvPG_volumetric_render.png)  
 
-Displaying volumes with LUTs and crop view at the current stage are available only from the code (see an [example](https://github.com/ekatrukha/bvv-playground/blob/master/src/test/java/bvv/examples/BT_Example01.java)).
+Displaying volumes with LUTs and crop view at the current stage are available only from the code (see an [example](https://github.com/ekatrukha/bvv-playground/blob/master/src/test/java/bvv/vistools/examples/BT_Example01.java)).
 
 ## For developers
 
