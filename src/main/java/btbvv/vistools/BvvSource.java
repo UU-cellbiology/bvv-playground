@@ -79,9 +79,9 @@ public abstract class BvvSource implements Bvv
 	
 	public abstract void setLUT(final float[][] lut_in);
 	
-	public abstract void setCropInterval(RealInterval cropInt);
+	public abstract void setClipInterval(RealInterval clipInt);
 	
-	public abstract void setCropTransform(AffineTransform3D cropTransform);
+	public abstract void setClipTransform(AffineTransform3D clipTransform);
 
 	@Override
 	public BvvHandle getBvvHandle()

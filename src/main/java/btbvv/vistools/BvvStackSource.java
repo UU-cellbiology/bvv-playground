@@ -251,14 +251,14 @@ public class BvvStackSource< T > extends BvvSource
 	}
 	
 	@Override
-	public void setCropInterval(RealInterval cropInt)
+	public void setClipInterval(RealInterval clipInt)
 	{
 		for ( final ConverterSetup setup : converterSetups )
 		{
 			if (setup instanceof GammaConverterSetup)
 			{
 				final GammaConverterSetup gconverter = ((GammaConverterSetup)setup);
-				gconverter.setCropInterval(cropInt);
+				gconverter.setClipInterval(clipInt);
 			}
 		}
 	}
@@ -334,14 +334,14 @@ public class BvvStackSource< T > extends BvvSource
 	}
 
 	@Override
-	public void setCropTransform(AffineTransform3D cropTransform) 
+	public void setClipTransform(AffineTransform3D clipTransform) 
 	{
 		for ( final ConverterSetup setup : converterSetups )
 		{
 			if (setup instanceof GammaConverterSetup)
 			{
 				final GammaConverterSetup gconverter = ((GammaConverterSetup)setup);
-				gconverter.setCropTransform(cropTransform);
+				gconverter.setClipTransform(clipTransform);
 			}
 		}
 		

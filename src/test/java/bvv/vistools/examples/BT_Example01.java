@@ -81,10 +81,10 @@ public class BT_Example01 {
 		//(input: float [256][3], the last index (color component) changes from 0 to 1)
 		source.setLUT(getRGBLutTable("Fire"));
 		
-		//crop half of the volume along Z axis in the shaders
-		//cropInterval is defined inside the "raw", non-transformed data interval		
+		//clip half of the volume along Z axis in the shaders
+		//clipInterval is defined inside the "raw", non-transformed data interval		
 		minI[2]=0.5*maxI[2];		
-		source.setCropInterval(new FinalRealInterval(minI,maxI));
+		source.setClipInterval(new FinalRealInterval(minI,maxI));
 		
 		
 	}

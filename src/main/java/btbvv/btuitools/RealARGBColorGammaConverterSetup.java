@@ -24,11 +24,11 @@ public class RealARGBColorGammaConverterSetup implements GammaConverterSetup {
 	
 	private boolean useLUT = false;
 	
-	private boolean cropActive = false;
+	private boolean clipActive = false;
 	
-	private FinalRealInterval cropInt = null;
+	private FinalRealInterval clipInt = null;
 	
-	private AffineTransform3D cropTransform = new AffineTransform3D();
+	private AffineTransform3D clipTransform = new AffineTransform3D();
 
 	public RealARGBColorGammaConverterSetup( final int setupId, final ColorConverter... converters )
 	{
@@ -281,36 +281,36 @@ public class RealARGBColorGammaConverterSetup implements GammaConverterSetup {
 	}
 
 	@Override
-	public boolean cropActive() {
+	public boolean clipActive() {
 		
-		return cropActive;
+		return clipActive;
 	}
 
 	@Override
-	public void setCropInterval(RealInterval cropInt) {
-		this.cropInt = new FinalRealInterval(cropInt);
-		cropActive = true;
+	public void setClipInterval(RealInterval clipInt) {
+		this.clipInt = new FinalRealInterval(clipInt);
+		clipActive = true;
 		listeners.list.forEach( l -> l.setupParametersChanged( this ) );
 	}
 
 	@Override
-	public FinalRealInterval getCropInterval() {
-		if(cropActive)
-			return cropInt;
+	public FinalRealInterval getClipInterval() {
+		if(clipActive)
+			return clipInt;
 		else
 			return null;
 	}
 
 	@Override
-	public AffineTransform3D getCropTransform() {
+	public AffineTransform3D getClipTransform() {
 		
-		return cropTransform;
+		return clipTransform;
 	}
 
 	@Override
-	public void setCropTransform(AffineTransform3D t) {
+	public void setClipTransform(AffineTransform3D t) {
 		
-		cropTransform = t.copy();
+		clipTransform = t.copy();
 		
 	}
 

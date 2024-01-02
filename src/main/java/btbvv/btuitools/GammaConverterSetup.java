@@ -21,12 +21,12 @@ public interface GammaConverterSetup extends ConverterSetup {
 	float [][] getLUT();	
 	boolean useLut();
 	
-	boolean cropActive();
-	void setCropInterval(RealInterval cropInt);
-	FinalRealInterval getCropInterval();
+	boolean clipActive();
+	void setClipInterval(RealInterval clipInt);
+	FinalRealInterval getClipInterval();
 	
-	AffineTransform3D getCropTransform();
-	void setCropTransform(AffineTransform3D t);
+	AffineTransform3D getClipTransform();
+	void setClipTransform(AffineTransform3D t);
 	
 	
 	void setRenderType(int nRender);

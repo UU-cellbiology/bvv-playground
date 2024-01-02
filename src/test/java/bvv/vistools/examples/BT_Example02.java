@@ -21,7 +21,7 @@ public class BT_Example02 {
 		//regular tif init
 		/**/
 		//final ImagePlus imp = IJ.openImage( "https://imagej.nih.gov/ij/images/t1-head.zip" );
-		final ImagePlus imp = IJ.openImage( "/home/eugene/Desktop/BigTrace_data/deskew/small_crop.tif" );
+		final ImagePlus imp = IJ.openImage( "/home/eugene/Desktop/BigTrace_data/BioFormats/small_crop.tif" );
 		final Img< UnsignedShortType > img = ImageJFunctions.wrapShort( imp );
 
 	
@@ -42,23 +42,23 @@ public class BT_Example02 {
 		source2.setColor(new ARGBType(ARGBType.rgba(0.0, 255.0, 0.0, 255.0)));
 		source2.setDisplayRange(0, 2100);
 
-		source.setCropTransform(deskew);
+		source.setClipTransform(deskew);
 			
-		//crop half of the volume along Z axis in the shaders
-		//cropInterval is defined inside the "raw", non-transformed data interval	
+		//clip half of the volume along Z axis in the shaders
+		//clipInterval is defined inside the "raw", non-transformed data interval	
 		FinalRealInterval finRealAfter = deskew.estimateBounds(new FinalInterval(minI,maxI));
 		double [] newMin =  finRealAfter.minAsDoubleArray();
 		double [] newMax =  finRealAfter.maxAsDoubleArray();
 		int nAxes = 1;
 		newMin[nAxes]=newMin[nAxes]+0.5*(newMax[nAxes]-newMin[nAxes]);		
-		source.setCropInterval(new FinalRealInterval(newMin,newMax));
+		source.setClipInterval(new FinalRealInterval(newMin,newMax));
 		
-		//crop source 2 in 'data' coordinates
+		//clip source 2 in 'data' coordinates
 		
 		double [] newMin2 =  img.minAsDoubleArray();
 		double [] newMax2 =  img.maxAsDoubleArray();
 		newMin2[nAxes]=newMin2[nAxes]+0.5*(newMax2[nAxes]-newMin2[nAxes]);
-		source2.setCropInterval(new FinalRealInterval(newMin2,newMax2));
+		source2.setClipInterval(new FinalRealInterval(newMin2,newMax2));
 	}
 	
 	/** function assigns new LLS7 transform to bt.afDataTransform (using provided voxel size of original data) 

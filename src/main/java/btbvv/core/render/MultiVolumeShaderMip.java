@@ -262,19 +262,19 @@ public class MultiVolumeShaderMip
 		segments.put( SegmentType.SampleMultiresolutionVolume, new SegmentTemplate(
 				"sample_volume_blocks.frag",
 				"im", "sourcemin", "sourcemax", 
-				"cropactive", "cropmin", "cropmax", "croptransform",
+				"clipactive", "clipmin", "clipmax", "cliptransform",
 				"intersectBoundingBox",
 				"lutSampler", "blockScales", "lutSize", "lutOffset", "sampleVolume" ) );
 		segments.put( SegmentType.SampleVolume, new SegmentTemplate(
 				"sample_volume_simple.frag",
 				"im", "sourcemax", 
-				"cropactive", "cropmin", "cropmax", "croptransform",
+				"clipactive", "clipmin", "clipmax", "cliptransform",
 				"intersectBoundingBox",
 				"volume", "sampleVolume" ) );
 		segments.put( SegmentType.SampleRGBAVolume, new SegmentTemplate(
 				"sample_volume_simple_rgba.frag",
 				"im", "sourcemax", 
-				"cropactive", "cropmin", "cropmax", "croptransform",
+				"clipactive", "clipmin", "clipmax", "cliptransform",
 				"intersectBoundingBox",
 				"volume", "sampleVolume" ) );
 		segments.put( SegmentType.Convert, new SegmentTemplate(
@@ -527,10 +527,10 @@ public class MultiVolumeShaderMip
 		private final Uniform1i uniformUseLUT;
 		private final Uniform1i uniformRenderType;
 		private final Uniform3fv lut; 
-		private final Uniform1i uniformCropActive;
-		private final Uniform3f uniformCropMin;
-		private final Uniform3f uniformCropMax;
-		private final UniformMatrix4f uniformCropTransform;
+		private final Uniform1i uniformClipActive;
+		private final Uniform3f uniformClipMin;
+		private final Uniform3f uniformClipMax;
+		private final UniformMatrix4f uniformClipTransform;
 		
 		private final VolumeShaderSignature.PixelType pixelType;
 		private final double rangeScale;
@@ -544,10 +544,10 @@ public class MultiVolumeShaderMip
 			uniformRenderType = prog.getUniform1i( segmentConv,"renderType" );
 			uniformUseLUT = prog.getUniform1i( segmentConv,"useLUT" );
 			lut = prog.getUniform3fv(segmentConv,"lut");
-			uniformCropActive = prog.getUniform1i( segmentVol,"cropactive" );
-			uniformCropMin = prog.getUniform3f( segmentVol,"cropmin" );
-			uniformCropMax = prog.getUniform3f( segmentVol,"cropmax" );
-			uniformCropTransform = prog.getUniformMatrix4f(segmentVol,"croptransform" );
+			uniformClipActive = prog.getUniform1i( segmentVol,"clipactive" );
+			uniformClipMin = prog.getUniform3f( segmentVol,"clipmin" );
+			uniformClipMax = prog.getUniform3f( segmentVol,"clipmax" );
+			uniformClipTransform = prog.getUniformMatrix4f(segmentVol,"cliptransform" );
 
 			this.pixelType = pixelType;
 
@@ -574,7 +574,7 @@ public class MultiVolumeShaderMip
 			uniformGamma.set(1.0f);
 			uniformGammaAlpha.set(1.0f);
 			uniformRenderType.set(0);
-			uniformCropActive.set(0);
+			uniformClipActive.set(0);
 			
 			if (converter instanceof GammaConverterSetup)
 			{	
@@ -584,12 +584,12 @@ public class MultiVolumeShaderMip
 				uniformRenderType.set(gconverter.getRenderType());
 				fminA = gconverter.getAlphaRangeMin() / rangeScale;
 				fmaxA = gconverter.getAlphaRangeMax() / rangeScale;
-				if(gconverter.cropActive())
+				if(gconverter.clipActive())
 				{
-					uniformCropActive.set(1);
-					uniformCropMin.set(gconverter.getCropInterval(),btbvv.core.shadergen.MinMax.MIN);
-					uniformCropMax.set(gconverter.getCropInterval(),btbvv.core.shadergen.MinMax.MAX);				
-					uniformCropTransform.set(MatrixMath.affine(gconverter.getCropTransform(), new Matrix4f()));
+					uniformClipActive.set(1);
+					uniformClipMin.set(gconverter.getClipInterval(),btbvv.core.shadergen.MinMax.MIN);
+					uniformClipMax.set(gconverter.getClipInterval(),btbvv.core.shadergen.MinMax.MAX);				
+					uniformClipTransform.set(MatrixMath.affine(gconverter.getClipTransform(), new Matrix4f()));
 				}
 				
 			}

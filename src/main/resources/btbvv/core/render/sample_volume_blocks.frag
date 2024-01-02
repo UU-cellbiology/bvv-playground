@@ -3,10 +3,10 @@
 uniform mat4 im;
 uniform vec3 sourcemin;
 uniform vec3 sourcemax;
-uniform int cropactive;
-uniform vec3 cropmin;
-uniform vec3 cropmax;
-uniform mat4 croptransform;
+uniform int clipactive;
+uniform vec3 clipmin;
+uniform vec3 clipmax;
+uniform mat4 cliptransform;
 
 void intersectBoundingBox( vec4 wfront, vec4 wback, out float tnear, out float tfar )
 {
@@ -25,17 +25,17 @@ float sampleVolume( vec4 wpos, sampler3D volumeCache, vec3 cacheSize, vec3 block
 {
 	vec3 pos = (im * wpos).xyz + 0.5;
 	
-	if(cropactive>0)
+	if(clipactive>0)
 	{
-		mat4 temp = croptransform*im;
-		vec3 poscrop = (croptransform*vec4(pos-0.5,1.0)).xyz;
-		vec3 cmin = (temp*vec4(cropmin,1.0)).xyz;
-		vec3 cmax = (temp*vec4(cropmax,1.0)).xyz;
-		vec3 s = step(cmin, poscrop) - step(cmax, poscrop);
-		//vec3 poscrop = pos - 0.5;
-		//vec3 s = step((im*vec4(cropmin,0.0)).xyz, poscrop) - step((im*vec4(cropmax,0.0)).xyz, poscrop);	
-		//vec3 poscrop = wpos.xyz;
-		//vec3 s = step(cropmin, poscrop) - step(cropmax, poscrop);			
+		mat4 temp = cliptransform*im;
+		vec3 posclip = (cliptransform*vec4(pos-0.5,1.0)).xyz;
+		vec3 cmin = (temp*vec4(clipmin,1.0)).xyz;
+		vec3 cmax = (temp*vec4(clipmax,1.0)).xyz;
+		vec3 s = step(cmin, posclip) - step(cmax, posclip);
+		//vec3 posclip = pos - 0.5;
+		//vec3 s = step((im*vec4(clipmin,0.0)).xyz, posclip) - step((im*vec4(clipmax,0.0)).xyz, posclip);	
+		//vec3 posclip = wpos.xyz;
+		//vec3 s = step(clipmin, posclip) - step(clipmax, posclip);			
 		if(s.x * s.y * s.z==0.0)
 			return 0.0;
 	} 

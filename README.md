@@ -5,7 +5,7 @@ This is a fork of [BVV](https://github.com/bigdataviewer/bigvolumeviewer-core) t
 - using LUTs;
 - using gamma correction;
 - using different volume render methods (transparency/illumination);
-- cropping displayed sources in shaders without reloading them.
+- clipping of displayed sources in shaders without reloading them.
 
 Currently synced to BVV version 0.3.3 (this [commit](https://github.com/bigdataviewer/bigvolumeviewer-core/commit/60fe3d0595f1a68dd45f85e216f09b369eaa165d)).
 
@@ -41,12 +41,12 @@ _Maximum intensity_
 _Volumetric_  
 ![Maximum intensity render](https://katpyxa.info/software/bvv_playground/bvvPG_volumetric_render.png)  
 
-Displaying volumes with LUTs and crop view at the current stage are available only from the code (see an [example](https://github.com/ekatrukha/bvv-playground/blob/master/src/test/java/bvv/vistools/examples/BT_Example01.java)).
+Displaying volumes with LUTs and clipped view at the current stage are available only from the code (see an [example](https://github.com/ekatrukha/bvv-playground/blob/master/src/test/java/bvv/vistools/examples/BT_Example01.java)).
 
 ## For developers
 
-A list of additional methods (adding LUTs and volume crop) is illustrated by [this example](https://github.com/ekatrukha/bvv-playground/blob/master/src/test/java/bvv/vistools/examples/BT_Example01.java).  
-There is a possibility to specify "crop transform", shown [here](https://github.com/ekatrukha/bvv-playground/blob/master/src/test/java/bvv/vistools/examples/BT_Example02.java).   
+A list of additional methods (adding LUTs and volume clipping) is illustrated by [this example](https://github.com/ekatrukha/bvv-playground/blob/master/src/test/java/bvv/vistools/examples/BT_Example01.java).  
+There is a possibility to specify "clipping transform", shown [here](https://github.com/ekatrukha/bvv-playground/blob/master/src/test/java/bvv/vistools/examples/BT_Example02.java).   
    
 The project is currently under development and has a lot of "experimental" code (i.e. not clean and in the state of "well, at least it works"). So comments and optimization suggestions are welcome.
 
