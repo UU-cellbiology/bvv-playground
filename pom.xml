@@ -10,7 +10,7 @@
 
 	<groupId>fiji.experimental</groupId>
 	<artifactId>bvv-playground</artifactId>
-	<version>0.1.3-SNAPSHOT</version>
+	<version>0.1.3</version>
 
 	<name>BVV-playground</name>
 	<description>Volume rendering of bdv datasets with gamma and transparency option</description>
