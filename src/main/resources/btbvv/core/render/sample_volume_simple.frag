@@ -5,11 +5,20 @@ uniform vec3 clipmin;
 uniform vec3 clipmax;
 uniform mat4 cliptransform;
 
-void intersectBoundingBox( vec4 wfront, vec4 wback, out float tnear, out float tfar )
+void intersectBoundingBox( vec4 wfront, vec4 wback, out float tnear, out float tfar)
 {
 	vec4 mfront = im * wfront;
 	vec4 mback = im * wback;	
-	intersectBox( mfront.xyz, (mback - mfront).xyz, vec3( 0, 0, 0 ), sourcemax, tnear, tfar );
+	if(clipactive>0)
+	{
+		vec3 rangemin = vec3((im*vec4(clipmin,1.0)).xyz);
+		vec3 rangemax = vec3((im*vec4(clipmax,1.0)).xyz);
+		intersectBox( mfront.xyz, (mback - mfront).xyz, rangemin, rangemax, tnear, tfar );
+	}
+	else
+	{
+		intersectBox( mfront.xyz, (mback - mfront).xyz, vec3( 0, 0, 0 ), sourcemax, tnear, tfar );
+	}
 }
 
 uniform sampler3D volume;
