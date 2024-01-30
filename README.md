@@ -1,4 +1,5 @@
-[![Java CI with Maven](https://github.com/ekatrukha/bvv-playground/actions/workflows/build-maven.yml/badge.svg)](https://github.com/ekatrukha/bvv-playground/actions/workflows/build-maven.yml) [![Maven Package](https://github.com/ekatrukha/bvv-playground/actions/workflows/maven-publish.yml/badge.svg)](https://github.com/ekatrukha/bvv-playground/actions/workflows/maven-publish.yml)
+[![Build Status](https://github.com/UU-cellbiology/bvv-playground/actions/workflows/build.yml/badge.svg)](https://github.com/UU-cellbiology/bvv-playground/actions/workflows/build.yml)  
+ 
 # BigVolumeViewer-playground
 
 This is a fork of [BVV](https://github.com/bigdataviewer/bigvolumeviewer-core) to play around with some new features:
@@ -51,33 +52,26 @@ There is a possibility to specify "clipping transform", shown [here](https://git
 The project is currently under development and has a lot of "experimental" code (i.e. not clean and in the state of "well, at least it works"). So comments and optimization suggestions are welcome.
 
 ### Adding project in maven
-This project is not in _scijava.public_ maven repository (well, not yet), but is published as [GitHub Package](https://github.com/ekatrukha?tab=packages&repo_name=bvv-playground).  
-To use it in your own project, first you will need to add to your _pom.xml_ github maven:
+This project lives in _scijava.public_ maven repository.
+To use it in your own project, add to your _pom.xml_ :
 ```
 <repositories>
 ....	
 	<repository>
-   		<id>github</id>
-    		<name>GitHub Packages</name>
-    		<url>https://maven.pkg.github.com/ekatrukha/bvv-playground</url>
+		<id>scijava.public</id>
+		<url>https://maven.scijava.org/content/groups/public</url>
 	</repository>
 </repositories>
 ```
 and add corresponding dependency:
+
 ```
 <dependency>
-	<groupId>fiji.experimental</groupId>
-	<artifactId>bvv-playground</artifactId>
-	<version>X.X.X</version>
+  <groupId>nl.uu.science.cellbiology</groupId>
+  <artifactId>bvv-playground</artifactId>
+  <version>X.X.X</version>
 </dependency>
 ```
-If you are using Github Actions to automate the build, you would need to add authentification to the ".yml" file:
-```
-        env:
-          GITHUB_TOKEN: ${{ github.token }}
-```
-
- 
 
 
 ----------

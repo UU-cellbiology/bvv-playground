@@ -45,7 +45,7 @@ import mpicbg.spim.data.XmlHelpers;
 
 /**
  * Manage a (fixed) set of {@link ConverterSetup}s and (changing) set of
- * {@link MinMaxGroup}s, such that the following is always true:
+ * {@link MinMaxGroupBT}s, such that the following is always true:
  * <ol>
  * <li>Every setup is assigned to exactly one group.</li>
  * <li>No group is empty.</li>
@@ -62,7 +62,7 @@ public class SetupAssignmentsBT
 	private final ArrayList< ConverterSetup > setups;
 
 	/**
-	 * A list of {@link MinMaxGroup}s, such that every {@link #setups setup} is
+	 * A list of {@link MinMaxGroupBT}s, such that every {@link #setups setup} is
 	 * contained in exactly one group.
 	 */
 	private final ArrayList< MinMaxGroupBT > minMaxGroups;
@@ -185,7 +185,7 @@ public class SetupAssignmentsBT
 	}
 
 	/**
-	 * @return the list of {@link MinMaxGroup}s, such that every {@link #setups
+	 * @return the list of {@link MinMaxGroupBT}s, such that every {@link #setups
 	 *         setup} is contained in exactly one group.
 	 */
 	public List< MinMaxGroupBT > getMinMaxGroups()
@@ -202,7 +202,7 @@ public class SetupAssignmentsBT
 	}
 
 	/**
-	 * @return the {@link MinMaxGroup} that contains {@code setup}, currently.
+	 * @return the {@link MinMaxGroupBT} that contains {@code setup}, currently.
 	 */
 	public MinMaxGroupBT getMinMaxGroup( final ConverterSetup setup )
 	{

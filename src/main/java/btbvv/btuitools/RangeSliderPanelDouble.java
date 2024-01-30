@@ -83,12 +83,14 @@ public class RangeSliderPanelDouble extends JPanel implements BoundedValueDouble
 	}
 
 	/**
-	 * Create a {@link SliderPanelDouble} to modify a given {@link BoundedValueDouble value}.
+	 * Create a {@link RangeSliderPanelDouble} to modify two {@link BoundedValueDouble values}.
 	 *
 	 * @param name
 	 *            label to show next to the slider.
-	 * @param model
-	 *            the value that is modified.
+	 * @param modelMin
+	 *            low value.
+	 * @param modelMax
+	 *            top value.
 	 * @param spinnerStepSize
 	 */
 	public RangeSliderPanelDouble(
