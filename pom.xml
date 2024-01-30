@@ -42,7 +42,7 @@
 			</roles>
 		</developer>
 		<developer>
-			<id>tpietzsch</id>
+			<id>ekatrukha</id>
 			<name>Eugene Katrukha</name>
 			<url>https://imagej.net/people/ekatrukha</url>
 			<roles>
@@ -80,15 +80,7 @@
 		<system>GitHub Actions</system>
 		<url>https://github.com/UU-cellbiology/bvv-playground/actions</url>
 	</ciManagement>
-	
-	
-	<distributionManagement>
-    	<repository>
-      		<id>github</id>
-      		<name>GitHub Packages</name>
-      		<url>https://maven.pkg.github.com/ekatrukha/bvv-playground</url>
-    	</repository>
-  	</distributionManagement>
+
 
 	<properties>
 		<package-name>bvvplayground</package-name>
