@@ -6,19 +6,20 @@
 		<groupId>org.scijava</groupId>
 		<artifactId>pom-scijava</artifactId>
 		<version>37.0.0</version>
+		<relativePath />
 	</parent>
 
-	<groupId>fiji.experimental</groupId>
+	<groupId>nl.uu.science.cellbiology</groupId>
 	<artifactId>bvv-playground</artifactId>
 	<version>0.1.4</version>
 
 	<name>BVV-playground</name>
 	<description>Volume rendering of bdv datasets with gamma and transparency option</description>
-	<url>https://github.com/ekatrukha/bvv-playground</url>
-	<inceptionYear>2018</inceptionYear>
+	<url>https://github.com/UU-cellbiology/bvv-playground</url>
+	<inceptionYear>2022</inceptionYear>
 	<organization>
-		<name>BigDataViewer</name>
-		<url>https://imagej.net/BigDataViewer</url>
+		<name>Cell Biology, Neurobiology and Biophysics Department of Utrecht University</name>
+		<url> https://cellbiology.science.uu.nl/</url>
 	</organization>
 	<licenses>
 		<license>
@@ -40,17 +41,21 @@
 				<role>maintainer</role>
 			</roles>
 		</developer>
+		<developer>
+			<id>tpietzsch</id>
+			<name>Eugene Katrukha</name>
+			<url>https://imagej.net/people/ekatrukha</url>
+			<roles>
+				<role>developer</role>
+				<role>maintainer</role>
+			</roles>
+		</developer>
 	</developers>
 	<contributors>
 		<contributor>
 			<name>Ulrik Guenther</name>
 			<url>https://ulrik.is/writing</url>
 			<properties><id>skalarproduktraum</id></properties>
-		</contributor>
-		<contributor>
-			<name>Eugene Katrukha</name>
-			<url>http://imagej.net/User:Ekatrukha</url>
-			<properties><id>ekatrukha</id></properties>
 		</contributor>
 	</contributors>
 
@@ -62,19 +67,21 @@
 	</mailingLists>
 
 	<scm>
-		<connection>scm:git:git://github.com/ekatrukha/bvv-playground</connection>
-		<developerConnection>scm:git:git@github.com:ekatrukha/bvv-playground</developerConnection>
+		<connection>scm:git:git://github.com/UU-cellbiology/bvv-playground</connection>
+		<developerConnection>scm:git:git@github.com:UU-cellbiology/bvv-playground</developerConnection>
 		<tag>HEAD</tag>
-		<url>https://github.com/ekatrukha/bvv-playground</url>
+		<url>https://github.com/UU-cellbiology/bvv-playground</url>
 	</scm>
 	<issueManagement>
 		<system>GitHub Issues</system>
-		<url>https://github.com/ekatrukha/bvv-playground/issues</url>
+		<url>https://github.com/UU-cellbiology/bvv-playground/issues</url>
 	</issueManagement>
 	<ciManagement>
 		<system>GitHub Actions</system>
-		<url>https://github.com/ekatrukha/bvv-playground/actions</url>
+		<url>https://github.com/UU-cellbiology/bvv-playground/actions</url>
 	</ciManagement>
+	
+	
 	<distributionManagement>
     	<repository>
       		<id>github</id>
@@ -86,21 +93,14 @@
 	<properties>
 		<package-name>bvvplayground</package-name>
 		<license.licenseName>bsd_2</license.licenseName>
-		<license.copyrightOwners>Tobias Pietzsch</license.copyrightOwners>
+		<license.copyrightOwners>Cell Biology, Neurobiology and Biophysics
+Department of Utrecht University.</license.copyrightOwners>
 
 		<!-- NB: Deploy releases to the SciJava Maven repository. -->
-<!-- 		<releaseProfiles>sign,deploy-to-scijava</releaseProfiles> -->
+		<releaseProfiles>sign,deploy-to-scijava</releaseProfiles> 
 	</properties>
 
-	<repositories>
-		<repository>
-			<id>scijava.public</id>
-			<url>https://maven.scijava.org/content/groups/public</url>
-		</repository>
-	</repositories>
-
 	<dependencies>
-
 		<dependency>
 			<groupId>commons-lang</groupId>
 			<artifactId>commons-lang</artifactId>
@@ -205,4 +205,11 @@
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
+	
+	<repositories>
+		<repository>
+			<id>scijava.public</id>
+			<url>https://maven.scijava.org/content/groups/public</url>
+		</repository>
+	</repositories>
 </project>
