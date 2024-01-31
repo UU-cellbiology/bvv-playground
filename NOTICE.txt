@@ -1,0 +1,2 @@
+This project is a fork of BigVolumeViewer project by Tobias Pietzsch
+https://github.com/bigdataviewer/bigvolumeviewer-core

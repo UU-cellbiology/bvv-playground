@@ -2,9 +2,10 @@ package btbvv.btcards;
 
 /*-
  * #%L
- * BigDataViewer core classes with minimal dependencies.
+ * Volume rendering of bdv datasets with gamma and transparency option
  * %%
- * Copyright (C) 2012 - 2023 BigDataViewer developers.
+ * Copyright (C) 2022 - 2024 Cell Biology, Neurobiology and Biophysics
+ * Department of Utrecht University.
  * %%
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
