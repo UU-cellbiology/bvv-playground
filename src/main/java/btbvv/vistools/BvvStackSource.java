@@ -43,6 +43,7 @@ import btbvv.core.multires.SourceStacks;
 import java.util.HashSet;
 import java.util.List;
 
+import net.imglib2.RandomAccessibleInterval;
 import net.imglib2.RealInterval;
 import net.imglib2.realtransform.AffineTransform3D;
 import net.imglib2.type.numeric.ARGBType;
@@ -247,6 +248,19 @@ public class BvvStackSource< T > extends BvvSource
 			{
 				final GammaConverterSetup gconverter = ((GammaConverterSetup)setup);
 				gconverter.setLUT(lut_in);
+			}
+		}
+	}
+	
+	@Override
+	public void setchLUT(RandomAccessibleInterval< ARGBType > rai)
+	{
+		for ( final ConverterSetup setup : converterSetups )
+		{
+			if (setup instanceof GammaConverterSetup)
+			{
+				final GammaConverterSetup gconverter = ((GammaConverterSetup)setup);
+				gconverter.setchLUT(rai);
 			}
 		}
 	}

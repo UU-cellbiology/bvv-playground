@@ -29,6 +29,7 @@
  */
 package btbvv.vistools;
 
+import net.imglib2.RandomAccessibleInterval;
 import net.imglib2.RealInterval;
 import net.imglib2.realtransform.AffineTransform3D;
 import net.imglib2.type.numeric.ARGBType;
@@ -79,6 +80,8 @@ public abstract class BvvSource implements Bvv
 	public abstract void setRenderType(final int nRenderType);
 	
 	public abstract void setLUT(final float[][] lut_in);
+	
+	public abstract void setchLUT(RandomAccessibleInterval< ARGBType > rai);
 	
 	public abstract void setClipInterval(RealInterval clipInt);
 	

@@ -34,6 +34,7 @@ import btbvv.btuitools.GammaConverterSetup;
 import btbvv.core.backend.GpuContext;
 import btbvv.core.backend.Texture;
 import btbvv.core.backend.Texture2D;
+import btbvv.core.backend.Texture3D;
 import btbvv.core.cache.CacheSpec;
 import btbvv.core.cache.TextureCache;
 import btbvv.core.dither.DitherBuffer;
@@ -282,10 +283,10 @@ public class MultiVolumeShaderMip
 				"volume", "sampleVolume" ) );
 		segments.put( SegmentType.Convert, new SegmentTemplate(
 				"convert.frag",
-				"convert", "offset", "scale", "gamma", "alphagamma","renderType","useLUT","lut" ) );
+				"convert", "offset", "scale", "gamma", "alphagamma","renderType","useLUT","lut", "zzz" ) );
 		segments.put( SegmentType.ConvertRGBA, new SegmentTemplate(
 				"convert_rgba.frag",
-				"convert", "offset", "scale", "gamma", "alphagamma","renderType","useLUT","lut" ) );
+				"convert", "offset", "scale", "gamma", "alphagamma" ) );
 		segments.put( SegmentType.MaxDepth, new SegmentTemplate(
 				useDepthTexture ? "maxdepthtexture.frag" : "maxdepthone.frag" ) );
 		segments.put( SegmentType.VertexShader, new SegmentTemplate( "multi_volume.vert" ) );
@@ -529,6 +530,7 @@ public class MultiVolumeShaderMip
 		private final Uniform1f uniformGammaAlpha;
 		private final Uniform1i uniformUseLUT;
 		private final Uniform1i uniformRenderType;
+		private final UniformSampler uniformBTLUT;
 		private final Uniform3fv lut; 
 		private final Uniform1i uniformClipActive;
 		private final Uniform3f uniformClipMin;
@@ -547,6 +549,7 @@ public class MultiVolumeShaderMip
 			uniformRenderType = prog.getUniform1i( segmentConv,"renderType" );
 			uniformUseLUT = prog.getUniform1i( segmentConv,"useLUT" );
 			lut = prog.getUniform3fv(segmentConv,"lut");
+			uniformBTLUT = prog.getUniformSampler(segmentConv, "zzz");
 			uniformClipActive = prog.getUniform1i( segmentVol,"clipactive" );
 			uniformClipMin = prog.getUniform3f( segmentVol,"clipmin" );
 			uniformClipMax = prog.getUniform3f( segmentVol,"clipmax" );
@@ -567,7 +570,7 @@ public class MultiVolumeShaderMip
 			}
 		}
 
-		public void setData( ConverterSetup converter )
+		public void setData( ConverterSetup converter)
 		{
 			final double fmin = converter.getDisplayRangeMin() / rangeScale;
 			final double fmax = converter.getDisplayRangeMax() / rangeScale;
@@ -578,7 +581,7 @@ public class MultiVolumeShaderMip
 			uniformGammaAlpha.set(1.0f);
 			uniformRenderType.set(0);
 			uniformClipActive.set(0);
-			
+
 			if (converter instanceof GammaConverterSetup)
 			{	
 				final GammaConverterSetup gconverter = ((GammaConverterSetup)converter);
@@ -594,7 +597,7 @@ public class MultiVolumeShaderMip
 					uniformClipMax.set(gconverter.getClipInterval(),btbvv.core.shadergen.MinMax.MAX);				
 					uniformClipTransform.set(MatrixMath.affine(gconverter.getClipTransform(), new Matrix4f()));
 				}
-				
+				uniformBTLUT.set(((GammaConverterSetup) converter).getchLUT());
 			}
 			
 			final double s = 1.0 / ( fmax - fmin );

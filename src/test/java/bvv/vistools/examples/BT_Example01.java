@@ -30,6 +30,7 @@
 package bvv.vistools.examples;
 
 
+import java.awt.image.IndexColorModel;
 import java.util.List;
 
 import javax.swing.UIManager;
@@ -45,11 +46,13 @@ import btbvv.vistools.BvvSource;
 import btbvv.vistools.BvvStackSource;
 import ij.IJ;
 import ij.ImagePlus;
+import ij.plugin.LutLoader;
 import ij.process.ByteProcessor;
 import mpicbg.spim.data.SpimDataException;
 import net.imglib2.FinalRealInterval;
 import net.imglib2.img.Img;
 import net.imglib2.img.display.imagej.ImageJFunctions;
+import net.imglib2.type.numeric.ARGBType;
 import net.imglib2.type.numeric.integer.UnsignedShortType;
 
 
@@ -63,8 +66,8 @@ public class BT_Example01 {
 		
 		//regular tif init
 		/**/
-		final ImagePlus imp = IJ.openImage( "https://imagej.nih.gov/ij/images/t1-head.zip" );
-		//final ImagePlus imp = IJ.openImage( "/home/eugene/Desktop/head/t1-head_2sources.tif" );
+		//final ImagePlus imp = IJ.openImage( "https://imagej.nih.gov/ij/images/t1-head.zip" );
+		final ImagePlus imp = IJ.openImage( "/home/eugene/Desktop/projects/BigTrace/BigTrace_data/t1-head.tif" );
 		final Img< UnsignedShortType > img = ImageJFunctions.wrapShort( imp );
 		final BvvSource source = BvvFunctions.show( img, "t1-head" );
 	
@@ -108,46 +111,52 @@ public class BT_Example01 {
 		
 		//assign a "Fire" lookup table to this source
 		//(input: float [256][3], the last index (color component) changes from 0 to 1)
-		source.setLUT(getRGBLutTable("Fire"));
+		//source.setLUT(getRGBLutTable("Fire"));
+		source.setLUT(getRGBLutTable("Spectrum"));
+		
+		ByteProcessor ish = new ByteProcessor(256,1);
+		for (int i=0; i<256; i++)
+			for (int j=0; j<1; j++)
+				ish.putPixel(i, j, i);
+		ImagePlus ccc = new ImagePlus("test LUT",ish);
+		ccc.show();
+		IJ.run("Fire");
+		IJ.run("RGB Color");
+		Img<ARGBType> rai = ImageJFunctions.wrapRGBA(ccc);
+		source.setchLUT(rai);
+		//ccc.close();
 		
 		//clip half of the volume along Z axis in the shaders
 		//clipInterval is defined inside the "raw", non-transformed data interval		
 		minI[2]=0.5*maxI[2];		
-		source.setClipInterval(new FinalRealInterval(minI,maxI));
+		//source.setClipInterval(new FinalRealInterval(minI,maxI));
 		
 		
 	}
 	
 	//a helper function to get LUT array from ImageJ
-	static public float [][]  getRGBLutTable(String sLUTName)
+	static public float [][] getRGBLutTable(String sLUTName)
 	{
-		int i,j;
-	
-		int [] onepix; 
-		float [][] RGBLutTable = new float[256][3];
-		ByteProcessor ish = new ByteProcessor(256,1);
-		for ( i=0; i<256; i++)
-			for (j=0; j<10; j++)
-				ish.putPixel(i, j, i);
-		ImagePlus ccc = new ImagePlus("test",ish);
-		ccc.show();
-		IJ.run(sLUTName);
-		IJ.run("RGB Color");
-		//ipLUT= (ColorProcessor) ccc.getProcessor();
-		ccc.setSlice(1);
-		for(i=0;i<256;i++)
-		{
-			
-			onepix= ccc.getPixel(i, 0);
-			//rgbtable[i]=ccc.getPixel(i, 1);
-			//java.awt.Color.RGBtoHSB(onepix[0], onepix[1], onepix[2], hsbvals);
-			RGBLutTable[i][0]=(float)(onepix[0]/255.0f);
-			RGBLutTable[i][1]=(float)(onepix[1]/255.0f);
-			RGBLutTable[i][2]=(float)(onepix[2]/255.0f);
-		}
+				
+		IndexColorModel icm = LutLoader.getLut(sLUTName);
+		
+		int size = icm.getMapSize();
+		byte [][] colors = new byte[3][size];
 
-		ccc.changes=false;
-		ccc.close();
+		icm.getReds(colors[0]);
+		icm.getGreens(colors[1]);
+		icm.getBlues(colors[2]);
+		
+		float [][] RGBLutTable = new float[size][3];
+		
+		for(int i=0;i<size;i++)
+		{			
+			for (int c=0;c<3;c++)
+			{
+				RGBLutTable[i][c]=(float)((colors[c][i]& 0xff)/255.0f);
+			}
+		}
+		
 		return RGBLutTable;
 		
 	}

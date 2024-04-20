@@ -61,6 +61,9 @@ import net.imglib2.type.numeric.integer.UnsignedShortType;
 import org.joml.Matrix4f;
 
 import bdv.tools.brightness.ConverterSetup;
+import btbvv.btuitools.BTLutTexture;
+import btbvv.btuitools.GammaConverterSetup;
+import btbvv.core.backend.Texture3D;
 import btbvv.core.backend.jogl.JoglGpuContext;
 import btbvv.core.blocks.TileAccess;
 import btbvv.core.cache.CacheSpec;
@@ -304,7 +307,18 @@ public class VolumeRenderer
 				int mri = 0;
 				for ( int i = 0; i < renderStacks.size(); i++ )
 				{
-					progvol.setConverter( i, renderConverters.get( i ) );
+					final ConverterSetup converter = renderConverters.get( i );
+					if (converter instanceof GammaConverterSetup)
+					{
+						final BTLutTexture lutT = ((GammaConverterSetup)converter).getchLUT();
+						if(lutT.bInit)
+						{
+							lutT.upload(context);
+						}
+					}
+					//final Texture3D textLUT = simpleStackManager.getLUTTexture(context, (GammaConverterSetup)renderConverters.get( i ));
+					progvol.setConverter( i, renderConverters.get( i ));
+					//progvol.setConverter( i, converter );
 					if ( volumeSignatures.get( i ).getSourceStackType() == MULTIRESOLUTION )
 					{
 						final VolumeBlocks volume = volumes.get( mri++ );

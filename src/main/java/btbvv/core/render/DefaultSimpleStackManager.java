@@ -47,6 +47,7 @@ import net.imglib2.view.Views;
 
 import org.joml.Vector3f;
 
+import btbvv.btuitools.GammaConverterSetup;
 import btbvv.core.backend.GpuContext;
 import btbvv.core.backend.Texture3D;
 import btbvv.core.multires.SimpleStack3D;

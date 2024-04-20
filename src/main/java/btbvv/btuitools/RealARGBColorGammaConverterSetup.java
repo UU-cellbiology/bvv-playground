@@ -33,9 +33,17 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.scijava.listeners.Listeners;
+
+import ij.IJ;
+import ij.ImagePlus;
+import ij.ImageStack;
+import ij.process.ByteProcessor;
 import net.imglib2.FinalRealInterval;
+import net.imglib2.RandomAccessibleInterval;
 import net.imglib2.RealInterval;
 import net.imglib2.display.ColorConverter;
+import net.imglib2.img.Img;
+import net.imglib2.img.display.imagej.ImageJFunctions;
 import net.imglib2.realtransform.AffineTransform3D;
 import net.imglib2.type.numeric.ARGBType;
 
@@ -47,6 +55,8 @@ public class RealARGBColorGammaConverterSetup implements GammaConverterSetup {
 	private final Listeners.List< SetupChangeListener > listeners;
 	
 	private float [][] lut;
+	
+	private BTLutTexture chLUT = new BTLutTexture();
 	
 	/**0 = maximum intensity projection; 1 = transparency **/
 	private int nRenderType =0; 
@@ -69,6 +79,7 @@ public class RealARGBColorGammaConverterSetup implements GammaConverterSetup {
 		this.id = setupId;
 		this.converters = converters;
 		this.listeners = new Listeners.SynchronizedList<>();
+
 	}
 
 	@Override
@@ -184,7 +195,7 @@ public class RealARGBColorGammaConverterSetup implements GammaConverterSetup {
 			}
 			if(converter instanceof ColorGammaConverter)
 			{
-				useLUT=false;
+				useLUT = false;
 			}
 		}
 		if ( changed )
@@ -277,6 +288,26 @@ public class RealARGBColorGammaConverterSetup implements GammaConverterSetup {
 		useLUT = true;
 		
 		listeners.list.forEach( l -> l.setupParametersChanged( this ) );
+	}
+	
+	@Override
+	public void setchLUT(final RandomAccessibleInterval< ARGBType > rai) 
+	{
+		
+		//lut =new float[lut_in.length][];
+		//for(int i=0;i<lut_in.length;i++)
+			//lut[i]=lut_in[i].clone();
+		//chLUT = new BTLutTexture();
+		chLUT.init(rai);
+		useLUT = true;
+		
+		listeners.list.forEach( l -> l.setupParametersChanged( this ) );
+	}
+	
+	@Override
+	public BTLutTexture getchLUT() {
+		
+			return chLUT;
 	}
 
 	@Override

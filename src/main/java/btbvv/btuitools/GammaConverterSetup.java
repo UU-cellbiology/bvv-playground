@@ -31,8 +31,10 @@ package btbvv.btuitools;
 
 import bdv.tools.brightness.ConverterSetup;
 import net.imglib2.FinalRealInterval;
+import net.imglib2.RandomAccessibleInterval;
 import net.imglib2.RealInterval;
 import net.imglib2.realtransform.AffineTransform3D;
+import net.imglib2.type.numeric.ARGBType;
 
 public interface GammaConverterSetup extends ConverterSetup {
 
@@ -47,7 +49,11 @@ public interface GammaConverterSetup extends ConverterSetup {
 	double getAlphaGamma();
 	
 	void setLUT(float [][] lut_in);
-	float [][] getLUT();	
+	float [][] getLUT();
+	
+	BTLutTexture getchLUT();
+	void setchLUT( RandomAccessibleInterval< ARGBType > rai);
+
 	boolean useLut();
 	
 	boolean clipActive();
