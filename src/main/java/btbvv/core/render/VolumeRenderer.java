@@ -311,7 +311,7 @@ public class VolumeRenderer
 					if (converter instanceof GammaConverterSetup)
 					{
 						final BTLutTexture lutT = ((GammaConverterSetup)converter).getchLUT();
-						if(lutT.bInit)
+						if(lutT.bNeedsUpload)
 						{
 							lutT.upload(context);
 						}

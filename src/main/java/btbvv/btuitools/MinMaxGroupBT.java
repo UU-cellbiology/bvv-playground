@@ -200,11 +200,13 @@ public class MinMaxGroupBT extends MinMaxGroup
 		}
 	}
 
+	@Override
 	public double getFullRangeMin()
 	{
 		return fullRangeMin;
 	}
 
+	@Override
 	public double getFullRangeMax()
 	{
 		return fullRangeMax;

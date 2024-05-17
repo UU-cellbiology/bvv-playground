@@ -1,11 +1,13 @@
 package btbvv.btuitools;
 
+import java.awt.image.IndexColorModel;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.IntBuffer;
 
 
 import btbvv.core.backend.GpuContext;
+import btbvv.core.backend.Texture1D;
 import btbvv.core.backend.Texture3D;
 
 import net.imglib2.Cursor;
@@ -25,8 +27,7 @@ public class BTLutTexture implements Texture3D
 	
 	private static ByteBuffer data;
 	//private ByteBuffer data;
-	
-	public boolean bInit = false;
+	public boolean bNeedsUpload = false;
 
 	public BTLutTexture()
 	{
@@ -35,51 +36,38 @@ public class BTLutTexture implements Texture3D
 		data.order( ByteOrder.nativeOrder() );
 	}
 
-	public void init(final RandomAccessibleInterval< ARGBType > rai)
+	public void initBuffer(final IndexColorModel icm)
 	{
-		size[0]=(int) Intervals.numElements( rai );
-		final int numBytes = ( int ) ( 4 *  size[0]);
+		size[0] = icm.getMapSize();
+		final int numBytes = 4 *  size[0];
 		data = ByteBuffer.allocateDirect( numBytes ); // allocate a bit more than needed...
 		data.order( ByteOrder.nativeOrder() );
-		copyToBufferRGBA8( rai );
-		bInit = true;
+		final IntBuffer sdata = data.asIntBuffer();
+		byte [][] colors = new byte[3][size[0]];
+		icm.getReds(colors[0]);
+		icm.getGreens(colors[1]);
+		icm.getBlues(colors[2]);
+		for (int i=0; i<size[0];i++)
+		{
+			final int r = colors[0][i] & 0xff;
+			final int g = colors[1][i] & 0xff;
+			final int b = colors[2][i] & 0xff;
+			final int all = ( 255 << 24 ) | ( b << 16 ) | ( g << 8 ) | r;
+			sdata.put( i,all );
+		}
+		//copyToBufferRGBA8( rai );
+		bNeedsUpload = true;
 	}
 	
 	public void upload( final GpuContext context )
 	{
 		context.delete( this ); // TODO: is this necessary everytime?
 		context.texSubImage3D( this, 0, 0, 0, texWidth(), texHeight(), texDepth(), data );
+		bNeedsUpload = false;
+		//context.texSubImage1D( this, 0, texWidth(), data );
 	}
 	
-//	private static void copyToBufferRGBA8( final RandomAccessibleInterval< ARGBType > rai, final ByteBuffer buffer )
-//	{
-//		// TODO handle specific RAI types more efficiently
-//		// TODO multithreading
-//		final Cursor< ARGBType > cursor = Views.flatIterable( rai ).cursor();
-//		final IntBuffer sdata = buffer.asIntBuffer();
-//		int i = 0;
-//		while ( cursor.hasNext() )
-//			sdata.put( i++, toRGBA( cursor.next().get() ) );
-//	}
-	private static void copyToBufferRGBA8( final RandomAccessibleInterval< ARGBType > rai )
-	{
-		// TODO handle specific RAI types more efficiently
-		// TODO multithreading
-		final Cursor< ARGBType > cursor = Views.flatIterable( rai ).cursor();
-		final IntBuffer sdata = data.asIntBuffer();
-		int i = 0;
-		while ( cursor.hasNext() )
-			sdata.put( i++, toRGBA( cursor.next().get() ) );
-	}
-	
-	private static int toRGBA( final int argb )
-	{
-		final int a = ( argb >> 24 ) & 0xff;
-		final int r = ( argb >> 16 ) & 0xff;
-		final int g = ( argb >> 8 ) & 0xff;
-		final int b = argb & 0xff;
-		return ( a << 24 ) | ( b << 16 ) | ( g << 8 ) | r;
-	}
+
 	
 	@Override
 	public InternalFormat texInternalFormat() 
@@ -96,6 +84,12 @@ public class BTLutTexture implements Texture3D
 	@Override
 	public int texHeight() 
 	{
+		return 1;
+	}
+	@Override
+	public int texDepth() 
+	{
+		
 		return 1;
 	}
 
@@ -118,11 +112,7 @@ public class BTLutTexture implements Texture3D
 		return Wrap.CLAMP_TO_EDGE;
 	}
 
-	@Override
-	public int texDepth() {
-		
-		return 1;
-	}
+
 
 
 

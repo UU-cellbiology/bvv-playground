@@ -130,7 +130,7 @@ public class ColorPanelBT extends JPanel
 			return;
 		setColor( new ARGBType(  newColor.getRGB() | 0xff000000 ) );
 		listeners.list.forEach( ChangeListener::colorChanged );
-	};
+	}
 
 	public Listeners< ChangeListener > changeListeners()
 	{

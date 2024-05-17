@@ -29,6 +29,8 @@
  */
 package btbvv.btuitools;
 
+
+
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Container;
@@ -41,6 +43,9 @@ import java.awt.event.ActionListener;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.image.IndexColorModel;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 
@@ -57,7 +62,9 @@ import javax.swing.JColorChooser;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
+import javax.swing.JMenuItem;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 import javax.swing.JSpinner;
 import javax.swing.KeyStroke;
 import javax.swing.SpinnerNumberModel;
@@ -65,12 +72,15 @@ import javax.swing.SwingUtilities;
 
 
 import bdv.util.InvokeOnEDT;
+import ij.IJ;
+import ij.plugin.LutLoader;
 import bdv.tools.brightness.ColorIcon;
 import bdv.tools.brightness.ConverterSetup;
 import bdv.tools.brightness.SliderPanel;
 import bdv.tools.brightness.SliderPanelDouble;
 import bdv.util.BoundedValueDouble;
 import bdv.util.DelayedPackDialog;
+import btbvv.core.VolumeViewerFrame;
 import mpicbg.spim.data.generic.sequence.BasicViewSetup;
 import net.imglib2.type.numeric.ARGBType;
 
@@ -83,10 +93,14 @@ import net.imglib2.type.numeric.ARGBType;
 @Deprecated
 public class BrightnessDialogBT extends DelayedPackDialog
 {
+	ConverterSetupsBT convSet;
+	
 	public BrightnessDialogBT( final Frame owner, final SetupAssignmentsBT setupAssignments )
 	{
 		super( owner, "brightness and color", false );
 
+		convSet = ( ConverterSetupsBT ) ((VolumeViewerFrame)owner).getConverterSetups();
+		convSet.getBounds();
 		final Container content = getContentPane();
 
 		final MinMaxPanelsBT minMaxPanels = new MinMaxPanelsBT( setupAssignments, this, true );
@@ -202,6 +216,47 @@ public class BrightnessDialogBT extends DelayedPackDialog
 					}, null );
 					d.setVisible( true );
 				} );
+				button.addMouseListener( new MouseAdapter()
+				{ 
+					@Override
+					public void mouseClicked(MouseEvent evt)
+					{
+					    
+					    if (SwingUtilities.isRightMouseButton(evt)) 
+					    {
+					      JPopupMenu popup = new JPopupMenu();
+					      String [] luts = IJ.getLuts();
+					      JMenuItem itemMenu;
+					      for(int i = 0; i<luts.length;i++)
+					      {
+					    	itemMenu =  new  JMenuItem(luts[i]);
+					    	itemMenu.addActionListener( new ActionListener()
+					    			{
+
+										@Override
+										public void actionPerformed( ActionEvent arg0 )
+										{
+											System.out.println(((JMenuItem)arg0.getSource()).getText());
+											String sLUTName = ((JMenuItem)arg0.getSource()).getText();
+											IndexColorModel icm = LutLoader.getLut(sLUTName);
+											if (setup instanceof GammaConverterSetup)
+											{
+												final GammaConverterSetup gconverter = ((GammaConverterSetup)setup);
+												gconverter.setchLUT( icm );
+												int i = icm.getMapSize() - 1;
+												final Color c = new Color(icm.getRed( i ) ,icm.getGreen( i ) ,icm.getBlue( i ) );
+												button.setIcon( new ColorIcon( c ) );
+											}
+										}
+					    			
+					    			});
+					    	popup.add(itemMenu);  
+					      }
+					      //menuItem.addActionListener(this);
+					      popup.show( evt.getComponent(), evt.getX(), evt.getY() );
+					    }
+					}
+				});
 				button.setEnabled( setup.supportsColor() );
 				buttons.add( button );
 				add( button );
@@ -212,6 +267,11 @@ public class BrightnessDialogBT extends DelayedPackDialog
 			if ( frame != null )
 				frame.pack();
 		}
+		
+		private ColorsPanel getItself()
+		{
+			return this;
+		}
 
 		private static Color getColor( final ConverterSetup setup )
 		{
@@ -220,8 +280,7 @@ public class BrightnessDialogBT extends DelayedPackDialog
 				final int value = setup.getColor().get();
 				return new Color( value );
 			}
-			else
-				return null;
+			return null;
 		}
 
 		private static void setColor( final ConverterSetup setup, final Color color )
@@ -329,7 +388,7 @@ public class BrightnessDialogBT extends DelayedPackDialog
 		{
 			super();
 			setupAssignments = assignments;
-			minMaxGroup = (MinMaxGroupBT)group;
+			minMaxGroup = group;
 			this.rememberSizes = rememberSizes;
 //			setBorder( BorderFactory.createCompoundBorder( BorderFactory.createEmptyBorder( 2, 2, 2, 2 ), BorderFactory.createLineBorder( Color.black ) ) );
 			setBorder( BorderFactory.createCompoundBorder( BorderFactory.createEmptyBorder( 2, 2, 2, 2 ), BorderFactory.createEtchedBorder() ) );

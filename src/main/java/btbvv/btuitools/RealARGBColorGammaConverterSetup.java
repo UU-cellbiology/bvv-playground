@@ -29,21 +29,18 @@
  */
 package btbvv.btuitools;
 
+import java.awt.image.IndexColorModel;
 import java.util.Arrays;
 import java.util.List;
 
 import org.scijava.listeners.Listeners;
 
-import ij.IJ;
-import ij.ImagePlus;
-import ij.ImageStack;
-import ij.process.ByteProcessor;
+
 import net.imglib2.FinalRealInterval;
 import net.imglib2.RandomAccessibleInterval;
 import net.imglib2.RealInterval;
 import net.imglib2.display.ColorConverter;
-import net.imglib2.img.Img;
-import net.imglib2.img.display.imagej.ImageJFunctions;
+
 import net.imglib2.realtransform.AffineTransform3D;
 import net.imglib2.type.numeric.ARGBType;
 
@@ -68,6 +65,8 @@ public class RealARGBColorGammaConverterSetup implements GammaConverterSetup {
 	private FinalRealInterval clipInt = null;
 	
 	private AffineTransform3D clipTransform = new AffineTransform3D();
+	
+	public IndexColorModel icm = null;
 
 	public RealARGBColorGammaConverterSetup( final int setupId, final ColorConverter... converters )
 	{
@@ -291,18 +290,19 @@ public class RealARGBColorGammaConverterSetup implements GammaConverterSetup {
 	}
 	
 	@Override
-	public void setchLUT(final RandomAccessibleInterval< ARGBType > rai) 
+	public void setchLUT(final IndexColorModel icm_) 
 	{
 		
 		//lut =new float[lut_in.length][];
 		//for(int i=0;i<lut_in.length;i++)
 			//lut[i]=lut_in[i].clone();
 		//chLUT = new BTLutTexture();
-		chLUT.init(rai);
+		chLUT.initBuffer(icm_);
 		useLUT = true;
 		
 		listeners.list.forEach( l -> l.setupParametersChanged( this ) );
 	}
+	
 	
 	@Override
 	public BTLutTexture getchLUT() {

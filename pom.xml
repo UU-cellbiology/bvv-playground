@@ -174,27 +174,27 @@ Department of Utrecht University.</license.copyrightOwners>
     		<artifactId>jide-oss</artifactId> 
     		<version>3.7.12</version>
   		</dependency> 
+  		<dependency>
+			<groupId>net.imagej</groupId>
+			<artifactId>ij</artifactId>
+		</dependency>
 
 		<!-- Test dependencies -->
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
-
+			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>net.imagej</groupId>
 			<artifactId>imagej</artifactId>
+			<scope>test</scope>
+		</dependency>
 
-		</dependency>
-		<dependency>
-			<groupId>net.imagej</groupId>
-			<artifactId>ij</artifactId>
-	
-		</dependency>
 		<dependency>
 			<groupId>net.imglib2</groupId>
 			<artifactId>imglib2-ij</artifactId>
-
+			<scope>test</scope>
 		</dependency>
 	</dependencies>
 	

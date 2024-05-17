@@ -91,7 +91,7 @@ public class BT_Example01 {
 		double [] maxI = spimData.getSequenceDescription().getImgLoader().getSetupImgLoader(0).getImage(0).maxAsDoubleArray();
 		*/
 	
-		
+		source.setDisplayRangeBounds( 0, 40000 );
 		source.setDisplayRange(0, 655);
 		source.setDisplayGamma(0.5);
 		
@@ -114,22 +114,24 @@ public class BT_Example01 {
 		//source.setLUT(getRGBLutTable("Fire"));
 		source.setLUT(getRGBLutTable("Spectrum"));
 		
-		ByteProcessor ish = new ByteProcessor(256,1);
-		for (int i=0; i<256; i++)
-			for (int j=0; j<1; j++)
-				ish.putPixel(i, j, i);
-		ImagePlus ccc = new ImagePlus("test LUT",ish);
-		ccc.show();
-		IJ.run("Fire");
-		IJ.run("RGB Color");
-		Img<ARGBType> rai = ImageJFunctions.wrapRGBA(ccc);
-		source.setchLUT(rai);
+//		ByteProcessor ish = new ByteProcessor(256,1);
+//		for (int i=0; i<256; i++)
+//			for (int j=0; j<1; j++)
+//				ish.putPixel(i, j, i);
+//		ImagePlus ccc = new ImagePlus("test LUT",ish);
+//		ccc.show();
+//		IJ.run("Fire");
+//		IJ.run("RGB Color");
+		//Img<ARGBType> rai = ImageJFunctions.wrapRGBA(ccc);
+		IndexColorModel icm = LutLoader.getLut("Fire");
+		//source.setchLUTICM(icm);
+		source.setchLUT(icm);
 		//ccc.close();
 		
 		//clip half of the volume along Z axis in the shaders
 		//clipInterval is defined inside the "raw", non-transformed data interval		
 		minI[2]=0.5*maxI[2];		
-		//source.setClipInterval(new FinalRealInterval(minI,maxI));
+		source.setClipInterval(new FinalRealInterval(minI,maxI));
 		
 		
 	}
@@ -153,7 +155,7 @@ public class BT_Example01 {
 		{			
 			for (int c=0;c<3;c++)
 			{
-				RGBLutTable[i][c]=(float)((colors[c][i]& 0xff)/255.0f);
+				RGBLutTable[i][c]=(colors[c][i]& 0xff)/255.0f;
 			}
 		}
 		

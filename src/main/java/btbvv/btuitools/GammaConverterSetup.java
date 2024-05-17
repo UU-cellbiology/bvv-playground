@@ -30,6 +30,9 @@
 package btbvv.btuitools;
 
 import bdv.tools.brightness.ConverterSetup;
+
+import java.awt.image.IndexColorModel;
+
 import net.imglib2.FinalRealInterval;
 import net.imglib2.RandomAccessibleInterval;
 import net.imglib2.RealInterval;
@@ -52,8 +55,10 @@ public interface GammaConverterSetup extends ConverterSetup {
 	float [][] getLUT();
 	
 	BTLutTexture getchLUT();
-	void setchLUT( RandomAccessibleInterval< ARGBType > rai);
+	void setchLUT( IndexColorModel icm_);
 
+
+	
 	boolean useLut();
 	
 	boolean clipActive();

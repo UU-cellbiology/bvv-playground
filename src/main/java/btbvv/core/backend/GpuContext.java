@@ -90,4 +90,8 @@ public interface GpuContext
 
 	// upload texture block from Buffer
 	void texSubImage3D( Texture3D texture, int xoffset, int yoffset, int zoffset, int width, int height, int depth, Buffer pixels );
+
+	// upload 1D texture block from Buffer
+	void texSubImage1D( Texture1D texture, int xoffset,  int width, Buffer pixels );
+
 }

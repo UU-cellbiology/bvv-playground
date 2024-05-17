@@ -40,6 +40,7 @@ import btbvv.btuitools.MinMaxGroupBT;
 import btbvv.btuitools.SetupAssignmentsBT;
 import btbvv.core.multires.SourceStacks;
 
+import java.awt.image.IndexColorModel;
 import java.util.HashSet;
 import java.util.List;
 
@@ -253,14 +254,14 @@ public class BvvStackSource< T > extends BvvSource
 	}
 	
 	@Override
-	public void setchLUT(RandomAccessibleInterval< ARGBType > rai)
+	public void setchLUT(IndexColorModel icm_ )
 	{
 		for ( final ConverterSetup setup : converterSetups )
 		{
 			if (setup instanceof GammaConverterSetup)
 			{
 				final GammaConverterSetup gconverter = ((GammaConverterSetup)setup);
-				gconverter.setchLUT(rai);
+				gconverter.setchLUT(icm_);
 			}
 		}
 	}
@@ -361,4 +362,5 @@ public class BvvStackSource< T > extends BvvSource
 		}
 		
 	}
+
 }

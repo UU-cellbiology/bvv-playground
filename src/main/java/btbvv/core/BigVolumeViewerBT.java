@@ -168,9 +168,11 @@ public class BigVolumeViewerBT
 			for ( final ConverterSetup setup : setupAssignments.getConverterSetups() )
 				setupAssignments.moveSetupToGroup( setup, group );
 		}
-
+		
 		brightnessDialog = new BrightnessDialogBT( viewerFrame, setupAssignments );
 
+		
+		
 		fileChooser = new JFileChooser();
 		fileChooser.setFileFilter( new FileFilter()
 		{
