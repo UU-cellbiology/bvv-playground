@@ -195,6 +195,7 @@ public class RealARGBColorGammaConverterSetup implements GammaConverterSetup {
 			if(converter instanceof ColorGammaConverter)
 			{
 				useLUT = false;
+				changed = true;
 			}
 		}
 		if ( changed )

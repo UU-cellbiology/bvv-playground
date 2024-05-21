@@ -39,10 +39,8 @@ import javax.swing.event.TreeModelListener;
 
 import bdv.tools.brightness.ConverterSetup;
 import bdv.ui.sourcegrouptree.SourceGroupTree;
-import bdv.ui.sourcetable.SourceTable;
 import bdv.viewer.ConverterSetups;
 import btbvv.btcards.sourcetable.SourceTableBT;
-import btbvv.btuitools.ColorIconBT;
 import btbvv.btuitools.GammaConverterSetup;
 
 import net.imglib2.type.numeric.ARGBType;
@@ -129,9 +127,6 @@ public class ColorEditorBT {
 				{
 					final GammaConverterSetup gconverter = ((GammaConverterSetup)converterSetup);
 					gconverter.setLUT( icm, colorPanel.getICMName());
-					//int i = icm.getMapSize() - 1;
-					//final Color c = new Color(icm.getRed( i ) ,icm.getGreen( i ) ,icm.getBlue( i ) );
-					//button.setIcon( new ColorIconBT( null, icm ) );
 				}
 			}
 			else
