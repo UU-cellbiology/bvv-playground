@@ -310,7 +310,7 @@ public class VolumeRenderer
 					final ConverterSetup converter = renderConverters.get( i );
 					if (converter instanceof GammaConverterSetup)
 					{
-						final BTLutTexture lutT = ((GammaConverterSetup)converter).getchLUT();
+						final BTLutTexture lutT = ((GammaConverterSetup)converter).getLUTTexture();
 						if(lutT.bNeedsUpload)
 						{
 							lutT.upload(context);

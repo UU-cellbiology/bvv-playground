@@ -35,9 +35,9 @@ import java.util.List;
 
 import org.scijava.listeners.Listeners;
 
+import ij.plugin.LutLoader;
 
 import net.imglib2.FinalRealInterval;
-import net.imglib2.RandomAccessibleInterval;
 import net.imglib2.RealInterval;
 import net.imglib2.display.ColorConverter;
 
@@ -50,8 +50,6 @@ public class RealARGBColorGammaConverterSetup implements GammaConverterSetup {
 	private final List< ColorConverter > converters;
 
 	private final Listeners.List< SetupChangeListener > listeners;
-	
-	private float [][] lut;
 	
 	private BTLutTexture chLUT = new BTLutTexture();
 	
@@ -67,6 +65,8 @@ public class RealARGBColorGammaConverterSetup implements GammaConverterSetup {
 	private AffineTransform3D clipTransform = new AffineTransform3D();
 	
 	public IndexColorModel icm = null;
+	
+	private String sLUTName = null;
 
 	public RealARGBColorGammaConverterSetup( final int setupId, final ColorConverter... converters )
 	{
@@ -231,8 +231,7 @@ public class RealARGBColorGammaConverterSetup implements GammaConverterSetup {
 	{
 		if(converters.get(0) instanceof ColorGammaConverter)
 			return ((ColorGammaConverter)converters.get( 0 )).getMinAlpha();
-		else
-			return 0.0;
+		return 0.0;
 	}
 
 	@Override
@@ -240,36 +239,31 @@ public class RealARGBColorGammaConverterSetup implements GammaConverterSetup {
 	{
 		if(converters.get(0) instanceof ColorGammaConverter)
 			return ((ColorGammaConverter)converters.get( 0 )).getMaxAlpha();
-		else
-			return 1.0;
+		return 1.0;
 		
 	}
 	
 	@Override
-	public double getDisplayGamma() {
+	public double getDisplayGamma() 
+	{
 		if(converters.get(0) instanceof ColorGammaConverter)
 		{
 			final ColorGammaConverter convgamma = (ColorGammaConverter)converters.get(0);
 			return convgamma.getGamma();
 		}
-		else
-		{
-			return 1.0;
-		}
+		return 1.0;
 		
 	}
 	
 	@Override
-	public double getAlphaGamma() {
+	public double getAlphaGamma() 
+	{
 		if(converters.get(0) instanceof ColorGammaConverter)
 		{
 			final ColorGammaConverter convgamma = (ColorGammaConverter)converters.get(0);
 			return convgamma.getGammaAlpha();
 		}
-		else
-		{
-			return 1.0;
-		}
+		return 1.0;
 	}
 
 	@Override
@@ -278,21 +272,12 @@ public class RealARGBColorGammaConverterSetup implements GammaConverterSetup {
 		return converters.get( 0 ).getColor();
 	}
 
-	@Override
-	public void setLUT(float[][] lut_in) {
-		
-		lut =new float[lut_in.length][];
-		for(int i=0;i<lut_in.length;i++)
-			lut[i]=lut_in[i].clone();
-		useLUT = true;
-		
-		listeners.list.forEach( l -> l.setupParametersChanged( this ) );
-	}
 	
 	@Override
-	public void setchLUT(final IndexColorModel icm_) 
+	public void setLUT(final IndexColorModel icm_, String sLUTName) 
 	{
 		
+		this.sLUTName = sLUTName;
 		//lut =new float[lut_in.length][];
 		//for(int i=0;i<lut_in.length;i++)
 			//lut[i]=lut_in[i].clone();
@@ -302,21 +287,23 @@ public class RealARGBColorGammaConverterSetup implements GammaConverterSetup {
 		
 		listeners.list.forEach( l -> l.setupParametersChanged( this ) );
 	}
-	
-	
 	@Override
-	public BTLutTexture getchLUT() {
+	public void setLUT(String sLUTName)
+	{
+		setLUT(LutLoader.getLut(sLUTName),sLUTName);
+	}
+	@Override
+	public String getLUTName()
+	{
+		if(useLUT)
+			return sLUTName;
+		
+		return null;
+	}
+	@Override
+	public BTLutTexture getLUTTexture() {
 		
 			return chLUT;
-	}
-
-	@Override
-	public float[][] getLUT() {
-		
-		if(!useLUT)
-			return null;
-		else
-			return lut;
 	}
 
 
@@ -357,8 +344,7 @@ public class RealARGBColorGammaConverterSetup implements GammaConverterSetup {
 	public FinalRealInterval getClipInterval() {
 		if(clipActive)
 			return clipInt;
-		else
-			return null;
+		return null;
 	}
 
 	@Override

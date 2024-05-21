@@ -29,6 +29,7 @@
  */
 package btbvv.btcards;
 
+import java.awt.image.IndexColorModel;
 import java.util.List;
 import java.util.function.Supplier;
 
@@ -40,6 +41,10 @@ import bdv.tools.brightness.ConverterSetup;
 import bdv.ui.sourcegrouptree.SourceGroupTree;
 import bdv.ui.sourcetable.SourceTable;
 import bdv.viewer.ConverterSetups;
+import btbvv.btcards.sourcetable.SourceTableBT;
+import btbvv.btuitools.ColorIconBT;
+import btbvv.btuitools.GammaConverterSetup;
+
 import net.imglib2.type.numeric.ARGBType;
 
 public class ColorEditorBT {
@@ -48,7 +53,7 @@ public class ColorEditorBT {
 	private final ColorPanelBT colorPanel;
 
 	public ColorEditorBT(
-			final SourceTable table,
+			final SourceTableBT table,
 			final ConverterSetups converterSetups,
 			final ColorPanelBT colorPanel )
 	{
@@ -115,11 +120,27 @@ public class ColorEditorBT {
 			return;
 
 		ARGBType color = colorPanel.getColor();
-
+		IndexColorModel icm = colorPanel.getICM();
 		for ( final ConverterSetup converterSetup : converterSetups )
 		{
-			if ( converterSetup.supportsColor() )
-				converterSetup.setColor( color );
+			if(icm != null)
+			{
+				if (converterSetup instanceof GammaConverterSetup)
+				{
+					final GammaConverterSetup gconverter = ((GammaConverterSetup)converterSetup);
+					gconverter.setLUT( icm, colorPanel.getICMName());
+					//int i = icm.getMapSize() - 1;
+					//final Color c = new Color(icm.getRed( i ) ,icm.getGreen( i ) ,icm.getBlue( i ) );
+					//button.setIcon( new ColorIconBT( null, icm ) );
+				}
+			}
+			else
+			{
+				if ( converterSetup.supportsColor() && color!=null)
+				{
+					converterSetup.setColor( color );
+				}
+			}
 		}
 
 		updateColorPanel();
@@ -145,6 +166,8 @@ public class ColorEditorBT {
 		{
 			ARGBType color = null;
 			boolean allColorsEqual = true;
+			boolean allLUTsEqual = true;
+			String sLUTName = null;
 			for ( final ConverterSetup converterSetup : converterSetups )
 			{
 				if ( converterSetup.supportsColor() )
@@ -154,9 +177,32 @@ public class ColorEditorBT {
 					else
 						allColorsEqual &= color.equals( converterSetup.getColor() );
 				}
+				if (converterSetup instanceof GammaConverterSetup)
+				{
+					final GammaConverterSetup gconverter = ((GammaConverterSetup)converterSetup);
+					if(gconverter.useLut())
+					{
+						allColorsEqual = false;	
+					
+						if(sLUTName == null)
+						{
+							sLUTName = gconverter.getLUTName();
+						}
+						else
+						{
+							allLUTsEqual  &=sLUTName.equals( gconverter.getLUTName() );
+						}
+					}
+					else
+					{
+						allLUTsEqual = false;
+					}
+				}
 			}
 			final ARGBType finalColor = color;
-			final boolean isConsistent = allColorsEqual;
+			final String sLUTFinal = sLUTName;
+			final boolean isConsistent = allColorsEqual||allLUTsEqual;
+			final boolean bLUTFinal = allLUTsEqual;
 			SwingUtilities.invokeLater( () -> {
 				synchronized ( ColorEditorBT.this )
 				{
@@ -164,6 +210,9 @@ public class ColorEditorBT {
 					colorPanel.setEnabled( finalColor != null );
 					colorPanel.setColor( finalColor );
 					colorPanel.setConsistent( isConsistent );
+					if(bLUTFinal)
+						colorPanel.setICMbyName( sLUTFinal  );
+						
 					blockUpdates = false;
 				}
 			} );

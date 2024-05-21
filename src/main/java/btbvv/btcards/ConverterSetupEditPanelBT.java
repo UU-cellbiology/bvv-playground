@@ -34,8 +34,8 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import bdv.ui.sourcegrouptree.SourceGroupTree;
-import bdv.ui.sourcetable.SourceTable;
 import bdv.util.BoundedValueDouble;
+import btbvv.btcards.sourcetable.SourceTableBT;
 import btbvv.btuitools.ConverterSetupsBT;
 import net.miginfocom.swing.MigLayout;
 
@@ -60,7 +60,7 @@ public class ConverterSetupEditPanelBT extends JPanel
 	}
 
 	public ConverterSetupEditPanelBT(
-			final SourceTable table,
+			final SourceTableBT table,
 			final ConverterSetupsBT converterSetups )
 	{
 		this();

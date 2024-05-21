@@ -42,13 +42,14 @@ import javax.swing.tree.TreeSelectionModel;
 
 import bdv.ui.CardPanel;
 import bdv.ui.sourcegrouptree.SourceGroupTree;
-import bdv.ui.sourcetable.SourceTable;
 import bdv.ui.viewermodepanel.DisplaySettingsPanel;
 import bdv.viewer.AbstractViewerPanel;
 import bdv.viewer.ViewerState;
+import btbvv.btcards.sourcetable.SourceTableBT;
 import btbvv.btuitools.ConverterSetupsBT;
 
-public class BtBVVDefaultCards {
+public class BtBVVDefaultCards 
+{
 	public static final String DEFAULT_SOURCES_CARD = "default bdv sources card";
 
 	public static final String DEFAULT_SOURCEGROUPS_CARD = "default bdv groups card";
@@ -60,8 +61,8 @@ public class BtBVVDefaultCards {
 		final ViewerState state = viewer.state();
 
 		// -- Sources table --
-		final SourceTable table = new SourceTable( state, converterSetups, viewer.getInputTriggerConfig() );
-		table.setPreferredScrollableViewportSize( new Dimension( 300, 200 ) );
+		final SourceTableBT table = new SourceTableBT( state, converterSetups, viewer.getInputTriggerConfig() );
+		table.setPreferredScrollableViewportSize( new Dimension( 340, 200 ) );
 		table.setFillsViewportHeight( true );
 		table.setDragEnabled( true );
 		final ConverterSetupEditPanelBT editPanelTableBT = new ConverterSetupEditPanelBT( table, converterSetups );
@@ -71,7 +72,7 @@ public class BtBVVDefaultCards {
 		scrollPaneTable.addMouseWheelListener( new MouseWheelScrollListener( scrollPaneTable ) );
 		tablePanel.add( scrollPaneTable, BorderLayout.CENTER );
 		tablePanel.add( editPanelTableBT, BorderLayout.SOUTH );
-		tablePanel.setPreferredSize( new Dimension( 300, 285 ) );
+		tablePanel.setPreferredSize( new Dimension( 340, 285 ) );
 
 		// -- Groups tree --
 		final SourceGroupTree tree = new SourceGroupTree( state, viewer.getInputTriggerConfig() );
@@ -90,7 +91,7 @@ public class BtBVVDefaultCards {
 		scrollPaneTree.addMouseWheelListener( new MouseWheelScrollListener( scrollPaneTree ) );
 		treePanel.add( scrollPaneTree, BorderLayout.CENTER );
 		treePanel.add( editPanelTree, BorderLayout.SOUTH );
-		treePanel.setPreferredSize( new Dimension( 300, 225 ) );
+		treePanel.setPreferredSize( new Dimension( 340, 225 ) );
 
 		cards.addCard( DEFAULT_VIEWERMODES_CARD, "Display Modes", new DisplaySettingsPanel( viewer.state() ), true, new Insets( 0, 4, 4, 0 ) );
 		cards.addCard( DEFAULT_SOURCES_CARD, "Sources", tablePanel, true, new Insets( 0, 0, 0, 0 ) );

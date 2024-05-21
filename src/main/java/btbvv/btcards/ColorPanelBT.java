@@ -31,16 +31,26 @@ package btbvv.btcards;
 
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.image.IndexColorModel;
 
 import javax.swing.JButton;
 import javax.swing.JColorChooser;
+import javax.swing.JMenuItem;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
+import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 
 import org.scijava.listeners.Listeners;
 
-import bdv.tools.brightness.ColorIcon;
 import bdv.ui.UIUtils;
+import btbvv.btuitools.ColorIconBT;
+import ij.IJ;
+import ij.plugin.LutLoader;
 
 import net.imglib2.type.numeric.ARGBType;
 import net.miginfocom.swing.MigLayout;
@@ -50,6 +60,10 @@ public class ColorPanelBT extends JPanel
 	private final JButton colorButton;
 
 	private final ARGBType color = new ARGBType();
+	
+	private IndexColorModel icm = null;
+	
+	private String icmName = null;
 
 	public interface ChangeListener
 	{
@@ -91,6 +105,43 @@ public class ColorPanelBT extends JPanel
 		colorButton.setMinimumSize( new Dimension( 32, 30 ) );
 		colorButton.setPreferredSize( new Dimension( 32, 30 ) );
 
+		colorButton.addMouseListener( new MouseAdapter()
+		{ 
+			@Override
+			public void mouseClicked(MouseEvent evt)
+			{
+			    
+			    if (SwingUtilities.isRightMouseButton(evt)&& colorButton.isEnabled()) 
+			    {
+			      JPopupMenu popup = new JPopupMenu();
+			      String [] luts = IJ.getLuts();
+			      JMenuItem itemMenu;
+			      for(int i = 0; i<luts.length;i++)
+			      {
+			    	itemMenu =  new  JMenuItem(luts[i]);
+			    	itemMenu.addActionListener( new ActionListener()
+			    			{
+
+								@Override
+								public void actionPerformed( ActionEvent arg0 )
+								{
+									//System.out.println(((JMenuItem)arg0.getSource()).getText());
+									String sLUTName = ((JMenuItem)arg0.getSource()).getText();
+									setICMbyName(sLUTName);
+									listeners.list.forEach( ChangeListener::colorChanged );
+
+								}
+			    			
+			    			});
+			    	popup.add(itemMenu);  
+			      }
+			      //menuItem.addActionListener(this);
+			      popup.show( evt.getComponent(), evt.getX(), evt.getY() );
+			    }
+			}
+		});
+		
+		
 		setColor( null );
 	}
 
@@ -143,12 +194,31 @@ public class ColorPanelBT extends JPanel
 			this.color.set( 0xffaaaaaa );
 		else
 			this.color.set( color );
+		icm = null;
+		icmName = null;
 		//colorButton.setIcon( new ColorIcon( new Color( this.color.get() ), 30, 30, 10, 10, true ) );
-		colorButton.setIcon( new ColorIcon( new Color( this.color.get() ), 21, 21, 7, 7, true ) );
+		colorButton.setIcon( new ColorIconBT( new Color( this.color.get() ), null, 21, 21, 7, 7, true ) );
+	}
+
+	public synchronized void setICMbyName(String icmName)
+	{
+		//IndexColorModel icm_ = LutLoader.getLut(sLUTName);
+		//setICM(icm_);
+		this.icmName = icmName;
+		this.icm = LutLoader.getLut(icmName);		
+		colorButton.setIcon( new ColorIconBT( null, icm, 21, 21, 7, 7, true ) );
 	}
 
 	public ARGBType getColor()
 	{
 		return color.copy();
+	}
+	public IndexColorModel getICM()
+	{
+		return icm;
+	}
+	public String getICMName()
+	{
+		return icmName;
 	}
 }

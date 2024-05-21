@@ -530,8 +530,7 @@ public class MultiVolumeShaderMip
 		private final Uniform1f uniformGammaAlpha;
 		private final Uniform1i uniformUseLUT;
 		private final Uniform1i uniformRenderType;
-		private final UniformSampler uniformBTLUT;
-		private final Uniform3fv lut; 
+		private final UniformSampler uniformLUT;
 		private final Uniform1i uniformClipActive;
 		private final Uniform3f uniformClipMin;
 		private final Uniform3f uniformClipMax;
@@ -548,8 +547,7 @@ public class MultiVolumeShaderMip
 			uniformGammaAlpha = prog.getUniform1f( segmentConv,"alphagamma" );
 			uniformRenderType = prog.getUniform1i( segmentConv,"renderType" );
 			uniformUseLUT = prog.getUniform1i( segmentConv,"useLUT" );
-			lut = prog.getUniform3fv(segmentConv,"lut");
-			uniformBTLUT = prog.getUniformSampler(segmentConv, "zzz");
+			uniformLUT = prog.getUniformSampler(segmentConv, "lut");
 			uniformClipActive = prog.getUniform1i( segmentVol,"clipactive" );
 			uniformClipMin = prog.getUniform3f( segmentVol,"clipmin" );
 			uniformClipMax = prog.getUniform3f( segmentVol,"clipmax" );
@@ -597,7 +595,7 @@ public class MultiVolumeShaderMip
 					uniformClipMax.set(gconverter.getClipInterval(),btbvv.core.shadergen.MinMax.MAX);				
 					uniformClipTransform.set(MatrixMath.affine(gconverter.getClipTransform(), new Matrix4f()));
 				}
-				uniformBTLUT.set(((GammaConverterSetup) converter).getchLUT());
+				uniformLUT.set(((GammaConverterSetup) converter).getLUTTexture());
 			}
 			
 			final double s = 1.0 / ( fmax - fmin );
@@ -619,7 +617,6 @@ public class MultiVolumeShaderMip
 				{
 					if(((GammaConverterSetup) converter).useLut())
 					{
-						lut.set(((GammaConverterSetup) converter).getLUT());
 						bUseLUT = true;
 						uniformUseLUT.set(1);
 						uniformOffset.set(
@@ -642,9 +639,9 @@ public class MultiVolumeShaderMip
 					uniformUseLUT.set(0);
 				
 					final int color = converter.getColor().get();
-					final double r = ( double ) ARGBType.red( color ) / 255.0;
-					final double g = ( double ) ARGBType.green( color ) / 255.0;
-					final double b = ( double ) ARGBType.blue( color ) / 255.0;
+					final double r = ARGBType.red( color ) / 255.0;
+					final double g = ARGBType.green( color ) / 255.0;
+					final double b = ARGBType.blue( color ) / 255.0;
 
 					uniformOffset.set(
 							( float ) ( o * r ),

@@ -48,6 +48,7 @@ import bdv.util.BoundedRange;
 import bdv.util.BoundedValueDouble;
 import bdv.util.Bounds;
 import bdv.viewer.ConverterSetupBounds;
+import btbvv.btcards.sourcetable.SourceTableBT;
 import btbvv.btuitools.ConverterSetupBoundsAlpha;
 import btbvv.btuitools.ConverterSetupBoundsGammaAlpha;
 import btbvv.btuitools.ConverterSetupBoundsGamma;
@@ -72,7 +73,7 @@ public class BoundedRangeEditorBT {
 	private boolean bSync;
 
 	public BoundedRangeEditorBT(
-			final SourceTable table,
+			final SourceTableBT table,
 			final ConverterSetupsBT converterSetups,
 			final BoundedRangePanelBT rangePanel,
 			final BoundedValuePanelBT gammaPanel,

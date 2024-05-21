@@ -31,7 +31,6 @@ package btbvv.vistools;
 
 import bdv.tools.brightness.ConverterSetup;
 import bdv.tools.brightness.MinMaxGroup;
-import bdv.tools.brightness.SetupAssignments;
 import bdv.util.Bounds;
 import bdv.viewer.ConverterSetupBounds;
 import bdv.viewer.SourceAndConverter;
@@ -44,7 +43,6 @@ import java.awt.image.IndexColorModel;
 import java.util.HashSet;
 import java.util.List;
 
-import net.imglib2.RandomAccessibleInterval;
 import net.imglib2.RealInterval;
 import net.imglib2.realtransform.AffineTransform3D;
 import net.imglib2.type.numeric.ARGBType;
@@ -89,6 +87,7 @@ public class BvvStackSource< T > extends BvvSource
 	{
 		for ( final ConverterSetup setup : converterSetups )
 			setup.setColor( color );
+		
 	}
 
 	@Override
@@ -240,28 +239,30 @@ public class BvvStackSource< T > extends BvvSource
 		}
 	}
 	
+	
+	
 	@Override
-	public void setLUT(final float[][] lut_in)
+	public void setLUT(final IndexColorModel icm_, String sLUTName )
 	{
 		for ( final ConverterSetup setup : converterSetups )
 		{
 			if (setup instanceof GammaConverterSetup)
 			{
 				final GammaConverterSetup gconverter = ((GammaConverterSetup)setup);
-				gconverter.setLUT(lut_in);
+				gconverter.setLUT(icm_, sLUTName);
 			}
 		}
 	}
 	
 	@Override
-	public void setchLUT(IndexColorModel icm_ )
+	public void setLUT( String sLUTName )
 	{
 		for ( final ConverterSetup setup : converterSetups )
 		{
 			if (setup instanceof GammaConverterSetup)
 			{
 				final GammaConverterSetup gconverter = ((GammaConverterSetup)setup);
-				gconverter.setchLUT(icm_);
+				gconverter.setLUT(sLUTName);
 			}
 		}
 	}

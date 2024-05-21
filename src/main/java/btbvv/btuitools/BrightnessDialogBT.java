@@ -74,7 +74,7 @@ import javax.swing.SwingUtilities;
 import bdv.util.InvokeOnEDT;
 import ij.IJ;
 import ij.plugin.LutLoader;
-import bdv.tools.brightness.ColorIcon;
+//import bdv.tools.brightness.ColorIcon;
 import bdv.tools.brightness.ConverterSetup;
 import bdv.tools.brightness.SliderPanel;
 import bdv.tools.brightness.SliderPanelDouble;
@@ -198,7 +198,24 @@ public class BrightnessDialogBT extends DelayedPackDialog
 			add( new JLabel( "set view colors:" ) );
 			for ( final ConverterSetup setup : setupAssignments.getConverterSetups() )
 			{
-				final JButton button = new JButton( new ColorIcon( getColor( setup ) ) );
+				final JButton button;
+				if (setup instanceof GammaConverterSetup)
+				{
+					final GammaConverterSetup gconverter = ((GammaConverterSetup)setup);
+					if(gconverter.useLut())
+					{
+						button = new JButton( new ColorIconBT( null, LutLoader.getLut(gconverter.getLUTName()) ) );
+					}
+					else
+					{
+						button = new JButton( new ColorIconBT( getColor( setup ), null ) );
+					}
+				}
+				else
+				{
+					button = new JButton( new ColorIconBT( getColor( setup ), null ) );
+				}
+			
 				button.addActionListener( e -> {
 					colorChooser.setColor( getColor( setup ) );
 					final JDialog d = JColorChooser.createDialog( button, "Choose a color", true, colorChooser, new ActionListener()
@@ -209,7 +226,7 @@ public class BrightnessDialogBT extends DelayedPackDialog
 							final Color c = colorChooser.getColor();
 							if (c != null)
 							{
-								button.setIcon( new ColorIcon( c ) );
+								button.setIcon( new ColorIconBT( c, null ) );
 								setColor( setup, c );
 							}
 						}
@@ -236,16 +253,15 @@ public class BrightnessDialogBT extends DelayedPackDialog
 										@Override
 										public void actionPerformed( ActionEvent arg0 )
 										{
-											System.out.println(((JMenuItem)arg0.getSource()).getText());
+											//System.out.println(((JMenuItem)arg0.getSource()).getText());
 											String sLUTName = ((JMenuItem)arg0.getSource()).getText();
 											IndexColorModel icm = LutLoader.getLut(sLUTName);
 											if (setup instanceof GammaConverterSetup)
 											{
 												final GammaConverterSetup gconverter = ((GammaConverterSetup)setup);
-												gconverter.setchLUT( icm );
-												int i = icm.getMapSize() - 1;
-												final Color c = new Color(icm.getRed( i ) ,icm.getGreen( i ) ,icm.getBlue( i ) );
-												button.setIcon( new ColorIcon( c ) );
+												gconverter.setLUT( sLUTName );
+
+												button.setIcon( new ColorIconBT( null, icm ) );
 											}
 										}
 					    			

@@ -51,13 +51,10 @@ public interface GammaConverterSetup extends ConverterSetup {
 	void setAlphaGamma( double gamma );
 	double getAlphaGamma();
 	
-	void setLUT(float [][] lut_in);
-	float [][] getLUT();
-	
-	BTLutTexture getchLUT();
-	void setchLUT( IndexColorModel icm_);
-
-
+	BTLutTexture getLUTTexture();
+	String getLUTName();
+	void setLUT(IndexColorModel icm_, String sLUTName);
+	void setLUT(String sLUTName);
 	
 	boolean useLut();
 	

@@ -112,7 +112,7 @@ public class BT_Example01 {
 		//assign a "Fire" lookup table to this source
 		//(input: float [256][3], the last index (color component) changes from 0 to 1)
 		//source.setLUT(getRGBLutTable("Fire"));
-		source.setLUT(getRGBLutTable("Spectrum"));
+		//source.setLUT(getRGBLutTable("Spectrum"));
 		
 //		ByteProcessor ish = new ByteProcessor(256,1);
 //		for (int i=0; i<256; i++)
@@ -123,9 +123,9 @@ public class BT_Example01 {
 //		IJ.run("Fire");
 //		IJ.run("RGB Color");
 		//Img<ARGBType> rai = ImageJFunctions.wrapRGBA(ccc);
-		IndexColorModel icm = LutLoader.getLut("Fire");
+		//IndexColorModel icm = LutLoader.getLut("Fire");
 		//source.setchLUTICM(icm);
-		source.setchLUT(icm);
+		//source.setLUT("Fire");
 		//ccc.close();
 		
 		//clip half of the volume along Z axis in the shaders

@@ -31,7 +31,6 @@ package btbvv.vistools;
 
 import java.awt.image.IndexColorModel;
 
-import net.imglib2.RandomAccessibleInterval;
 import net.imglib2.RealInterval;
 import net.imglib2.realtransform.AffineTransform3D;
 import net.imglib2.type.numeric.ARGBType;
@@ -65,7 +64,7 @@ public abstract class BvvSource implements Bvv
 
 	public abstract void setActive( final boolean isActive );
 	
-	//addition of BVV-playgrount
+	//addition of BVV-playground
 	
 	public abstract void setDisplayGamma( final double gamma );
 
@@ -81,10 +80,9 @@ public abstract class BvvSource implements Bvv
 	
 	public abstract void setRenderType(final int nRenderType);
 	
-	public abstract void setLUT(final float[][] lut_in);
+	public abstract void setLUT(final IndexColorModel icm_, String sLUTName);
 	
-	public abstract void setchLUT(final IndexColorModel icm_);
-
+	public abstract void setLUT(String sLUTName);
 	
 	public abstract void setClipInterval(RealInterval clipInt);
 	
