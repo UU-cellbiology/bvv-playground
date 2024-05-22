@@ -7,11 +7,16 @@ import bdv.viewer.ConverterSetups;
 import bdv.viewer.SourceAndConverter;
 import bdv.viewer.SourceToConverterSetupBimap;
 import bdv.viewer.ViewerState;
+import btbvv.btuitools.GammaConverterSetup;
+import ij.IJ;
+
 import com.formdev.flatlaf.ui.FlatUIUtils;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Point;
 import java.awt.datatransfer.Transferable;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.InputEvent;
@@ -20,7 +25,10 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.swing.JColorChooser;
 import javax.swing.JComponent;
+import javax.swing.JMenuItem;
+import javax.swing.JPopupMenu;
 import javax.swing.JTable;
+import javax.swing.SwingUtilities;
 import javax.swing.TransferHandler;
 import javax.swing.UIManager;
 import net.imglib2.type.numeric.ARGBType;
@@ -183,7 +191,8 @@ public class SourceTableBT extends JTable
 	@Override
 	protected void processMouseEvent( final MouseEvent e )
 	{
-		if ( e.getModifiers() == InputEvent.BUTTON1_MASK )
+		//if ( e.getModifiers() == InputEvent.BUTTON1_MASK )
+		if(SwingUtilities.isLeftMouseButton(e))
 		{
 			if ( e.getID() == MouseEvent.MOUSE_PRESSED )
 			{
@@ -280,6 +289,113 @@ public class SourceTableBT extends JTable
 					e.consume();
 			}
 		}
+		if (SwingUtilities.isRightMouseButton(e) )
+		{
+			if ( e.getID() == MouseEvent.MOUSE_PRESSED )
+			{
+				final Point point = e.getPoint();
+				pressedAt = point;
+				final int vcol = columnAtPoint( point );
+				final int vrow = rowAtPoint( point );
+				if ( vcol >= 0 && vrow >= 0 )
+				{
+					final int mcol = convertColumnIndexToModel( vcol );
+					switch ( mcol )
+					{
+					case IS_ACTIVE_COLUMN:
+					case IS_CURRENT_COLUMN:
+					case COLOR_COLUMN:
+						final int mrow = convertRowIndexToModel( vrow );
+						if ( isRowSelected( mrow ) )
+						{
+							e.consume();
+							consumeNext = true;
+						}
+					}
+				}
+			}
+			else if ( e.getID() == MouseEvent.MOUSE_RELEASED )
+			{
+				if ( consumeNext )
+				{
+					releasedWhen = e.getWhen();
+					consumeNext = false;
+					e.consume();
+				}
+
+				if ( pressedAt == null )
+					return;
+
+				final Point point = e.getPoint();
+				if ( point.distanceSq( pressedAt ) > 2 )
+					return;
+
+				final int vcol = columnAtPoint( point );
+				final int vrow = rowAtPoint( point );
+				if ( vcol >= 0 && vrow >= 0 )
+				{
+					final int mcol = convertColumnIndexToModel( vcol );
+					switch ( mcol )
+					{
+					case IS_ACTIVE_COLUMN:
+					case IS_CURRENT_COLUMN:
+					case COLOR_COLUMN:
+						final int mrow = convertRowIndexToModel( vrow );
+						final SourceAndConverter< ? > source = model.getValueAt( mrow ).getSource();
+						if ( mcol == IS_ACTIVE_COLUMN )
+						{
+							if ( isRowSelected( mrow ) )
+								state.setSourcesActive( getSelectedSources(), !state.isSourceActive( source ) );
+							else
+								state.setSourceActive( source, !state.isSourceActive( source ) );
+						}
+						else if ( mcol == IS_CURRENT_COLUMN )
+						{
+							state.setCurrentSource( source );
+						}
+						else // if ( mcol == COLOR_COLUMN )
+						{
+							converters.getConverterSetup( source );
+							final ConverterSetup c = converters.getConverterSetup( source );
+							if ( c != null && c.supportsColor() )
+							{
+								final GammaConverterSetup gc = ((GammaConverterSetup)c);
+								JPopupMenu popup = new JPopupMenu();
+								String [] luts = IJ.getLuts();
+								JMenuItem itemMenu;
+								for(int i = 0; i<luts.length;i++)
+								{
+									itemMenu =  new  JMenuItem(luts[i]);
+									itemMenu.addActionListener( new ActionListener()
+									{
+
+										@Override
+										public void actionPerformed( ActionEvent arg0 )
+										{
+											//System.out.println(((JMenuItem)arg0.getSource()).getText());
+											String sLUTName = ((JMenuItem)arg0.getSource()).getText();
+											gc.setLUT(sLUTName);
+											//listeners.list.forEach( ChangeListener::colorChanged );
+
+										}
+
+									});
+									popup.add(itemMenu);  
+								}
+								//menuItem.addActionListener(this);
+								popup.show( e.getComponent(), e.getX(), e.getY() );							
+							}
+						}
+					}
+				}
+			}
+			else if ( e.getID() == MouseEvent.MOUSE_CLICKED )
+			{
+				if ( e.getWhen() == releasedWhen )
+					e.consume();
+			}
+		}
+		
 		super.processMouseEvent( e );
 	}
 

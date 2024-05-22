@@ -113,30 +113,30 @@ public class ColorPanelBT extends JPanel
 			    
 			    if (SwingUtilities.isRightMouseButton(evt)&& colorButton.isEnabled()) 
 			    {
-			      JPopupMenu popup = new JPopupMenu();
-			      String [] luts = IJ.getLuts();
-			      JMenuItem itemMenu;
-			      for(int i = 0; i<luts.length;i++)
-			      {
-			    	itemMenu =  new  JMenuItem(luts[i]);
-			    	itemMenu.addActionListener( new ActionListener()
+			    	JPopupMenu popup = new JPopupMenu();
+			    	String [] luts = IJ.getLuts();
+			    	JMenuItem itemMenu;
+			    	for(int i = 0; i<luts.length;i++)
+			    	{
+			    		itemMenu =  new  JMenuItem(luts[i]);
+			    		itemMenu.addActionListener( new ActionListener()
+			    		{
+
+			    			@Override
+			    			public void actionPerformed( ActionEvent arg0 )
 			    			{
+			    				//System.out.println(((JMenuItem)arg0.getSource()).getText());
+			    				String sLUTName = ((JMenuItem)arg0.getSource()).getText();
+			    				setICMbyName(sLUTName);
+			    				listeners.list.forEach( ChangeListener::colorChanged );
 
-								@Override
-								public void actionPerformed( ActionEvent arg0 )
-								{
-									//System.out.println(((JMenuItem)arg0.getSource()).getText());
-									String sLUTName = ((JMenuItem)arg0.getSource()).getText();
-									setICMbyName(sLUTName);
-									listeners.list.forEach( ChangeListener::colorChanged );
+			    			}
 
-								}
-			    			
-			    			});
-			    	popup.add(itemMenu);  
-			      }
-			      //menuItem.addActionListener(this);
-			      popup.show( evt.getComponent(), evt.getX(), evt.getY() );
+			    		});
+			    		popup.add(itemMenu);  
+			    	}
+			    	//menuItem.addActionListener(this);
+			    	popup.show( evt.getComponent(), evt.getX(), evt.getY() );
 			    }
 			}
 		});
