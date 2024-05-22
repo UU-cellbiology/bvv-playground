@@ -95,7 +95,6 @@ public class ConverterSetupBoundsGamma {
 		{
 			return bounds.join( new Bounds( ((GammaConverterSetup)setup).getDisplayGamma(), ((GammaConverterSetup)setup).getDisplayGamma()) );
 		}
-		else
-			return bounds.join( new Bounds( 0.01, 5.0 ) );
+		return bounds.join( new Bounds( 0.01, 5.0 ) );
 	}
 }

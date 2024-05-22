@@ -1,9 +1,9 @@
 package btbvv.btcards.sourcetable;
 
 import java.awt.Component;
-import javax.swing.JLabel;
 import javax.swing.JRadioButton;
 import javax.swing.JTable;
+import javax.swing.SwingConstants;
 import javax.swing.UIManager;
 import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
@@ -17,7 +17,7 @@ class RadioButtonRendererBT extends JRadioButton implements TableCellRenderer
 	private static final Border noFocusBorder = new EmptyBorder(1, 1, 1, 1);
 
 	public RadioButtonRendererBT() {
-		setHorizontalAlignment( JLabel.CENTER);
+		setHorizontalAlignment( SwingConstants.CENTER);
 		setBorderPainted( true );
 		setOpaque( true );
 	}

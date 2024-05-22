@@ -34,10 +34,8 @@ import bdv.tools.brightness.ConverterSetup;
 import java.awt.image.IndexColorModel;
 
 import net.imglib2.FinalRealInterval;
-import net.imglib2.RandomAccessibleInterval;
 import net.imglib2.RealInterval;
 import net.imglib2.realtransform.AffineTransform3D;
-import net.imglib2.type.numeric.ARGBType;
 
 public interface GammaConverterSetup extends ConverterSetup {
 
@@ -51,10 +49,14 @@ public interface GammaConverterSetup extends ConverterSetup {
 	void setAlphaGamma( double gamma );
 	double getAlphaGamma();
 	
-	BTLutTexture getLUTTexture();
 	String getLUTName();
 	void setLUT(IndexColorModel icm_, String sLUTName);
 	void setLUT(String sLUTName);
+	IndexColorModel getLutICM();
+	boolean updateNeededLUT();
+	LutCSTextureBT getLUTTexture();
+	void setLUTTexture(LutCSTextureBT lut_);
+
 	
 	boolean useLut();
 	

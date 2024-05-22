@@ -86,15 +86,13 @@ public class MinSpinner extends JSpinner
 	{
 		if(boundInterval == null)
 			return boundValue.getRangeMin();
-		else
-			return boundInterval.getRangeMin(); 
+		return boundInterval.getRangeMin(); 
 	}
 	public double getRangeMax()
 	{
 		if(boundInterval == null)
 			return boundValue.getRangeMax();
-		else
-			return boundInterval.getRangeMax(); 
+		return boundInterval.getRangeMax(); 
 	}
 	/*public double getFullRangeMin()
 	{

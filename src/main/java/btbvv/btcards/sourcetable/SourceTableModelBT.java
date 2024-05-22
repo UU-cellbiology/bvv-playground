@@ -25,7 +25,7 @@ import static gnu.trove.impl.Constants.DEFAULT_LOAD_FACTOR;
  */
 public class SourceTableModelBT extends AbstractTableModel
 {
-	private final ViewerState state;
+	//private final ViewerState state;
 
 	private final SourceToConverterSetupBimap converters;
 
@@ -38,7 +38,7 @@ public class SourceTableModelBT extends AbstractTableModel
 
 	public SourceTableModelBT( final ViewerState state, final ConverterSetups converterSetups )
 	{
-		this.state = state;
+		//this.state = state;
 		this.converters = converterSetups;
 		model = new StateModel( state );
 
@@ -63,8 +63,11 @@ public class SourceTableModelBT extends AbstractTableModel
 			case CURRENT_SOURCE_CHANGED:
 			case SOURCE_ACTIVITY_CHANGED:
 			case NUM_SOURCES_CHANGED:
-				final StateModel model = new StateModel( state );
-				SwingUtilities.invokeLater( () -> analyzeChanges( model ) );
+				final StateModel model1 = new StateModel( state );
+				SwingUtilities.invokeLater( () -> analyzeChanges( model1 ) );
+				break;
+			default:
+				break;
 			}
 		} );
 	}
@@ -155,27 +158,27 @@ public class SourceTableModelBT extends AbstractTableModel
 		return model.getSources().get( rowIndex );
 	}
 
-	private void analyzeChanges( final StateModel model )
+	private void analyzeChanges( final StateModel model1 )
 	{
 		final StateModel previousModel = this.model;
-		this.model = model;
+		this.model = model1;
 
 		// -- NUM_SOURCES_CHANGED --
 
 		final List< SourceModel > removedSources = new ArrayList<>();
 		for ( SourceModel source : previousModel.getSources() )
-			if ( !model.getSources().contains( source ) )
+			if ( !model1.getSources().contains( source ) )
 				removedSources.add( source );
 
 		final List< SourceModel > addedSources = new ArrayList<>();
-		for ( SourceModel source : model.getSources() )
+		for ( SourceModel source : model1.getSources() )
 			if ( !previousModel.getSources().contains( source ) )
 				addedSources.add( source );
 
 		// -- CURRENT_SOURCE_CHANGED, SOURCE_ACTIVITY_CHANGED --
 
 		final List< SourceModel > changedSources = new ArrayList<>();
-		for ( SourceModel source : model.getSources() )
+		for ( SourceModel source : model1.getSources() )
 		{
 			final SourceModel previousSource = previousModel.getSources().get( source );
 			if ( previousSource != null )
@@ -193,8 +196,8 @@ public class SourceTableModelBT extends AbstractTableModel
 		// sources added or removed
 		if ( !addedSources.isEmpty() )
 		{
-			final int firstRow = model.getSources().indexOf( addedSources.get( 0 ) );
-			final int lastRow = model.getSources().indexOf( addedSources.get( addedSources.size() - 1 ) );
+			final int firstRow = model1.getSources().indexOf( addedSources.get( 0 ) );
+			final int lastRow = model1.getSources().indexOf( addedSources.get( addedSources.size() - 1 ) );
 			fireTableRowsInserted( firstRow, lastRow );
 		}
 		else if ( !removedSources.isEmpty() )
@@ -207,8 +210,8 @@ public class SourceTableModelBT extends AbstractTableModel
 		// sources that changed currentness or activeness
 		if ( !changedSources.isEmpty() )
 		{
-			final int firstRow = model.getSources().indexOf( changedSources.get( 0 ) );
-			final int lastRow = model.getSources().indexOf( changedSources.get( changedSources.size() - 1 ) );
+			final int firstRow = model1.getSources().indexOf( changedSources.get( 0 ) );
+			final int lastRow = model1.getSources().indexOf( changedSources.get( changedSources.size() - 1 ) );
 			fireTableRowsUpdated( firstRow, lastRow );
 		}
 	}

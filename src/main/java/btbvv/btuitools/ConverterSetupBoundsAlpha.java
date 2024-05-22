@@ -115,7 +115,6 @@ public class ConverterSetupBoundsAlpha
 		{
 			return bounds.join( new Bounds( ((GammaConverterSetup)setup).getAlphaRangeMin(), ((GammaConverterSetup)setup).getAlphaRangeMax() ) );
 		}
-		else
-			return bounds.join( new Bounds( setup.getDisplayRangeMin(), setup.getDisplayRangeMax() ) );
+		return bounds.join( new Bounds( setup.getDisplayRangeMin(), setup.getDisplayRangeMax() ) );
 	}
 }

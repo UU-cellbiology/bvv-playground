@@ -76,16 +76,16 @@ public class MouseWheelScrollListener implements MouseWheelListener {
 	private boolean searchParentScrollPane()
 	{
 		parentSearched = true;
-		Component parent = pane.getParent();
-		while ( !( parent instanceof JScrollPane ) )
+		Component parent1 = pane.getParent();
+		while ( !( parent1 instanceof JScrollPane ) )
 		{
-			if ( parent == null )
+			if ( parent1 == null )
 			{
 				return false;
 			}
-			parent = parent.getParent();
+			parent1 = parent1.getParent();
 		}
-		this.parent = parent;
+		this.parent = parent1;
 		return true;
 	}
 }

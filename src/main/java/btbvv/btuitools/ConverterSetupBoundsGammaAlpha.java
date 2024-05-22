@@ -34,7 +34,6 @@ import java.util.Map;
 
 import bdv.tools.brightness.ConverterSetup;
 import bdv.util.Bounds;
-import bdv.viewer.SourceToConverterSetupBimap;
 
 public class ConverterSetupBoundsGammaAlpha {
 
@@ -95,7 +94,6 @@ public class ConverterSetupBoundsGammaAlpha {
 		{
 			return bounds.join( new Bounds( ((GammaConverterSetup)setup).getAlphaGamma(), ((GammaConverterSetup)setup).getAlphaGamma()) );
 		}
-		else
-			return bounds.join( new Bounds( 0.01, 5.0 ) );
+		return bounds.join( new Bounds( 0.01, 5.0 ) );
 	}
 }

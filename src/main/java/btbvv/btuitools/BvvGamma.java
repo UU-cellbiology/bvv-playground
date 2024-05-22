@@ -117,8 +117,8 @@ public class BvvGamma {
 
 		if ( converters.isEmpty() )
 			return null;
-		else
-			return new RealARGBColorGammaConverterSetup( setupId, converters );
+		
+		return new RealARGBColorGammaConverterSetup( setupId, converters );
 	}
 	
 	public static void initSetups(

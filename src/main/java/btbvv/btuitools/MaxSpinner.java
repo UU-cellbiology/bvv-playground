@@ -87,15 +87,13 @@ public class MaxSpinner extends JSpinner
 	{
 		if(boundInterval == null)
 			return boundValue.getRangeMin();
-		else
-			return boundInterval.getRangeMin(); 
+		return boundInterval.getRangeMin(); 
 	}
 	public double getRangeMax()
 	{
 		if(boundInterval == null)
 			return boundValue.getRangeMax();
-		else
-			return boundInterval.getRangeMax(); 
+		return boundInterval.getRangeMax(); 
 	}
 	
 	public void setRange(double min, double max)

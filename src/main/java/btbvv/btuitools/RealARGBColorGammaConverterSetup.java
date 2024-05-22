@@ -44,17 +44,18 @@ import net.imglib2.display.ColorConverter;
 import net.imglib2.realtransform.AffineTransform3D;
 import net.imglib2.type.numeric.ARGBType;
 
-public class RealARGBColorGammaConverterSetup implements GammaConverterSetup {
+public class RealARGBColorGammaConverterSetup implements GammaConverterSetup 
+{
 	private final int id;
 
 	private final List< ColorConverter > converters;
 
 	private final Listeners.List< SetupChangeListener > listeners;
 	
-	private BTLutTexture chLUT = new BTLutTexture();
+	private LutCSTextureBT texLUT = new LutCSTextureBT();
 	
 	/**0 = maximum intensity projection; 1 = transparency **/
-	private int nRenderType =0; 
+	private int nRenderType = 0; 
 	
 	private boolean useLUT = false;
 	
@@ -64,9 +65,11 @@ public class RealARGBColorGammaConverterSetup implements GammaConverterSetup {
 	
 	private AffineTransform3D clipTransform = new AffineTransform3D();
 	
-	public IndexColorModel icm = null;
+	private IndexColorModel icm = null;
 	
 	private String sLUTName = null;
+	
+	private boolean bUpdateTexture = false;
 
 	public RealARGBColorGammaConverterSetup( final int setupId, final ColorConverter... converters )
 	{
@@ -195,6 +198,8 @@ public class RealARGBColorGammaConverterSetup implements GammaConverterSetup {
 			if(converter instanceof ColorGammaConverter)
 			{
 				useLUT = false;
+				icm = null;
+				bUpdateTexture = true;
 				changed = true;
 			}
 		}
@@ -279,19 +284,22 @@ public class RealARGBColorGammaConverterSetup implements GammaConverterSetup {
 	{
 		
 		this.sLUTName = sLUTName;
-		//lut =new float[lut_in.length][];
-		//for(int i=0;i<lut_in.length;i++)
-			//lut[i]=lut_in[i].clone();
-		//chLUT = new BTLutTexture();
-		chLUT.initBuffer(icm_);
+		icm = icm_;
 		useLUT = true;
+		bUpdateTexture = true;
 		
 		listeners.list.forEach( l -> l.setupParametersChanged( this ) );
 	}
 	@Override
 	public void setLUT(String sLUTName)
 	{
-		setLUT(LutLoader.getLut(sLUTName),sLUTName);
+		final IndexColorModel icm_lut = LutLoader.getLut(sLUTName);
+		if(icm_lut == null)
+		{
+			System.err.println("Cannot load ImageJ LUT with the name \""+sLUTName+ "\". Wrong name/not installed?");
+			return;
+		}
+		setLUT(icm_lut ,sLUTName);
 	}
 	@Override
 	public String getLUTName()
@@ -302,9 +310,9 @@ public class RealARGBColorGammaConverterSetup implements GammaConverterSetup {
 		return null;
 	}
 	@Override
-	public BTLutTexture getLUTTexture() {
+	public LutCSTextureBT getLUTTexture() {
 		
-			return chLUT;
+			return texLUT;
 	}
 
 
@@ -359,6 +367,25 @@ public class RealARGBColorGammaConverterSetup implements GammaConverterSetup {
 		
 		clipTransform = t.copy();
 		
+	}
+
+	@Override
+	public IndexColorModel getLutICM()
+	{
+		return icm;
+	}
+
+	@Override
+	public boolean updateNeededLUT()
+	{
+		return bUpdateTexture;
+	}
+
+	@Override
+	public void setLUTTexture(LutCSTextureBT lut_)
+	{
+		texLUT = lut_;	
+		bUpdateTexture = false;
 	}
 
 

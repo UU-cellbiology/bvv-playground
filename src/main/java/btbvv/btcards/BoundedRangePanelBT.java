@@ -447,31 +447,31 @@ class BoundedRangePanelBT extends JPanel
 	public void setBoundsDialog()
 	{
 		final JPanel panel = new JPanel( new MigLayout( "fillx", "[][grow]", "" ) );
-		final JSpinner minSpinner = new JSpinner( new SpinnerNumberModel( 0.0, 0.0, 1.0, 1.0 ) );
-		final JSpinner maxSpinner = new JSpinner( new SpinnerNumberModel( 0.0, 0.0, 1.0, 1.0 ) );
-		minSpinner.setEditor( new UnboundedNumberEditor( minSpinner ) );
-		maxSpinner.setEditor( new UnboundedNumberEditor( maxSpinner ) );
-		minSpinner.setValue( range.getMinBound() );
-		maxSpinner.setValue( range.getMaxBound() );
-		minSpinner.addChangeListener( e -> {
-			final double value = ( Double ) minSpinner.getValue();
-			if ( value > ( Double ) maxSpinner.getValue() )
-				maxSpinner.setValue( value );
+		final JSpinner minSpinner1 = new JSpinner( new SpinnerNumberModel( 0.0, 0.0, 1.0, 1.0 ) );
+		final JSpinner maxSpinner1 = new JSpinner( new SpinnerNumberModel( 0.0, 0.0, 1.0, 1.0 ) );
+		minSpinner1.setEditor( new UnboundedNumberEditor( minSpinner1 ) );
+		maxSpinner1.setEditor( new UnboundedNumberEditor( maxSpinner1 ) );
+		minSpinner1.setValue( range.getMinBound() );
+		maxSpinner1.setValue( range.getMaxBound() );
+		minSpinner1.addChangeListener( e -> {
+			final double value = ( Double ) minSpinner1.getValue();
+			if ( value > ( Double ) maxSpinner1.getValue() )
+				maxSpinner1.setValue( value );
 		} );
-		maxSpinner.addChangeListener( e -> {
-			final double value = ( Double ) maxSpinner.getValue();
-			if ( value < ( Double ) minSpinner.getValue() )
-				minSpinner.setValue( value );
+		maxSpinner1.addChangeListener( e -> {
+			final double value = ( Double ) maxSpinner1.getValue();
+			if ( value < ( Double ) minSpinner1.getValue() )
+				minSpinner1.setValue( value );
 		} );
 		panel.add( "right", new JLabel( "min" ) );
-		panel.add( "growx, wrap", minSpinner );
+		panel.add( "growx, wrap", minSpinner1 );
 		panel.add( "right", new JLabel( "max" ) );
-		panel.add( "growx", maxSpinner );
+		panel.add( "growx", maxSpinner1 );
 		final int result = JOptionPane.showConfirmDialog( null, panel, "Set Bounds", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE );
 		if ( result == JOptionPane.YES_OPTION )
 		{
-			final double min = ( Double ) minSpinner.getValue();
-			final double max = ( Double ) maxSpinner.getValue();
+			final double min = ( Double ) minSpinner1.getValue();
+			final double max = ( Double ) maxSpinner1.getValue();
 			updateRange( range.withMinBound( min ).withMaxBound( max ) );
 		}
 	}

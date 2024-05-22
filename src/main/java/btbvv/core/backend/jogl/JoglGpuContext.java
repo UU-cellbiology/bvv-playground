@@ -37,7 +37,6 @@ import btbvv.core.backend.GpuContext;
 import btbvv.core.backend.SetUniforms;
 import btbvv.core.backend.StagingBuffer;
 import btbvv.core.backend.Texture;
-import btbvv.core.backend.Texture1D;
 import btbvv.core.backend.Texture3D;
 import btbvv.core.shadergen.Shader;
 
@@ -261,23 +260,6 @@ public class JoglGpuContext implements GpuContext
 			gl.glBindTexture( GL_TEXTURE_3D, restoreTextureId );
 	}
 	
-	@Override
-	public void texSubImage1D( final Texture1D texture, final int xoffset, final int width, final Buffer pixels )
-	{
-		final int textureId = getTextureId( texture ).id;
-
-		final int[] tmp = new int[ 1 ];
-		gl.glGetIntegerv( GL_TEXTURE_BINDING_1D, tmp, 0 );
-		final int restoreTextureId = tmp[ 0 ];
-
-		if ( restoreTextureId != textureId )
-			gl.glBindTexture( GL_TEXTURE_1D, textureId );
-
-		gl.glTexSubImage1D( GL_TEXTURE_1D, 0, xoffset,  width, format( texture ), type( texture ), pixels );
-
-		if ( restoreTextureId != textureId )
-			gl.glBindTexture( GL_TEXTURE_1D, restoreTextureId );
-	}
 	public static JoglGpuContext get( final GL3 gl )
 	{
 		return contexts.computeIfAbsent( gl, JoglGpuContext::new );

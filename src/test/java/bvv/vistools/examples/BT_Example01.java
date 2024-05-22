@@ -41,6 +41,7 @@ import com.formdev.flatlaf.FlatIntelliJLaf;
 
 import bdv.spimdata.SpimDataMinimal;
 import bdv.spimdata.XmlIoSpimDataMinimal;
+import btbvv.vistools.Bvv;
 import btbvv.vistools.BvvFunctions;
 import btbvv.vistools.BvvSource;
 import btbvv.vistools.BvvStackSource;
@@ -70,7 +71,11 @@ public class BT_Example01 {
 		final ImagePlus imp = IJ.openImage( "/home/eugene/Desktop/projects/BigTrace/BigTrace_data/t1-head.tif" );
 		final Img< UnsignedShortType > img = ImageJFunctions.wrapShort( imp );
 		final BvvSource source = BvvFunctions.show( img, "t1-head" );
-	
+
+		final ImagePlus imp2 = IJ.openImage( "/home/eugene/Desktop/projects/BigTrace/BigTrace_data/t1-head.tif" );
+		final Img< UnsignedShortType > img2 = ImageJFunctions.wrapShort( imp );
+		final BvvSource source2 = BvvFunctions.show( img, "t1-head", Bvv.options().addTo( source ) );
+		
 		double [] minI = img.minAsDoubleArray();
 		double [] maxI = img.maxAsDoubleArray();
 		/**/
@@ -110,23 +115,9 @@ public class BT_Example01 {
 		//source.setAlphaGamma(0.9);
 		
 		//assign a "Fire" lookup table to this source
-		//(input: float [256][3], the last index (color component) changes from 0 to 1)
-		//source.setLUT(getRGBLutTable("Fire"));
-		//source.setLUT(getRGBLutTable("Spectrum"));
+		source.setLUT( "Fire" );
 		
-//		ByteProcessor ish = new ByteProcessor(256,1);
-//		for (int i=0; i<256; i++)
-//			for (int j=0; j<1; j++)
-//				ish.putPixel(i, j, i);
-//		ImagePlus ccc = new ImagePlus("test LUT",ish);
-//		ccc.show();
-//		IJ.run("Fire");
-//		IJ.run("RGB Color");
-		//Img<ARGBType> rai = ImageJFunctions.wrapRGBA(ccc);
-		//IndexColorModel icm = LutLoader.getLut("Fire");
-		//source.setchLUTICM(icm);
-		//source.setLUT("Fire");
-		//ccc.close();
+
 		
 		//clip half of the volume along Z axis in the shaders
 		//clipInterval is defined inside the "raw", non-transformed data interval		
@@ -136,30 +127,4 @@ public class BT_Example01 {
 		
 	}
 	
-	//a helper function to get LUT array from ImageJ
-	static public float [][] getRGBLutTable(String sLUTName)
-	{
-				
-		IndexColorModel icm = LutLoader.getLut(sLUTName);
-		
-		int size = icm.getMapSize();
-		byte [][] colors = new byte[3][size];
-
-		icm.getReds(colors[0]);
-		icm.getGreens(colors[1]);
-		icm.getBlues(colors[2]);
-		
-		float [][] RGBLutTable = new float[size][3];
-		
-		for(int i=0;i<size;i++)
-		{			
-			for (int c=0;c<3;c++)
-			{
-				RGBLutTable[i][c]=(colors[c][i]& 0xff)/255.0f;
-			}
-		}
-		
-		return RGBLutTable;
-		
-	}
 }

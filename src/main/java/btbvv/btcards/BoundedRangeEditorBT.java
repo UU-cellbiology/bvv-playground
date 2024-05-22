@@ -43,7 +43,6 @@ import javax.swing.event.TreeModelListener;
 
 import bdv.tools.brightness.ConverterSetup;
 import bdv.ui.sourcegrouptree.SourceGroupTree;
-import bdv.ui.sourcetable.SourceTable;
 import bdv.util.BoundedRange;
 import bdv.util.BoundedValueDouble;
 import bdv.util.Bounds;

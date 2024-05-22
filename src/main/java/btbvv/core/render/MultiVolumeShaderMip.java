@@ -34,7 +34,6 @@ import btbvv.btuitools.GammaConverterSetup;
 import btbvv.core.backend.GpuContext;
 import btbvv.core.backend.Texture;
 import btbvv.core.backend.Texture2D;
-import btbvv.core.backend.Texture3D;
 import btbvv.core.cache.CacheSpec;
 import btbvv.core.cache.TextureCache;
 import btbvv.core.dither.DitherBuffer;

@@ -248,6 +248,7 @@ public class MinMaxGroupBT extends MinMaxGroup
 	 *
 	 * @param setup
 	 */
+	@Override
 	public void addSetup( final ConverterSetup setup )
 	{
 		setups.add( setup );
@@ -263,6 +264,7 @@ public class MinMaxGroupBT extends MinMaxGroup
 	 * @param setup
 	 * @return true, if this group is now empty. false otherwise.
 	 */
+	@Override
 	public boolean removeSetup( final ConverterSetup setup )
 	{
 		setups.remove( setup );

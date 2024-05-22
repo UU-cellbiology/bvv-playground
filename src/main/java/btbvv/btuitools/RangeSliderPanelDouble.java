@@ -75,7 +75,7 @@ public class RangeSliderPanelDouble extends JPanel implements BoundedValueDouble
 
 	private boolean userDefinedNumberFormat = false;
 	
-	private ArrayList<RangeListener> rangeListeners = new ArrayList<RangeListener>();
+	private ArrayList<RangeListener> rangeListeners = new ArrayList<>();
 
 
 	public interface RangeListener

@@ -191,8 +191,8 @@ public class SourceTableBT extends JTable
 	@Override
 	protected void processMouseEvent( final MouseEvent e )
 	{
-		//if ( e.getModifiers() == InputEvent.BUTTON1_MASK )
-		if(SwingUtilities.isLeftMouseButton(e))
+		//if ( e.getModifiers() == InputEvent.BUTTON1_MASK)
+		if(SwingUtilities.isLeftMouseButton(e)||SwingUtilities.isRightMouseButton(e))
 		{
 			if ( e.getID() == MouseEvent.MOUSE_PRESSED )
 			{
@@ -257,135 +257,74 @@ public class SourceTableBT extends JTable
 							state.setCurrentSource( source );
 						}
 						else // if ( mcol == COLOR_COLUMN )
-						{
+						{					
 							converters.getConverterSetup( source );
 							final ConverterSetup c = converters.getConverterSetup( source );
 							if ( c != null && c.supportsColor() )
 							{
-								final Color newColor = JColorChooser.showDialog( null, "Set Source Color", new Color( c.getColor().get() ) );
-								if ( newColor != null )
+								if(SwingUtilities.isLeftMouseButton(e))
 								{
-									final ARGBType color = new ARGBType( newColor.getRGB() | 0xff000000 );
-									if ( isRowSelected( mrow ) )
+
+									final Color newColor = JColorChooser.showDialog( null, "Set Source Color", new Color( c.getColor().get() ) );
+									if ( newColor != null )
 									{
-										for ( final SourceAndConverter< ? > s : getSelectedSources() )
+										final ARGBType color = new ARGBType( newColor.getRGB() | 0xff000000 );
+										if ( isRowSelected( mrow ) )
 										{
-											final ConverterSetup cs = converters.getConverterSetup( s );
-											if ( cs != null && cs.supportsColor() )
-												cs.setColor( color );
+											for ( final SourceAndConverter< ? > s : getSelectedSources() )
+											{
+												final ConverterSetup cs = converters.getConverterSetup( s );
+												if ( cs != null && cs.supportsColor() )
+													cs.setColor( color );
+											}
 										}
+										else
+											c.setColor( color );
 									}
-									else
-										c.setColor( color );
 								}
-							}
-						}
-					}
-				}
-			}
-			else if ( e.getID() == MouseEvent.MOUSE_CLICKED )
-			{
-				if ( e.getWhen() == releasedWhen )
-					e.consume();
-			}
-		}
-		if (SwingUtilities.isRightMouseButton(e) )
-		{
-			if ( e.getID() == MouseEvent.MOUSE_PRESSED )
-			{
-				final Point point = e.getPoint();
-				pressedAt = point;
-				final int vcol = columnAtPoint( point );
-				final int vrow = rowAtPoint( point );
-				if ( vcol >= 0 && vrow >= 0 )
-				{
-					final int mcol = convertColumnIndexToModel( vcol );
-					switch ( mcol )
-					{
-					case IS_ACTIVE_COLUMN:
-					case IS_CURRENT_COLUMN:
-					case COLOR_COLUMN:
-						final int mrow = convertRowIndexToModel( vrow );
-						if ( isRowSelected( mrow ) )
-						{
-							e.consume();
-							consumeNext = true;
-						}
-					}
-				}
-			}
-			else if ( e.getID() == MouseEvent.MOUSE_RELEASED )
-			{
-				if ( consumeNext )
-				{
-					releasedWhen = e.getWhen();
-					consumeNext = false;
-					e.consume();
-				}
-
-				if ( pressedAt == null )
-					return;
-
-				final Point point = e.getPoint();
-				if ( point.distanceSq( pressedAt ) > 2 )
-					return;
-
-				final int vcol = columnAtPoint( point );
-				final int vrow = rowAtPoint( point );
-				if ( vcol >= 0 && vrow >= 0 )
-				{
-					final int mcol = convertColumnIndexToModel( vcol );
-					switch ( mcol )
-					{
-					case IS_ACTIVE_COLUMN:
-					case IS_CURRENT_COLUMN:
-					case COLOR_COLUMN:
-						final int mrow = convertRowIndexToModel( vrow );
-						final SourceAndConverter< ? > source = model.getValueAt( mrow ).getSource();
-						if ( mcol == IS_ACTIVE_COLUMN )
-						{
-							if ( isRowSelected( mrow ) )
-								state.setSourcesActive( getSelectedSources(), !state.isSourceActive( source ) );
-							else
-								state.setSourceActive( source, !state.isSourceActive( source ) );
-						}
-						else if ( mcol == IS_CURRENT_COLUMN )
-						{
-							state.setCurrentSource( source );
-						}
-						else // if ( mcol == COLOR_COLUMN )
-						{
-							converters.getConverterSetup( source );
-							final ConverterSetup c = converters.getConverterSetup( source );
-							if ( c != null && c.supportsColor() )
-							{
-								final GammaConverterSetup gc = ((GammaConverterSetup)c);
-								JPopupMenu popup = new JPopupMenu();
-								String [] luts = IJ.getLuts();
-								JMenuItem itemMenu;
-								for(int i = 0; i<luts.length;i++)
+								else
 								{
-									itemMenu =  new  JMenuItem(luts[i]);
-									itemMenu.addActionListener( new ActionListener()
+									final GammaConverterSetup gc = ((GammaConverterSetup)c);
+									JPopupMenu popup = new JPopupMenu();
+									String [] luts = IJ.getLuts();
+									JMenuItem itemMenu;
+									for(int i = 0; i<luts.length;i++)
 									{
-
-										@Override
-										public void actionPerformed( ActionEvent arg0 )
+										itemMenu =  new  JMenuItem(luts[i]);
+										itemMenu.addActionListener( new ActionListener()
 										{
-											//System.out.println(((JMenuItem)arg0.getSource()).getText());
-											String sLUTName = ((JMenuItem)arg0.getSource()).getText();
-											gc.setLUT(sLUTName);
-											//listeners.list.forEach( ChangeListener::colorChanged );
 
-										}
+											@Override
+											public void actionPerformed( ActionEvent arg0 )
+											{
+												String sLUTName = ((JMenuItem)arg0.getSource()).getText();
+												if ( isRowSelected( mrow ) )
+												{
+													for ( final SourceAndConverter< ? > s : getSelectedSources() )
+													{
+														final GammaConverterSetup cs = (GammaConverterSetup)converters.getConverterSetup( s );
+														if ( cs != null && cs.supportsColor() )
+															cs.setLUT(sLUTName);
+													}
+												}
+												else
+												{
+													gc.setLUT(sLUTName);
+												}
 
-									});
-									popup.add(itemMenu);  
+											}
+
+										});
+										popup.add(itemMenu);  
+									}
+									//menuItem.addActionListener(this);
+									popup.show( e.getComponent(), e.getX(), e.getY() );								
 								}
-								//menuItem.addActionListener(this);
-								popup.show( e.getComponent(), e.getX(), e.getY() );							
+						
+							
 							}
 						}
+						
 					}
 				}
 			}
@@ -402,7 +341,8 @@ public class SourceTableBT extends JTable
 	@Override
 	protected void processMouseMotionEvent( final MouseEvent e )
 	{
-		if ( consumeNext && e.getModifiers() == InputEvent.BUTTON1_MASK && e.getID() == MouseEvent.MOUSE_DRAGGED )
+		//if ( consumeNext && e.getModifiers() == InputEvent.BUTTON1_MASK && e.getID() == MouseEvent.MOUSE_DRAGGED )
+		if ( consumeNext && (SwingUtilities.isLeftMouseButton(e)||SwingUtilities.isRightMouseButton(e)) && e.getID() == MouseEvent.MOUSE_DRAGGED )
 			e.consume();
 		super.processMouseMotionEvent( e );
 	}

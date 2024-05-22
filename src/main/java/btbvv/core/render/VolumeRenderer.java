@@ -61,9 +61,7 @@ import net.imglib2.type.numeric.integer.UnsignedShortType;
 import org.joml.Matrix4f;
 
 import bdv.tools.brightness.ConverterSetup;
-import btbvv.btuitools.BTLutTexture;
 import btbvv.btuitools.GammaConverterSetup;
-import btbvv.core.backend.Texture3D;
 import btbvv.core.backend.jogl.JoglGpuContext;
 import btbvv.core.blocks.TileAccess;
 import btbvv.core.cache.CacheSpec;
@@ -161,6 +159,10 @@ public class VolumeRenderer
 	 * provides SimpleVolumes for SimpleStacks.
 	 */
 	private final SimpleStackManager simpleStackManager = new DefaultSimpleStackManager();
+	
+	/** handles LUTs (GPU upload and check if they are expired)
+	 * for converter Setups **/
+	private final SimpleLUTTextureManager simpleLUTManager = new SimpleLUTTextureManager();
 
 	private final DefaultQuad quad;
 
@@ -307,18 +309,19 @@ public class VolumeRenderer
 				int mri = 0;
 				for ( int i = 0; i < renderStacks.size(); i++ )
 				{
-					final ConverterSetup converter = renderConverters.get( i );
-					if (converter instanceof GammaConverterSetup)
-					{
-						final BTLutTexture lutT = ((GammaConverterSetup)converter).getLUTTexture();
-						if(lutT.bNeedsUpload)
-						{
-							lutT.upload(context);
-						}
-					}
-					//final Texture3D textLUT = simpleStackManager.getLUTTexture(context, (GammaConverterSetup)renderConverters.get( i ));
-					progvol.setConverter( i, renderConverters.get( i ));
-					//progvol.setConverter( i, converter );
+					final GammaConverterSetup gc = ( GammaConverterSetup ) renderConverters.get( i );
+					
+					simpleLUTManager.processTextureLUT( context, gc );
+//					if (converter instanceof GammaConverterSetup)
+//					{
+//						final BTLutTexture lutT = ((GammaConverterSetup)converter).getLUTTexture();
+//						if(lutT.bNeedsUpload)
+//						{
+//							lutT.upload(context);
+//						}
+//					}
+
+					progvol.setConverter( i, gc );
 					if ( volumeSignatures.get( i ).getSourceStackType() == MULTIRESOLUTION )
 					{
 						final VolumeBlocks volume = volumes.get( mri++ );
@@ -339,6 +342,7 @@ public class VolumeRenderer
 			}
 
 			simpleStackManager.freeUnusedSimpleVolumes( context );
+			simpleLUTManager.freeUnusedLUTs( context );
 		}
 
 		if ( progvol != null )
