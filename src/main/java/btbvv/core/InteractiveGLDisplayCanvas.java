@@ -32,6 +32,10 @@ package btbvv.core;
 import bdv.TransformEventHandler;
 import bdv.viewer.InteractiveDisplay;
 import bdv.viewer.OverlayRenderer;
+
+import com.jogamp.opengl.GL2ES2;
+import com.jogamp.opengl.GL2ES3;
+import com.jogamp.opengl.GL3;
 import com.jogamp.opengl.GLAutoDrawable;
 import com.jogamp.opengl.GLCapabilities;
 import com.jogamp.opengl.GLCapabilitiesImmutable;
@@ -117,6 +121,7 @@ public class InteractiveGLDisplayCanvas< C extends Component & GLAutoDrawable > 
 	public static InteractiveGLDisplayCanvas< GLCanvas > createGLCanvas( final int width, final int height )
 	{
 		final GLCanvas canvas = new GLCanvas( new GLCapabilities( GLProfile.getMaxProgrammableCore( true ) ) );
+		
 		return new InteractiveGLDisplayCanvas<>( canvas, width, height, false );
 	}
 
@@ -158,6 +163,7 @@ public class InteractiveGLDisplayCanvas< C extends Component & GLAutoDrawable > 
 
 		final InteractiveGLDisplayCanvas< GLJPanel > canvas = new InteractiveGLDisplayCanvas<>( panel, width, height, true );
 		panel.onPaintComponent = canvas::paintOverlays;
+		
 		return canvas;
 	}
 
@@ -165,6 +171,7 @@ public class InteractiveGLDisplayCanvas< C extends Component & GLAutoDrawable > 
 	{
 		this.canvas = canvas;
 		this.yAxisFlipped = yAxisFlipped;
+
 
 		canvas.setPreferredSize( new Dimension( width, height ) );
 		canvas.setFocusable( true );

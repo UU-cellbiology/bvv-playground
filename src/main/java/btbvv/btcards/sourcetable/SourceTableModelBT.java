@@ -121,7 +121,7 @@ public class SourceTableModelBT extends AbstractTableModel
 				final GammaConverterSetup gconverter = ((GammaConverterSetup)c);
 				if(gconverter.useLut())
 				{
-					return gconverter.getLUTName();
+					return gconverter.getLutICM();
 				}
 			}
 			return ( c != null && c.supportsColor() ) ? c.getColor() : null;

@@ -200,13 +200,15 @@ public class ColorPanelBT extends JPanel
 		colorButton.setIcon( new ColorIconBT( new Color( this.color.get() ), null, 21, 21, 7, 7, true ) );
 	}
 
+	public void setICM(IndexColorModel icm_, String icmName_)
+	{
+		this.icm = icm_;
+		this.icmName = icmName_;
+		colorButton.setIcon( new ColorIconBT( null, icm, 21, 21, 7, 7, true ) );
+	}
 	public synchronized void setICMbyName(String icmName)
 	{
-		//IndexColorModel icm_ = LutLoader.getLut(sLUTName);
-		//setICM(icm_);
-		this.icmName = icmName;
-		this.icm = LutLoader.getLut(icmName);		
-		colorButton.setIcon( new ColorIconBT( null, icm, 21, 21, 7, 7, true ) );
+		setICM(LutLoader.getLut(icmName), icmName);
 	}
 
 	public ARGBType getColor()

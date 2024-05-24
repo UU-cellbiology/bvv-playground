@@ -12,6 +12,8 @@ import java.awt.Component;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
+import java.awt.image.IndexColorModel;
+
 import javax.swing.Icon;
 import javax.swing.JLabel;
 import javax.swing.JTable;
@@ -58,10 +60,9 @@ class ColorRendererBT extends JLabel implements TableCellRenderer
 						c, isSelected ? table.getSelectionForeground() : table.getForeground(), 0.5 );
 				setIcon( new ColorIcon( c, w, h, 5, 5, true, outlineColor ) );
 			}
-			if(value instanceof String)
-			{
-				
-				setIcon( new ColorIconBT( null, LutLoader.getLut(( String ) value), w, h, 5, 5, false) );
+			if(value instanceof IndexColorModel)
+			{				
+				setIcon( new ColorIconBT( null, (IndexColorModel)value, w, h, 5, 5, false) );
 			}
 		}
 		return this;

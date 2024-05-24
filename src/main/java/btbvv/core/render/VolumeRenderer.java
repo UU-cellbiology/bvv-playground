@@ -46,6 +46,8 @@ import static com.jogamp.opengl.GL.GL_ONE_MINUS_SRC_ALPHA;
 import static com.jogamp.opengl.GL.GL_SRC_ALPHA;
 import static com.jogamp.opengl.GL.GL_UNPACK_ALIGNMENT;
 
+import com.jogamp.opengl.GL2ES2;
+import com.jogamp.opengl.GL2ES3;
 import com.jogamp.opengl.GL3;
 
 import java.util.ArrayList;
@@ -166,7 +168,7 @@ public class VolumeRenderer
 
 	private final DefaultQuad quad;
 
-
+//	private boolean bShowInfo = true;
 
 
 	public VolumeRenderer(
@@ -259,6 +261,26 @@ public class VolumeRenderer
 
 		gl.glEnable( GL_DEPTH_TEST );
 		gl.glDepthFunc( GL_ALWAYS );
+		
+//		if(bShowInfo)
+//		{
+//	
+//			final int[] val = new int[1];
+//			
+//			gl.glGetIntegerv( GL2ES2.GL_MAX_TEXTURE_IMAGE_UNITS, val, 0 );
+//			System.out.println("GL_MAX_TEXTURE_IMAGE_UNITS "+ Integer.toString( val[0]));
+//			gl.glGetIntegerv( GL2ES2.GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS, val, 0 );
+//			System.out.println("GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS "+ Integer.toString( val[0]));
+//			gl.glGetIntegerv( GL2ES3.GL_MAX_FRAGMENT_UNIFORM_BLOCKS, val, 0 );
+//			System.out.println("GL_MAX_FRAGMENT_UNIFORM_BLOCKS "+ Integer.toString(val[0]));
+//			gl.glGetIntegerv( GL2ES3.GL_MAX_COMBINED_UNIFORM_BLOCKS, val, 0 );
+//			System.out.println("GL_MAX_COMBINED_UNIFORM_BLOCKS "+ Integer.toString(val[0]));
+//			gl.glGetIntegerv(  GL2ES3.GL_MAX_FRAGMENT_UNIFORM_COMPONENTS, val, 0 );
+//			System.out.println("GL_MAX_FRAGMENT_UNIFORM_COMPONENTS "+ Integer.toString(val[0]));
+//
+//			bShowInfo = false;
+//		}
+		
 
 		if ( type == FULL )
 		{
@@ -312,15 +334,6 @@ public class VolumeRenderer
 					final GammaConverterSetup gc = ( GammaConverterSetup ) renderConverters.get( i );
 					
 					simpleLUTManager.processTextureLUT( context, gc );
-//					if (converter instanceof GammaConverterSetup)
-//					{
-//						final BTLutTexture lutT = ((GammaConverterSetup)converter).getLUTTexture();
-//						if(lutT.bNeedsUpload)
-//						{
-//							lutT.upload(context);
-//						}
-//					}
-
 					progvol.setConverter( i, gc );
 					if ( volumeSignatures.get( i ).getSourceStackType() == MULTIRESOLUTION )
 					{

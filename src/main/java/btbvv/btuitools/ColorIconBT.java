@@ -87,12 +87,7 @@ public class ColorIconBT implements Icon
 		final int y0 = y + oy;
 		if ( color == null && icm == null)
 		{
-			g2d.setColor( new Color( 0xffbcbc ) );
-			g2d.fillArc( x0, y0, size, size, 0, 120 );
-			g2d.setColor( new Color( 0xbcffbc ) );
-			g2d.fillArc( x0, y0, size, size, 120, 120 );
-			g2d.setColor( new Color( 0xbcbcff ) );
-			g2d.fillArc( x0, y0, size, size, 240, 120 );
+			drawBlank(g2d, x0, y0); 
 		}
 		else
 		{
@@ -102,36 +97,41 @@ public class ColorIconBT implements Icon
 				if ( drawAsCircle )
 					g2d.fillOval( x0, y0, size, size );
 				else
-					g2d.fillRoundRect( x, y, width, height, arcWidth, arcHeight );
-	
-
+					g2d.fillRoundRect( x, y, width, height, arcWidth, arcHeight );	
 			}
 			else
 			{
 
 				int l = icm.getMapSize()-1;
-				if ( drawAsCircle )
+				if(l>0)
 				{
-					for(int r = size;r>0; r--)
+					if ( drawAsCircle )
 					{
-						int ind = Math.round( r*l /size);
-						final Color cLUT = new Color(icm.getRed( ind ) ,icm.getGreen( ind ) ,icm.getBlue( ind ) );
-						g2d.setColor( cLUT );
-						g2d.fillRect( x, y, r, size );
+						for(int r = size;r>0; r--)
+						{
+							int ind = Math.round( r*l /size);
+							final Color cLUT = new Color(icm.getRed( ind ) ,icm.getGreen( ind ) ,icm.getBlue( ind ) );
+							g2d.setColor( cLUT );
+							g2d.fillRect( x, y, r, size );
+						}
+					}
+					else
+					{
+						for(int r = width;r>0; r--)
+						{
+							int ind = Math.round( r*l /width);
+							final Color cLUT = new Color(icm.getRed( ind ) ,icm.getGreen( ind ) ,icm.getBlue( ind ) );
+							g2d.setColor( cLUT );
+							g2d.fillRect( x, y, r, height);
+						}	
 					}
 				}
 				else
 				{
-					for(int r = width;r>0; r--)
-					{
-						int ind = Math.round( r*l /width);
-						final Color cLUT = new Color(icm.getRed( ind ) ,icm.getGreen( ind ) ,icm.getBlue( ind ) );
-						g2d.setColor( cLUT );
-						g2d.fillRect( x, y, r, height);
-					}	
+					drawBlank (g2d, x0, y0);
 				}
-
 			}
+			
 			if ( drawOutline )
 			{
 				final Color oc;
@@ -140,12 +140,29 @@ public class ColorIconBT implements Icon
 				else
 					oc = outlineColor;
 				g2d.setColor( oc );
-				if ( drawAsCircle )
-					g2d.drawOval( x0, y0, size, size );
+				if(color != null)
+				{
+					if ( drawAsCircle )
+						g2d.drawOval( x0, y0, size, size );
+					else
+						g2d.drawRoundRect( x, y, width, height, arcWidth, arcHeight );
+				}
 				else
-					g2d.drawRoundRect( x, y, width, height, arcWidth, arcHeight );
+				{
+					g2d.drawRect( x, y, width, height );
+				}
 			}
 		}
+	}
+	
+	void drawBlank (final Graphics2D g2d, final int x0, final int y0)
+	{
+		g2d.setColor( new Color( 0xffbcbc ) );
+		g2d.fillArc( x0, y0, size, size, 0, 120 );
+		g2d.setColor( new Color( 0xbcffbc ) );
+		g2d.fillArc( x0, y0, size, size, 120, 120 );
+		g2d.setColor( new Color( 0xbcbcff ) );
+		g2d.fillArc( x0, y0, size, size, 240, 120 );
 	}
 
 	@Override

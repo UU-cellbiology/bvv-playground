@@ -163,6 +163,7 @@ public class ColorEditorBT {
 			boolean allColorsEqual = true;
 			boolean allLUTsEqual = true;
 			String sLUTName = null;
+			IndexColorModel icm_curr = null;
 			for ( final ConverterSetup converterSetup : converterSetups )
 			{
 				if ( converterSetup.supportsColor() )
@@ -182,6 +183,7 @@ public class ColorEditorBT {
 						if(sLUTName == null)
 						{
 							sLUTName = gconverter.getLUTName();
+							icm_curr = gconverter.getLutICM();
 						}
 						else
 						{
@@ -198,6 +200,7 @@ public class ColorEditorBT {
 			final String sLUTFinal = sLUTName;
 			final boolean isConsistent = allColorsEqual||allLUTsEqual;
 			final boolean bLUTFinal = allLUTsEqual;
+			final IndexColorModel icmFinal = icm_curr;
 			SwingUtilities.invokeLater( () -> {
 				synchronized ( ColorEditorBT.this )
 				{
@@ -206,7 +209,7 @@ public class ColorEditorBT {
 					colorPanel.setColor( finalColor );
 					colorPanel.setConsistent( isConsistent );
 					if(bLUTFinal)
-						colorPanel.setICMbyName( sLUTFinal  );
+						colorPanel.setICM( icmFinal, sLUTFinal);
 						
 					blockUpdates = false;
 				}
