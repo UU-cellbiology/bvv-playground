@@ -34,7 +34,6 @@ import btbvv.core.multires.SimpleStack3D;
 
 public interface SimpleStackManager
 {
-
 	SimpleVolume getSimpleVolume( GpuContext context, SimpleStack3D< ? > stack );
 
 	/**

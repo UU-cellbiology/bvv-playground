@@ -259,7 +259,7 @@ public class JoglGpuContext implements GpuContext
 		if ( restoreTextureId != textureId )
 			gl.glBindTexture( GL_TEXTURE_3D, restoreTextureId );
 	}
-	
+
 	public static JoglGpuContext get( final GL3 gl )
 	{
 		return contexts.computeIfAbsent( gl, JoglGpuContext::new );

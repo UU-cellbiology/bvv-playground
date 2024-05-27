@@ -32,10 +32,6 @@ package btbvv.core;
 import bdv.TransformEventHandler;
 import bdv.viewer.InteractiveDisplay;
 import bdv.viewer.OverlayRenderer;
-
-import com.jogamp.opengl.GL2ES2;
-import com.jogamp.opengl.GL2ES3;
-import com.jogamp.opengl.GL3;
 import com.jogamp.opengl.GLAutoDrawable;
 import com.jogamp.opengl.GLCapabilities;
 import com.jogamp.opengl.GLCapabilitiesImmutable;
@@ -113,15 +109,14 @@ public class InteractiveGLDisplayCanvas< C extends Component & GLAutoDrawable > 
 	/**
 	 * Create a new {@code InteractiveDisplayCanvas} with a {@link GLCanvas}.
 	 *
-	 * @param width
 	 *            preferred component width.
 	 * @param height
+	 * @param width
 	 *            preferred component height.
 	 */
 	public static InteractiveGLDisplayCanvas< GLCanvas > createGLCanvas( final int width, final int height )
 	{
-		final GLCanvas canvas = new GLCanvas( new GLCapabilities( GLProfile.getMaxProgrammableCore( true ) ) );
-		
+		final GLCanvas canvas = new GLCanvas( new GLCapabilities( GLProfile.getMaxProgrammableCore( true ) ) );		
 		return new InteractiveGLDisplayCanvas<>( canvas, width, height, false );
 	}
 
@@ -162,8 +157,7 @@ public class InteractiveGLDisplayCanvas< C extends Component & GLAutoDrawable > 
 		final MyGLJPanel panel = new MyGLJPanel( new GLCapabilities( GLProfile.getMaxProgrammableCore( true ) ) );
 
 		final InteractiveGLDisplayCanvas< GLJPanel > canvas = new InteractiveGLDisplayCanvas<>( panel, width, height, true );
-		panel.onPaintComponent = canvas::paintOverlays;
-		
+		panel.onPaintComponent = canvas::paintOverlays;		
 		return canvas;
 	}
 
@@ -234,6 +228,7 @@ public class InteractiveGLDisplayCanvas< C extends Component & GLAutoDrawable > 
 	 *
 	 * @param h handler to remove
 	 */
+	@Override
 	public void addHandler( final Object h )
 	{
 		if ( h instanceof KeyListener )
@@ -262,6 +257,7 @@ public class InteractiveGLDisplayCanvas< C extends Component & GLAutoDrawable > 
 	 *
 	 * @param h handler to remove
 	 */
+	@Override
 	public void removeHandler( final Object h )
 	{
 		if ( h instanceof KeyListener )
