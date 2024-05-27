@@ -29,9 +29,17 @@
  */
 package btbvv.btcards;
 
+import java.awt.Dimension;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.net.URL;
+
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JToggleButton;
 
 import bdv.ui.sourcegrouptree.SourceGroupTree;
 import bdv.util.BoundedValueDouble;
@@ -48,7 +56,15 @@ public class ConverterSetupEditPanelBT extends JPanel
 	private final BoundedValuePanelBT gammaPanel;
 	private final BoundedRangePanelBT rangeAlphaPanel;
 	private final BoundedValuePanelBT gammaAlphaPanel;
+	
+	private final JButton expandButton;
+	private final JPanel extendedPanel;
 	private final JCheckBox cbSync;
+	private final ImageIcon expandIcon; 
+	private final ImageIcon collapseIcon; 
+
+	
+	private boolean bExpanded = false;
 
 	public ConverterSetupEditPanelBT(
 			final SourceGroupTree tree,
@@ -73,7 +89,7 @@ public class ConverterSetupEditPanelBT extends JPanel
 		super( new MigLayout( "ins 0, fillx, hidemode 3", "[min!]0[]0[]", "[]2[]2[]2[]2[]" ) );
 		colorPanel = new ColorPanelBT();
 		rangePanel = new BoundedRangePanelBT();
-		gammaPanel= new BoundedValuePanelBT( new BoundedValueDouble(0.01,5.0,1.0));
+		gammaPanel = new BoundedValuePanelBT( new BoundedValueDouble(0.01,5.0,1.0));
 		rangeAlphaPanel = new BoundedRangePanelBT();
 		gammaAlphaPanel = new BoundedValuePanelBT( new BoundedValueDouble(0.01,5.0,1.0));
 		cbSync = new JCheckBox();
@@ -95,12 +111,53 @@ public class ConverterSetupEditPanelBT extends JPanel
 		add( new JLabel(" Sync LUT -> α "), "growy, wrap" );
 		add( new JLabel("LUT"), "" );
 		add( rangePanel, "growx, span, wrap" );
-		add( new JLabel(" γ"), "" );
-		add( gammaPanel, "growx, span, wrap" );
-		add( new JLabel(" α"), "" );
-		add( rangeAlphaPanel, "growx, span, wrap" );
-		add( new JLabel(" γ α"), "" );
-		add( gammaAlphaPanel, "growx, span" );
+		
+		extendedPanel = new JPanel();
+		extendedPanel.setLayout( new MigLayout( "ins 0 0 0 0, fillx, filly, hidemode 3", "[][grow][]", "[]0[]" ) );
+		extendedPanel.add( new JLabel(" γ"), "" );
+		extendedPanel.add( gammaPanel, "growx, span, wrap" );
+		extendedPanel.add( new JLabel(" α"), "" );
+		extendedPanel.add( rangeAlphaPanel, "growx, span, wrap" );
+		extendedPanel.add( new JLabel(" γ α"), "" );
+		extendedPanel.add( gammaAlphaPanel, "growx, span" );
+
+		extendedPanel.setVisible( false );
+		expandButton = new JButton();
+		URL icon_path = btbvv.btcards.ConverterSetupEditPanelBT.class.getResource("/icons/expand.png");
+		expandIcon = new ImageIcon(icon_path);
+		icon_path = btbvv.btcards.ConverterSetupEditPanelBT.class.getResource("/icons/collapse.png");
+		collapseIcon = new ImageIcon(icon_path);
+		expandButton.setForeground( this.getBackground() );
+		expandButton.setIcon( expandIcon );
+		expandButton.setPreferredSize( new Dimension(10,14) );
+		expandButton.setMinimumSize( new Dimension(10,14) );
+		expandButton.setFocusable( false );
+		expandButton.setBorderPainted( false );
+		expandButton.setOpaque( true );
+		expandButton.addActionListener( new ActionListener() 
+				{
+
+					@Override
+					public void actionPerformed( ActionEvent e )
+					{
+
+						bExpanded = !bExpanded;	
+						if(bExpanded)	
+						{
+							expandButton.setIcon( collapseIcon );
+						}
+						else
+						{
+							expandButton.setIcon( expandIcon );
+						}
+						extendedPanel.setVisible( bExpanded  );
+						expandButton.setSelected( false );
+						
+					}
+			
+				});
+		add(expandButton, "growx, span, wrap" );
+		add(extendedPanel,"growx, span, wrap");
 		
 	}
 }

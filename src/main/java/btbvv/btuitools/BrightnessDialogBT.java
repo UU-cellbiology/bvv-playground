@@ -36,6 +36,8 @@ import java.awt.Color;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Frame;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
@@ -467,12 +469,14 @@ public class BrightnessDialogBT extends DelayedPackDialog
 
 			final JPanel advancedPanel = new JPanel();
 			//advancedPanel.setLayout( new BoxLayout( advancedPanel, BoxLayout.PAGE_AXIS ) );
-			advancedPanel.setLayout( new GridLayout( 0,2,0,0 ) );
+			//advancedPanel.setLayout( new GridLayout( 0,2,0,0 ) );
+			advancedPanel.setLayout( new GridBagLayout( ) );
 
 			final JSpinner dummy = new JSpinner();
 			dummy.setModel( new SpinnerNumberModel( minMaxGroup.getRangeMax(), minMaxGroup.getFullRangeMin(), minMaxGroup.getFullRangeMax(), 1 ) );
 			dummy.setBorder( BorderFactory.createEmptyBorder( 0, 10, 10, 10 ) );
 			final Dimension ps = dummy.getPreferredSize();
+			ps.setSize( ps.getWidth()*0.5, ps.getHeight() );
 			
 			final MinSpinner spinnerAlphaRangeMin = new MinSpinner(null, minMaxGroup.alphaRange, ps, null, false);
 			spinnerAlphaRangeMin.sLimit =()->minMaxGroup.getAlphaFullRangeMin();
@@ -514,14 +518,35 @@ public class BrightnessDialogBT extends DelayedPackDialog
 				@Override
 				public void run()
 				{
-					advancedPanel.add( spinnerRangeMin );
-					advancedPanel.add( spinnerRangeMax );
-					advancedPanel.add( spinnerGammaRangeMin );
-					advancedPanel.add( spinnerGammaRangeMax );
-					advancedPanel.add( spinnerAlphaRangeMin );
-					advancedPanel.add( spinnerAlphaRangeMax );
-					advancedPanel.add( spinnerAlphaGammaRangeMin );
-					advancedPanel.add( spinnerAlphaGammaRangeMax );					
+					GridBagConstraints cd = new GridBagConstraints();
+					cd.gridx = 0;
+					cd.gridy = 0;
+					advancedPanel.add( spinnerRangeMin,cd );
+					cd.gridx ++;
+					advancedPanel.add( spinnerRangeMax,cd );
+					cd.gridy ++;
+					cd.gridx = 0;
+					advancedPanel.add( spinnerGammaRangeMin, cd);
+					cd.gridx ++;
+					advancedPanel.add( spinnerGammaRangeMax, cd );
+					cd.gridy ++;
+					cd.gridx = 0;
+					advancedPanel.add( spinnerAlphaRangeMin, cd );
+					cd.gridx ++;
+					advancedPanel.add( spinnerAlphaRangeMax, cd );
+					cd.gridy ++;
+					cd.gridx = 0;
+					advancedPanel.add( spinnerAlphaGammaRangeMin, cd );
+					cd.gridx ++;
+					advancedPanel.add( spinnerAlphaGammaRangeMax, cd );					
+//					advancedPanel.add( spinnerRangeMin);
+//					advancedPanel.add( spinnerRangeMax);
+//					advancedPanel.add( spinnerGammaRangeMin );
+//					advancedPanel.add( spinnerGammaRangeMax );
+//					advancedPanel.add( spinnerAlphaRangeMin );
+//					advancedPanel.add( spinnerAlphaRangeMax );
+//					advancedPanel.add( spinnerAlphaGammaRangeMin );
+//					advancedPanel.add( spinnerAlphaGammaRangeMax );	
 					advancedButton.setText( "<<" );
 					isShowingAdvanced = true;
 				}
@@ -562,6 +587,7 @@ public class BrightnessDialogBT extends DelayedPackDialog
 			alphaPanel.addRangeListener( () -> spinnerAlphaRangeMax.setValue( minMaxGroup.alphaRange.getRangeMax() ) );
 			gammaAlphaPanel.setRangeListener(()-> spinnerAlphaGammaRangeMin.setValue(minMaxGroup.gammaAlphaRange.getRangeMin()));
 			gammaAlphaPanel.setRangeListener(()-> spinnerAlphaGammaRangeMax.setValue(minMaxGroup.gammaAlphaRange.getRangeMax()));
+
 
 			final JPanel westPanel = new JPanel();
 			westPanel.setLayout( new BoxLayout( westPanel, BoxLayout.LINE_AXIS ) );
