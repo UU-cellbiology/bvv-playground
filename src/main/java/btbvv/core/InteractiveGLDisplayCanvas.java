@@ -109,9 +109,9 @@ public class InteractiveGLDisplayCanvas< C extends Component & GLAutoDrawable > 
 	/**
 	 * Create a new {@code InteractiveDisplayCanvas} with a {@link GLCanvas}.
 	 *
+	 * @param width
 	 *            preferred component width.
 	 * @param height
-	 * @param width
 	 *            preferred component height.
 	 */
 	public static InteractiveGLDisplayCanvas< GLCanvas > createGLCanvas( final int width, final int height )
@@ -165,7 +165,6 @@ public class InteractiveGLDisplayCanvas< C extends Component & GLAutoDrawable > 
 	{
 		this.canvas = canvas;
 		this.yAxisFlipped = yAxisFlipped;
-
 
 		canvas.setPreferredSize( new Dimension( width, height ) );
 		canvas.setFocusable( true );

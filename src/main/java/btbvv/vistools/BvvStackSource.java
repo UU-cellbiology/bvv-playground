@@ -86,8 +86,7 @@ public class BvvStackSource< T > extends BvvSource
 	public void setColor( final ARGBType color )
 	{
 		for ( final ConverterSetup setup : converterSetups )
-			setup.setColor( color );
-		
+			setup.setColor( color );		
 	}
 
 	@Override
@@ -238,9 +237,7 @@ public class BvvStackSource< T > extends BvvSource
 			}
 		}
 	}
-	
-	
-	
+		
 	@Override
 	public void setLUT(final IndexColorModel icm_, String sLUTName )
 	{

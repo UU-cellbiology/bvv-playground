@@ -11,7 +11,7 @@
 
 	<groupId>nl.uu.science.cellbiology</groupId>
 	<artifactId>bvv-playground</artifactId>
-	<version>0.1.5-SNAPSHOT</version>
+	<version>0.2.0-SNAPSHOT</version>
 
 	<name>BVV-playground</name>
 	<description>Volume rendering of bdv datasets with gamma and transparency option</description>
@@ -85,8 +85,7 @@
 	<properties>
 		<package-name>bvvplayground</package-name>
 		<license.licenseName>bsd_2</license.licenseName>
-		<license.copyrightOwners>Cell Biology, Neurobiology and Biophysics
-Department of Utrecht University.</license.copyrightOwners>
+		<license.copyrightOwners>Cell Biology, Neurobiology and Biophysics Department of Utrecht University.</license.copyrightOwners>
 
 		<!-- NB: Deploy releases to the SciJava Maven repository. -->
 		<releaseProfiles>sign,deploy-to-scijava</releaseProfiles> 
@@ -196,11 +195,7 @@ Department of Utrecht University.</license.copyrightOwners>
 			<artifactId>imglib2-ij</artifactId>
 			<scope>test</scope>
 		</dependency>
-		<dependency>
-			<groupId>nl.uu.science.cellbiology</groupId>
-			<artifactId>bigtrace</artifactId>
-			<version>0.4.0-SNAPSHOT</version>
-		</dependency>
+
 	</dependencies>
 	
 	<repositories>
