@@ -59,8 +59,9 @@ public class BT_Example03 {
 		} catch (SpimDataException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}		
-		
+			return;
+		}				
+				
 		//create a deskew transform
 		
 		AffineTransform3D deskew = new AffineTransform3D();

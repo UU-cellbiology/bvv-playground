@@ -2,11 +2,12 @@
  
 # BigVolumeViewer-playground
 
-This is a fork of [BVV](https://github.com/bigdataviewer/bigvolumeviewer-core) to play around with some new features:
-- using LUTs;
-- using gamma correction;
-- using different volume render methods (transparency/illumination);
-- clipping of displayed sources in shaders without reloading them.
+This is a fork of [BVV](https://github.com/bigdataviewer/bigvolumeviewer-core) with some additional features:
+- "alpha-bending" volume render method (transparency/illumination);
+- opacity/transparency voxels property;
+- possibility to use LookUpTables (LUTs, custom and coming from ImageJ);
+- application of gamma correction to LUT/opacity;
+- clipping of displayed sources in shaders, optionally using clipping transform.
 
 Currently synced to BVV version 0.3.3 (this [commit](https://github.com/bigdataviewer/bigvolumeviewer-core/commit/60fe3d0595f1a68dd45f85e216f09b369eaa165d)).
 
@@ -18,9 +19,15 @@ extract and put them to the _jar_ folder of the _latest_ FIJI installation.
 
 The plugin should appear in the _Plugins>BigDataViewer>BVV-playground_
 
-It works in the same way as BigVolumeViewer, but there are some new additional features (see below).
-
 ## Additional features
+
+### Volumentric rendering
+A new shortcut <kbd>O</kbd> (letter) is used to switch between "Maximum intensity projection" and "Volumetric" rendering. By "volumetric" I mean "transparency" or "alpha-blending" ray-casting. These two different render methods are illustrated below:  
+_Maximum intensity_  
+![Maximum intensity render](https://katpyxa.info/software/bvv_playground/bvvPG_maximum_intensity_render.png)  
+_Volumetric_  
+![Maximum intensity render](https://katpyxa.info/software/bvv_playground/bvvPG_volumetric_render.png)  
+
 
 First of all, "Brightness and Color" dialog (shortcut <kbd>S</kbd>) is different:
 
@@ -36,11 +43,6 @@ In addition to color, one can also independently map intensity values to an opac
 
 A new additional checkbox on the left is used to synchronize top pair of sliders (LUT) with the bottom pair (**α**), but not the other way around. It also synchronizes ranges in the extended view (<kbd>>></kbd> button).
 
-A new shortcut <kbd>O</kbd> (letter) is used to switch between "Maximum intensity projection" and "Volumetric" rendering. By "volumetric" I mean "transparency" or "alpha-blending" ray-casting. These two different render methods are illustrated below:  
-_Maximum intensity_  
-![Maximum intensity render](https://katpyxa.info/software/bvv_playground/bvvPG_maximum_intensity_render.png)  
-_Volumetric_  
-![Maximum intensity render](https://katpyxa.info/software/bvv_playground/bvvPG_volumetric_render.png)  
 
 Displaying volumes with LUTs and clipped view at the current stage are available only from the code (see an [example](https://github.com/ekatrukha/bvv-playground/blob/master/src/test/java/bvv/vistools/examples/BT_Example01.java)).
 

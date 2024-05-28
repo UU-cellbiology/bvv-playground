@@ -73,9 +73,6 @@ public class BT_Example01 {
 		final Img< UnsignedShortType > img = ImageJFunctions.wrapShort( imp );
 		final BvvSource source = BvvFunctions.show( img, "t1-head" );
 
-		final ImagePlus imp2 = IJ.openImage( "/home/eugene/Desktop/projects/BigTrace/BigTrace_data/t1-head.tif" );
-		final Img< UnsignedShortType > img2 = ImageJFunctions.wrapShort( imp );
-		final BvvSource source2 = BvvFunctions.show( img, "t1-head2", Bvv.options().addTo( source ) );
 		double [] minI = img.minAsDoubleArray();
 		double [] maxI = img.maxAsDoubleArray();
 		/**/
@@ -120,15 +117,14 @@ public class BT_Example01 {
 		//or one can assign custom IndexColorModel + name as string
 		//in this illustration we going to get IndexColorModel from IJ 
 		//(but it could be made somewhere else)
-		final IndexColorModel icm_lut = LutLoader.getLut("Spectrum");
-		source.setLUT( icm_lut, "SpectrumLUT" );
+		//final IndexColorModel icm_lut = LutLoader.getLut("Spectrum");
+		//source.setLUT( icm_lut, "SpectrumLUT" );
 
 		
 		//clip half of the volume along Z axis in the shaders
 		//clipInterval is defined inside the "raw", non-transformed data interval		
 		minI[2]=0.5*maxI[2];		
-		source.setClipInterval(new FinalRealInterval(minI,maxI));
-		
+		source.setClipInterval(new FinalRealInterval(minI,maxI));		
 		
 	}
 	

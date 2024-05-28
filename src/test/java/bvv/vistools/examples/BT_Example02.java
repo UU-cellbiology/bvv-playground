@@ -50,7 +50,7 @@ public class BT_Example02 {
 		//regular tif init
 		/**/
 		//final ImagePlus imp = IJ.openImage( "https://imagej.nih.gov/ij/images/t1-head.zip" );
-		final ImagePlus imp = IJ.openImage( "/home/eugene/Desktop/BigTrace_data/BioFormats/small_crop.tif" );
+		final ImagePlus imp = IJ.openImage( "/home/eugene/Desktop/projects/BigTrace/BigTrace_data/BioFormats/small_crop.tif" );
 		final Img< UnsignedShortType > img = ImageJFunctions.wrapShort( imp );
 
 	
@@ -73,15 +73,14 @@ public class BT_Example02 {
 		
 		
 		int nAxes = 1;
-		//clip source 1 in 'data' coordinates
 		
+		//clip source 1 in 'data' coordinates		
 		double [] newMin2 =  img.minAsDoubleArray();
 		double [] newMax2 =  img.maxAsDoubleArray();
-		newMin2[nAxes]=newMin2[nAxes]+0.5*(newMax2[nAxes]-newMin2[nAxes]);
-		//source.setClipInterval(new FinalRealInterval(newMin2,newMax2));
+		newMin2[nAxes] = newMin2[nAxes]+0.5*(newMax2[nAxes]-newMin2[nAxes]);
+		source.setClipInterval(new FinalRealInterval(newMin2,newMax2));
 
-		//clip source 2 in 'clip' coordinates
-		
+		//clip source 2 in 'clip' coordinates		
 		source2.setClipTransform(deskew);
 			
 		//clip half of the volume along Z axis in the shaders
@@ -90,7 +89,7 @@ public class BT_Example02 {
 		double [] newMin =  finRealAfter.minAsDoubleArray();
 		double [] newMax =  finRealAfter.maxAsDoubleArray();
 	
-		newMin[nAxes]=newMin[nAxes]+0.5*(newMax[nAxes]-newMin[nAxes]);		
+		newMin[nAxes] = newMin[nAxes]+0.5*(newMax[nAxes]-newMin[nAxes]);		
 		source2.setClipInterval(new FinalRealInterval(newMin,newMax));
 		
 
