@@ -43,6 +43,7 @@ import bdv.spimdata.SpimDataMinimal;
 import bdv.spimdata.XmlIoSpimDataMinimal;
 import btbvv.vistools.Bvv;
 import btbvv.vistools.BvvFunctions;
+import btbvv.vistools.BvvOptions;
 import btbvv.vistools.BvvSource;
 import btbvv.vistools.BvvStackSource;
 import ij.IJ;
@@ -71,7 +72,10 @@ public class BT_Example01 {
 		final ImagePlus imp = IJ.openImage( "/home/eugene/Desktop/projects/BigTrace/BigTrace_data/t1-head.tif" );
 		final Img< UnsignedShortType > img = ImageJFunctions.wrapShort( imp );
 		final BvvSource source = BvvFunctions.show( img, "t1-head" );
-		
+
+		final ImagePlus imp2 = IJ.openImage( "/home/eugene/Desktop/projects/BigTrace/BigTrace_data/t1-head.tif" );
+		final Img< UnsignedShortType > img2 = ImageJFunctions.wrapShort( imp );
+		final BvvSource source2 = BvvFunctions.show( img, "t1-head2", Bvv.options().addTo( source ) );
 		double [] minI = img.minAsDoubleArray();
 		double [] maxI = img.maxAsDoubleArray();
 		/**/

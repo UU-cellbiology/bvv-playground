@@ -196,6 +196,11 @@ Department of Utrecht University.</license.copyrightOwners>
 			<artifactId>imglib2-ij</artifactId>
 			<scope>test</scope>
 		</dependency>
+		<dependency>
+			<groupId>nl.uu.science.cellbiology</groupId>
+			<artifactId>bigtrace</artifactId>
+			<version>0.4.0-SNAPSHOT</version>
+		</dependency>
 	</dependencies>
 	
 	<repositories>

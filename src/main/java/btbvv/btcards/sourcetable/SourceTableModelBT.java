@@ -222,7 +222,7 @@ public class SourceTableModelBT extends AbstractTableModel
 
 	private static final int NO_ENTRY_VALUE = -1;
 
-	static class StateModel
+	public static class StateModel
 	{
 		private final StateModel.UnmodifiableSources sources;
 
@@ -245,7 +245,7 @@ public class SourceTableModelBT extends AbstractTableModel
 			return sources;
 		}
 
-		static class UnmodifiableSources extends WrappedList< SourceModel >
+		public static class UnmodifiableSources extends WrappedList< SourceModel >
 		{
 			private final TObjectIntMap< SourceModel > sourceIndices;
 
@@ -287,7 +287,7 @@ public class SourceTableModelBT extends AbstractTableModel
 		}
 	}
 
-	static class SourceModel
+	public static class SourceModel
 	{
 		private final String name;
 		private final boolean active;

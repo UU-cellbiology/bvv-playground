@@ -4,7 +4,6 @@ package btbvv.btcards.sourcetable;
 import bdv.tools.brightness.ColorIcon;
 import bdv.ui.UIUtils;
 import btbvv.btuitools.ColorIconBT;
-import ij.plugin.LutLoader;
 
 import java.awt.BasicStroke;
 import java.awt.Color;

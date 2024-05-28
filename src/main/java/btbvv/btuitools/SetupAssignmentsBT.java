@@ -301,13 +301,13 @@ public class SetupAssignmentsBT
 		for ( final Element elem : minMaxGroupNodes  )
 		{
 			final int id = Integer.parseInt( elem.getChildText( "id" ) );
-			final double fullRangeMin = Double.parseDouble( elem.getChildText( "fullRangeMin" ) );
-			final double fullRangeMax = Double.parseDouble( elem.getChildText( "fullRangeMax" ) );
+			final double fullRangeMin1 = Double.parseDouble( elem.getChildText( "fullRangeMin" ) );
+			final double fullRangeMax1 = Double.parseDouble( elem.getChildText( "fullRangeMax" ) );
 			final double rangeMin = Double.parseDouble( elem.getChildText( "rangeMin" ) );
 			final double rangeMax = Double.parseDouble( elem.getChildText( "rangeMax" ) );
 			final double currentMin = Double.parseDouble( elem.getChildText( "currentMin" ) );
 			final double currentMax = Double.parseDouble( elem.getChildText( "currentMax" ) );
-			minMaxGroups.set( id, new MinMaxGroupBT( fullRangeMin, fullRangeMax, rangeMin, rangeMax, currentMin, currentMax, minIntervalSize ) );
+			minMaxGroups.set( id, new MinMaxGroupBT( fullRangeMin1, fullRangeMax1, rangeMin, rangeMax, currentMin, currentMax, minIntervalSize ) );
 		}
 
 		for ( final Element elem : converterSetupNodes )

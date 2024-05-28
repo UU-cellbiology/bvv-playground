@@ -100,11 +100,9 @@ public class ColorPanelBT extends JPanel
 		colorButton.setBorderPainted( false );
 		colorButton.setFocusPainted( false );
 		colorButton.setContentAreaFilled( false );
-		//colorButton.setMinimumSize( new Dimension( 46, 42 ) );
-		//colorButton.setPreferredSize( new Dimension( 46, 42 ) );
-		colorButton.setMinimumSize( new Dimension( 32, 30 ) );
-		colorButton.setPreferredSize( new Dimension( 32, 30 ) );
-
+		colorButton.setMinimumSize( new Dimension( 46, 42 ) );
+		colorButton.setPreferredSize( new Dimension( 46, 42 ) );
+		
 		colorButton.addMouseListener( new MouseAdapter()
 		{ 
 			@Override
@@ -135,7 +133,6 @@ public class ColorPanelBT extends JPanel
 			    		});
 			    		popup.add(itemMenu);  
 			    	}
-			    	//menuItem.addActionListener(this);
 			    	popup.show( evt.getComponent(), evt.getX(), evt.getY() );
 			    }
 			}
@@ -196,15 +193,14 @@ public class ColorPanelBT extends JPanel
 			this.color.set( color );
 		icm = null;
 		icmName = null;
-		//colorButton.setIcon( new ColorIcon( new Color( this.color.get() ), 30, 30, 10, 10, true ) );
-		colorButton.setIcon( new ColorIconBT( new Color( this.color.get() ), null, 21, 21, 7, 7, true ) );
+		colorButton.setIcon( new ColorIconBT( new Color( this.color.get() ), null, 30, 30, 10, 10, true ) );
 	}
 
 	public void setICM(IndexColorModel icm_, String icmName_)
 	{
 		this.icm = icm_;
 		this.icmName = icmName_;
-		colorButton.setIcon( new ColorIconBT( null, icm, 21, 21, 7, 7, true ) );
+		colorButton.setIcon( new ColorIconBT( null, icm, 30, 30, 10, 10, true ) );
 	}
 	public synchronized void setICMbyName(String icmName)
 	{

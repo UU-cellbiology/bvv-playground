@@ -130,6 +130,7 @@ public class BvvGamma {
 			initSetupNumericType( spimData, setup, converterSetups, sources );
 	}
 	
+	@SuppressWarnings( "cast" )
 	private static < T extends NumericType< T >, V extends Volatile< T > & NumericType< V > > void initSetupNumericType(
 			final AbstractSpimData< ? > spimData,
 			final BasicViewSetup setup,

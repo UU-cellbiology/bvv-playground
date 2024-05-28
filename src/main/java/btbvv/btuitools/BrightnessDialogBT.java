@@ -38,7 +38,6 @@ import java.awt.Dimension;
 import java.awt.Frame;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.GridLayout;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -286,11 +285,6 @@ public class BrightnessDialogBT extends DelayedPackDialog
 				frame.pack();
 		}
 		
-		private ColorsPanel getItself()
-		{
-			return this;
-		}
-
 		private static Color getColor( final ConverterSetup setup )
 		{
 			if ( setup.supportsColor() )
@@ -539,14 +533,7 @@ public class BrightnessDialogBT extends DelayedPackDialog
 					advancedPanel.add( spinnerAlphaGammaRangeMin, cd );
 					cd.gridx ++;
 					advancedPanel.add( spinnerAlphaGammaRangeMax, cd );					
-//					advancedPanel.add( spinnerRangeMin);
-//					advancedPanel.add( spinnerRangeMax);
-//					advancedPanel.add( spinnerGammaRangeMin );
-//					advancedPanel.add( spinnerGammaRangeMax );
-//					advancedPanel.add( spinnerAlphaRangeMin );
-//					advancedPanel.add( spinnerAlphaRangeMax );
-//					advancedPanel.add( spinnerAlphaGammaRangeMin );
-//					advancedPanel.add( spinnerAlphaGammaRangeMax );	
+
 					advancedButton.setText( "<<" );
 					isShowingAdvanced = true;
 				}

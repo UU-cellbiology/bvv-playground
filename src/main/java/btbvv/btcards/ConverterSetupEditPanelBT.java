@@ -39,13 +39,15 @@ import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JToggleButton;
 
+import bdv.tools.brightness.ConverterSetup;
 import bdv.ui.sourcegrouptree.SourceGroupTree;
 import bdv.util.BoundedValueDouble;
 import btbvv.btcards.sourcetable.SourceTableBT;
 import btbvv.btuitools.ConverterSetupsBT;
 import net.miginfocom.swing.MigLayout;
+
+import org.scijava.listeners.Listeners;
 
 public class ConverterSetupEditPanelBT extends JPanel
 {
@@ -63,6 +65,10 @@ public class ConverterSetupEditPanelBT extends JPanel
 	private final ImageIcon expandIcon; 
 	private final ImageIcon collapseIcon; 
 
+	private BoundedRangeEditorBT rangeEditor = null;
+	private ColorEditorBT colorEditor = null;
+	
+	private final Listeners.List< ActionListener > listeners;
 	
 	private boolean bExpanded = false;
 
@@ -71,8 +77,8 @@ public class ConverterSetupEditPanelBT extends JPanel
 			final ConverterSetupsBT converterSetups )
 	{
 		this();
-		new BoundedRangeEditorBT( tree, converterSetups, rangePanel, gammaPanel, rangeAlphaPanel, gammaAlphaPanel, cbSync);
-		new ColorEditorBT( tree, converterSetups, colorPanel );
+		rangeEditor = new BoundedRangeEditorBT( tree, converterSetups, rangePanel, gammaPanel, rangeAlphaPanel, gammaAlphaPanel, cbSync);
+		colorEditor = new ColorEditorBT( tree, converterSetups, colorPanel );
 	}
 
 	public ConverterSetupEditPanelBT(
@@ -80,13 +86,22 @@ public class ConverterSetupEditPanelBT extends JPanel
 			final ConverterSetupsBT converterSetups )
 	{
 		this();
-		new BoundedRangeEditorBT( table, converterSetups, rangePanel, gammaPanel, rangeAlphaPanel,gammaAlphaPanel, cbSync);
-		new ColorEditorBT( table, converterSetups, colorPanel );
+		rangeEditor = new BoundedRangeEditorBT( table, converterSetups, rangePanel, gammaPanel, rangeAlphaPanel,gammaAlphaPanel, cbSync);
+		colorEditor = new ColorEditorBT( table, converterSetups, colorPanel );
+	}
+	public ConverterSetupEditPanelBT(
+			final ConverterSetup singleCS,
+			final ConverterSetupsBT converterSetups )
+	{
+		this();
+		rangeEditor = new BoundedRangeEditorBT( singleCS, converterSetups, rangePanel, gammaPanel, rangeAlphaPanel,gammaAlphaPanel, cbSync);
+		colorEditor = new ColorEditorBT( singleCS, converterSetups, colorPanel );
 	}
 
 	public ConverterSetupEditPanelBT()
 	{
 		super( new MigLayout( "ins 0, fillx, hidemode 3", "[min!]0[]0[]", "[]2[]2[]2[]2[]" ) );
+		this.listeners = new Listeners.SynchronizedList<>();
 		colorPanel = new ColorPanelBT();
 		rangePanel = new BoundedRangePanelBT();
 		gammaPanel = new BoundedValuePanelBT( new BoundedValueDouble(0.01,5.0,1.0));
@@ -104,20 +119,17 @@ public class ConverterSetupEditPanelBT extends JPanel
 		( ( MigLayout ) rangeAlphaPanel.getLayout() ).setLayoutConstraints(sLayoutConstraints );
 		( ( MigLayout ) gammaAlphaPanel.getLayout() ).setLayoutConstraints(sLayoutConstraints );
 
-		add( new JLabel(" "), "" );
-		add( colorPanel, "growy" );
-		add( new JLabel(" Color "), "growy" );
-		add( cbSync, "growy" );
-		add( new JLabel(" Sync LUT -> α "), "growy, wrap" );
-		add( new JLabel("LUT"), "" );
+
+		add(colorPanel);
 		add( rangePanel, "growx, span, wrap" );
 		
 		extendedPanel = new JPanel();
-		extendedPanel.setLayout( new MigLayout( "ins 0 0 0 0, fillx, filly, hidemode 3", "[][grow][]", "[]0[]" ) );
+		extendedPanel.setLayout( new MigLayout( "ins 0 0 0 0, fillx, filly, hidemode 3", "[][][grow]", "[]0[]" ) );
 		extendedPanel.add( new JLabel(" γ"), "" );
 		extendedPanel.add( gammaPanel, "growx, span, wrap" );
 		extendedPanel.add( new JLabel(" α"), "" );
 		extendedPanel.add( rangeAlphaPanel, "growx, span, wrap" );
+		extendedPanel.add(cbSync);
 		extendedPanel.add( new JLabel(" γ α"), "" );
 		extendedPanel.add( gammaAlphaPanel, "growx, span" );
 
@@ -152,12 +164,29 @@ public class ConverterSetupEditPanelBT extends JPanel
 						}
 						extendedPanel.setVisible( bExpanded  );
 						expandButton.setSelected( false );
-						
+						listeners.list.forEach( l -> l.actionPerformed( new ActionEvent(this, 0, "test") ) );
 					}
 			
 				});
 		add(expandButton, "growx, span, wrap" );
 		add(extendedPanel,"growx, span, wrap");
 		
+	}
+	public void addExpandActionListener(ActionListener al)
+	{
+		listeners.add( al );
+		//expandButton.addActionListener( al );
+	}
+	public synchronized void update()
+	{
+		if(rangeEditor != null)
+			rangeEditor.updateSelection();
+		if( colorEditor != null)
+			colorEditor.updateSelection();
+
+	}
+	public boolean isExpanded()
+	{
+		return bExpanded;
 	}
 }

@@ -31,6 +31,7 @@ package btbvv.btcards;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Supplier;
 
@@ -57,6 +58,7 @@ import btbvv.btuitools.GammaConverterSetup;
 public class BoundedRangeEditorBT {
 	private final Supplier< List< ConverterSetup > > selectedConverterSetups;
 
+
 	private final BoundedRangePanelBT rangePanel;
 	private final BoundedValuePanelBT gammaPanel;
 	private final BoundedRangePanelBT rangeAlphaPanel;
@@ -67,10 +69,13 @@ public class BoundedRangeEditorBT {
 	private final ConverterSetupBoundsAlpha converterSetupBoundsAlpha;
 	private final ConverterSetupBoundsGammaAlpha converterSetupBoundsGammaAlpha;
 	
+	private List<ConverterSetup> singleCS;
 	private final JCheckBox cbSync;
 	
 	private boolean bSync;
 
+
+	
 	public BoundedRangeEditorBT(
 			final SourceTableBT table,
 			final ConverterSetupsBT converterSetups,
@@ -83,6 +88,25 @@ public class BoundedRangeEditorBT {
 		this( table::getSelectedConverterSetups, converterSetups, rangePanel, gammaPanel, rangeAlphaPanel, gammaAlphaPanel, cbSync);
 		table.getSelectionModel().addListSelectionListener( e -> updateSelection() );
 	}
+	public BoundedRangeEditorBT(
+			final ConverterSetup singleCS,
+			final ConverterSetupsBT converterSetups,
+			final BoundedRangePanelBT rangePanel,
+			final BoundedValuePanelBT gammaPanel,
+			final BoundedRangePanelBT rangeAlphaPanel,
+			final BoundedValuePanelBT gammaAlphaPanel,
+			final JCheckBox cbSync)
+	{
+		this(  () -> null, converterSetups, rangePanel, gammaPanel, rangeAlphaPanel, gammaAlphaPanel, cbSync);
+		if(singleCS != null)
+		{
+			singleCS.setupChangeListeners().add( converterSetup ->
+			{
+				updateSelection();
+			});
+			this.singleCS.add( singleCS );
+		}
+	}
 
 	public BoundedRangeEditorBT(
 			final SourceGroupTree tree,
@@ -94,7 +118,7 @@ public class BoundedRangeEditorBT {
 			final JCheckBox cbSync)
 	{
 		this(
-				() -> converterSetups.getConverterSetups( tree.getSelectedSources() ),
+				() -> converterSetups.getConverterSetups( tree.getSelectedSources() ), 
 				converterSetups, rangePanel, gammaPanel, rangeAlphaPanel,gammaAlphaPanel, cbSync);
 		tree.getSelectionModel().addTreeSelectionListener( e -> updateSelection() );
 		tree.getModel().addTreeModelListener( new TreeModelListener()
@@ -134,6 +158,7 @@ public class BoundedRangeEditorBT {
 			final BoundedValuePanelBT gammaAlphaPanel,
 			final JCheckBox cbSync)
 	{
+		this.singleCS = new ArrayList<>();
 		this.selectedConverterSetups = selectedConverterSetups;
 		this.rangePanel = rangePanel;
 		this.gammaPanel = gammaPanel;
@@ -422,9 +447,16 @@ public class BoundedRangeEditorBT {
 		updateGammaAlphaPanel();
 	}
 
-	private synchronized void updateSelection()
+	synchronized void updateSelection()
 	{
-		converterSetups = selectedConverterSetups.get();
+		if(singleCS.size() == 0)
+		{
+			converterSetups = selectedConverterSetups.get();
+		}
+		else
+		{
+			converterSetups = singleCS;
+		}
 		updateRangePanel();
 		updateGammaPanel();
 		updateRangeAlphaPanel();

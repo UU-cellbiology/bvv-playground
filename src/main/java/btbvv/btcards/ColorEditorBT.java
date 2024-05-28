@@ -30,6 +30,7 @@
 package btbvv.btcards;
 
 import java.awt.image.IndexColorModel;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Supplier;
 
@@ -47,6 +48,7 @@ import net.imglib2.type.numeric.ARGBType;
 
 public class ColorEditorBT {
 	private final Supplier< List< ConverterSetup > > selectedConverterSetups;
+	private List<ConverterSetup> singleCS;
 
 	private final ColorPanelBT colorPanel;
 
@@ -58,7 +60,22 @@ public class ColorEditorBT {
 		this( table::getSelectedConverterSetups, converterSetups, colorPanel );
 		table.getSelectionModel().addListSelectionListener( e -> updateSelection() );
 	}
+	public ColorEditorBT(
+			final ConverterSetup singleCS,
+			final ConverterSetups converterSetups,
+			final ColorPanelBT colorPanel )
+	{
+		this( () -> null, converterSetups, colorPanel );
 
+		if(singleCS!=null)
+		{
+			singleCS.setupChangeListeners().add( converterSetup ->
+			{
+				updateSelection();
+			});
+			this.singleCS.add( singleCS );
+		}
+	}
 	public ColorEditorBT(
 			final SourceGroupTree tree,
 			final ConverterSetups converterSetups,
@@ -101,6 +118,7 @@ public class ColorEditorBT {
 			final ConverterSetups converterSetups,
 			final ColorPanelBT colorPanel )
 	{
+		this.singleCS = new ArrayList<>();
 		this.selectedConverterSetups = selectedConverterSetups;
 		this.colorPanel = colorPanel;
 
@@ -141,9 +159,16 @@ public class ColorEditorBT {
 		updateColorPanel();
 	}
 
-	private synchronized void updateSelection()
+	synchronized void updateSelection()
 	{
-		converterSetups = selectedConverterSetups.get();
+		if(singleCS.size()==0)
+		{
+			converterSetups = selectedConverterSetups.get();
+		}
+		else
+		{
+			converterSetups  = singleCS;
+		}
 		updateColorPanel();
 	}
 

@@ -41,7 +41,7 @@ import bdv.ui.keymap.KeymapSettingsPage;
 import bdv.viewer.ConverterSetups;
 import bdv.viewer.NavigationActions;
 import bdv.viewer.ViewerState;
-import btbvv.btuitools.BrightnessDialogBT;
+import btbvv.btuitools.BrightnessColorDialog;
 import btbvv.btuitools.BvvGamma;
 import btbvv.btuitools.GammaConverterSetup;
 import btbvv.btuitools.MinMaxGroupBT;
@@ -93,8 +93,8 @@ public class BigVolumeViewerBT
 	private final ManualTransformation manualTransformation;
 	private final Bookmarks bookmarks;
 	private final SetupAssignmentsBT setupAssignments;
-	final BrightnessDialogBT brightnessDialog;
-
+	//final BrightnessDialogBT brightnessDialog;
+	final BrightnessColorDialog brightnessDialog;
 	private final KeymapManager keymapManager;
 	private final AppearanceManager appearanceManager;
 	final PreferencesDialog preferencesDialog;
@@ -169,7 +169,8 @@ public class BigVolumeViewerBT
 				setupAssignments.moveSetupToGroup( setup, group );
 		}
 		
-		brightnessDialog = new BrightnessDialogBT( viewerFrame, setupAssignments );
+		//brightnessDialog = new BrightnessDialogBT( viewerFrame, setupAssignments );
+		brightnessDialog = new BrightnessColorDialog( viewerFrame, viewer, setups );
 
 		
 		
