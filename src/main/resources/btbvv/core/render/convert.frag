@@ -13,7 +13,7 @@ vec4 convert(vec4 acc, float v )
 	if(useLUT >0)
 	{
 		vec3 q = vec3(0);
-		q.x = clamp(offset.r + scale.r * v,0.0,1.0);
+		q.x = pow(clamp(offset.r + scale.r * v,0.0,1.0),gamma);
 		finC =  texture( lut, q);
 	}
 	else
