@@ -35,9 +35,9 @@ import java.util.List;
 
 import javax.swing.UIManager;
 
-import org.fusesource.jansi.Ansi.Color;
 
 import com.formdev.flatlaf.FlatIntelliJLaf;
+import com.formdev.flatlaf.FlatLaf;
 
 import bdv.spimdata.SpimDataMinimal;
 import bdv.spimdata.XmlIoSpimDataMinimal;
@@ -54,7 +54,7 @@ import mpicbg.spim.data.SpimDataException;
 import net.imglib2.FinalRealInterval;
 import net.imglib2.img.Img;
 import net.imglib2.img.display.imagej.ImageJFunctions;
-import net.imglib2.type.numeric.ARGBType;
+
 import net.imglib2.type.numeric.integer.UnsignedShortType;
 
 
@@ -84,7 +84,6 @@ public class BT_Example01 {
 		try {
 			spimData = new XmlIoSpimDataMinimal().load( xmlFilename );
 		} catch (SpimDataException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}		
 		final List< BvvStackSource< ? > > sources = BvvFunctions.show( spimData );
