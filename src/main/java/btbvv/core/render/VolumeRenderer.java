@@ -45,6 +45,7 @@ import static com.jogamp.opengl.GL.GL_ONE_MINUS_SRC_ALPHA;
 import static com.jogamp.opengl.GL.GL_SRC_ALPHA;
 import static com.jogamp.opengl.GL.GL_UNPACK_ALIGNMENT;
 
+import com.jogamp.opengl.GL;
 import com.jogamp.opengl.GL2ES2;
 import com.jogamp.opengl.GL2ES3;
 import com.jogamp.opengl.GL3;
@@ -260,6 +261,8 @@ public class VolumeRenderer
 
 		gl.glEnable( GL_DEPTH_TEST );
 		gl.glDepthFunc( GL_ALWAYS );
+		gl.glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+		gl.glClear(GL.GL_COLOR_BUFFER_BIT);
 		
 //		if(bShowInfo)
 //		{
