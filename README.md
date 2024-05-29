@@ -43,9 +43,9 @@ By clicking on the "three trianlges" button it can be expanded to show advanced 
 
 There is a new slider marked "**γ**" that adjusts non-linear color/LUT mapping by introducing [gamma](https://en.wikipedia.org/wiki/Gamma_correction) correction (a power-law).  
 
-In addition to color, one can also independently map intensity values to an opacity of voxel using "**α** range" (with a corresponding "**α γ**" gamma adjustment slider below).
+In addition to color, one can also independently adjust the mapping of intensity values to the opacity using "**α**" range slider (with a corresponding "**γ α**" gamma adjustment slider below).
 
-A new additional checkbox on the left is used to synchronize top pair of sliders (color/LUT) with the bottom pair (**α**), but not the other way around. It also synchronizes slider ranges. It is useful to keep it selected in the beginning, to see the volume, and later fine-tune the alpha values independently (unselected) for a better result. It is especially helpful in the volumetric rendering mode.   
+A new additional checkbox on the left is used to synchronize top pair of sliders (color/LUT + **γ**) with the bottom pair (**α** + **γ α**), but not the other way around. It also synchronizes slider ranges. It is useful to keep it selected in the beginning, to see the volume, and later fine-tune the alpha values independently (unselected) for a better result. It is especially helpful in the volumetric rendering mode.   
 
 ### Lookup tables (LUTs)
 
