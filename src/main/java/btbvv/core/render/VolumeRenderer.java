@@ -261,7 +261,7 @@ public class VolumeRenderer
 
 		gl.glEnable( GL_DEPTH_TEST );
 		gl.glDepthFunc( GL_ALWAYS );
-		gl.glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+		gl.glClearColor(1.0f, 1.0f, 1.0f, 0.0f);
 		gl.glClear(GL.GL_COLOR_BUFFER_BIT);
 		
 //		if(bShowInfo)
