@@ -12,3 +12,4 @@ pom.xml.next
 *.iml
 build/
 .gradle/
+.factorypath
