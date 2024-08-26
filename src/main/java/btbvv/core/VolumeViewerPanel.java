@@ -165,7 +165,7 @@ public class VolumeViewerPanel
 		}
 	}
 	
-	private boolean bRenderMode = true;
+	private boolean bRenderMode = false;
 
 	private final Repaint repaint = new Repaint();
 
