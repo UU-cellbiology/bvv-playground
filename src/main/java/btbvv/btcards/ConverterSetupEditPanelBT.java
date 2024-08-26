@@ -126,9 +126,9 @@ public class ConverterSetupEditPanelBT extends JPanel
 		extendedPanel.setLayout( new MigLayout( "ins 0 0 0 0, fillx, filly, hidemode 3", "[][][grow]", "[]0[]" ) );
 		extendedPanel.add( new JLabel(" γ"), "" );
 		extendedPanel.add( gammaPanel, "growx, span, wrap" );
+		extendedPanel.add(cbSync);
 		extendedPanel.add( new JLabel(" α"), "" );
 		extendedPanel.add( rangeAlphaPanel, "growx, span, wrap" );
-		extendedPanel.add(cbSync);
 		extendedPanel.add( new JLabel(" γ α"), "" );
 		extendedPanel.add( gammaAlphaPanel, "growx, span" );
 

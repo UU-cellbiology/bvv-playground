@@ -150,6 +150,11 @@ public class VolumeViewerPanel
 			type = NONE;
 			return t;
 		}
+		protected synchronized RepaintType get()
+		{
+			final RepaintType t = type;
+			return t;
+		}
 	}
 
 	private final Repaint repaint = new Repaint();
@@ -382,6 +387,11 @@ public class VolumeViewerPanel
 		state.getState().changeListeners().add( this );
 
 		painterThread.start();
+	}
+	
+	public RepaintType getRepaintStatus()
+	{
+		return repaint.get();
 	}
 
 	/**
