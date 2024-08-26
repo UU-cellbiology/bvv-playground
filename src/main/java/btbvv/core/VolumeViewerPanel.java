@@ -150,12 +150,15 @@ public class VolumeViewerPanel
 			type = NONE;
 			return t;
 		}
+		
 		protected synchronized RepaintType get()
 		{
 			final RepaintType t = type;
 			return t;
 		}
 	}
+	
+	private boolean bRenderMode = false;
 
 	private final Repaint repaint = new Repaint();
 
@@ -393,6 +396,17 @@ public class VolumeViewerPanel
 	{
 		return repaint.get();
 	}
+	
+	public void setRenderMode (boolean bRenderMode_)
+	{
+		bRenderMode = bRenderMode_;
+	}
+	
+	public boolean getRenderMode ()
+	{
+		return bRenderMode;
+	}
+	
 
 	/**
 	 * @deprecated Modify {@link #state()} directly
@@ -1000,8 +1014,17 @@ public class VolumeViewerPanel
 		{
 			final GL3 gl = drawable.getGL().getGL3();
 
-			final RepaintType type = repaint.getAndClear();
+			final RepaintType type;
+			if(bRenderMode )
+			{
+				type = repaint.get();
+			}
+			else
+			{
+				type = repaint.getAndClear();
 
+			}
+			
 			if ( type == FULL )
 			{
 				setRenderState();
