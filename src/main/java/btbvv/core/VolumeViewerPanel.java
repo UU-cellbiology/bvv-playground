@@ -144,6 +144,13 @@ public class VolumeViewerPanel
 			}
 		}
 
+		protected synchronized void set( final RepaintType type )
+		{
+			this.type = type;
+			painterThread.requestRepaint();
+		}
+
+
 		protected synchronized RepaintType getAndClear()
 		{
 			final RepaintType t = type;
@@ -158,7 +165,7 @@ public class VolumeViewerPanel
 		}
 	}
 	
-	private boolean bRenderMode = false;
+	private boolean bRenderMode = true;
 
 	private final Repaint repaint = new Repaint();
 
@@ -1052,7 +1059,14 @@ public class VolumeViewerPanel
 			gl.glDisable( GL_DEPTH_TEST );
 			sceneBuf.drawQuad( gl );
 			final RepaintType rerender = renderer.draw( gl, type, sceneBuf, renderStacks, renderConverters, pv, maxRenderMillis, maxAllowedStepInVoxels );
-			repaint.request( rerender );
+			if(bRenderMode)
+			{
+				repaint.set( rerender );
+			}
+			else
+			{
+				repaint.request( rerender );
+			}
 			offscreen.unbind( gl, false );
 			offscreen.drawQuad( gl );
 		}
