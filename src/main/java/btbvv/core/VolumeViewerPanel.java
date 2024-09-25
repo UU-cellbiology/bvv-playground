@@ -107,6 +107,7 @@ import static btbvv.core.render.VolumeRenderer.RepaintType.SCENE;
 import static com.jogamp.opengl.GL.GL_DEPTH_TEST;
 import static com.jogamp.opengl.GL.GL_LESS;
 import static com.jogamp.opengl.GL.GL_RGB8;
+import static com.jogamp.opengl.GL.GL_RGBA8;
 
 public class VolumeViewerPanel
 		extends AbstractViewerPanel
@@ -328,7 +329,7 @@ public class VolumeViewerPanel
 
 		final int renderWidth = options.getRenderWidth();
 		final int renderHeight = options.getRenderHeight();
-		sceneBuf = new OffScreenFrameBufferWithDepth( renderWidth, renderHeight, GL_RGB8 );
+		sceneBuf = new OffScreenFrameBufferWithDepth( renderWidth, renderHeight, GL_RGBA8 );
 		offscreen = new OffScreenFrameBuffer( renderWidth, renderHeight, GL_RGB8, false, useGLJPanel );
 		maxRenderMillis = options.getMaxRenderMillis();
 
@@ -1045,6 +1046,7 @@ public class VolumeViewerPanel
 				gl.glDepthFunc( GL_LESS );
 				if ( renderScene != null )
 					renderScene.render( gl, renderData );
+				//sceneBuf.unbind( gl, false );
 				sceneBuf.unbind( gl, false );
 			}
 
@@ -1055,7 +1057,7 @@ public class VolumeViewerPanel
 			}
 
 //			offscreen.flipY = true;
-			offscreen.bind( gl, false );
+			offscreen.bind( gl, true );
 			gl.glDisable( GL_DEPTH_TEST );
 			sceneBuf.drawQuad( gl );
 			final RepaintType rerender = renderer.draw( gl, type, sceneBuf, renderStacks, renderConverters, pv, maxRenderMillis, maxAllowedStepInVoxels );

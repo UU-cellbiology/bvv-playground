@@ -42,7 +42,9 @@ import java.nio.IntBuffer;
 import net.imglib2.RandomAccess;
 import net.imglib2.img.Img;
 import net.imglib2.img.array.ArrayImgs;
+import net.imglib2.img.display.imagej.ImageJFunctions;
 import net.imglib2.type.numeric.real.FloatType;
+import net.imglib2.view.Views;
 
 import static com.jogamp.opengl.GL.GL_ARRAY_BUFFER;
 import static com.jogamp.opengl.GL.GL_CLAMP_TO_EDGE;
@@ -58,6 +60,7 @@ import static com.jogamp.opengl.GL.GL_FRAMEBUFFER_BINDING;
 import static com.jogamp.opengl.GL.GL_FRAMEBUFFER_COMPLETE;
 import static com.jogamp.opengl.GL.GL_LINEAR;
 import static com.jogamp.opengl.GL.GL_RGB;
+import static com.jogamp.opengl.GL.GL_RGBA;
 import static com.jogamp.opengl.GL.GL_RGB32F;
 import static com.jogamp.opengl.GL.GL_TEXTURE0;
 import static com.jogamp.opengl.GL.GL_TEXTURE_2D;
@@ -98,13 +101,13 @@ public class OffScreenFrameBufferWithDepth
 	private int[] viewport = new int[ 4 ];
 
 	// downloaded texture data
-	private float[] rgb;
+	private float[] rgba;
 
 	// downloaded texture data
 	private float[] depth;
 
 	// downloaded texture data as 3 * fwWidth * fbHeight image
-	private Img< FloatType > rgbImg;
+	private Img< FloatType > rgbaImg;
 
 	// downloaded texture data as 3 * fwWidth * fbHeight image
 	private Img< FloatType > depthImg;
@@ -232,8 +235,8 @@ public class OffScreenFrameBufferWithDepth
 			return;
 		imgsInitialized = true;
 
-		rgb = new float[ fbWidth * fbHeight * 3 ];
-		rgbImg = ArrayImgs.floats( rgb, 3, fbWidth, fbHeight );
+		rgba = new float[ fbWidth * fbHeight * 4 ];
+		rgbaImg = ArrayImgs.floats( rgba, 4, fbWidth, fbHeight );
 
 		depth = new float[ fbWidth * fbHeight ];
 		depthImg = ArrayImgs.floats( depth, fbWidth, fbHeight );
@@ -279,7 +282,7 @@ public class OffScreenFrameBufferWithDepth
 		if ( !imgValid )
 			System.err.println( "Img not valid. Call getTexture() first." );
 
-		final RandomAccess< FloatType > a = rgbImg.randomAccess();
+		final RandomAccess< FloatType > a = rgbaImg.randomAccess();
 		a.setPosition( new long[] { c, x, y } );
 		return a.get().get();
 	}
@@ -309,7 +312,10 @@ public class OffScreenFrameBufferWithDepth
 		imgValid = false;
 
 		if ( getTexture )
+		{
 			getTexture( gl );
+			ImageJFunctions.show( Views.permute(  rgbaImg , 0, 2) );
+		}
 	}
 
 	/**
@@ -346,7 +352,7 @@ public class OffScreenFrameBufferWithDepth
 		initImgs();
 
 		gl.glBindTexture( GL_TEXTURE_2D, texColorBuffer );
-		gl.glGetTexImage( GL_TEXTURE_2D, 0, GL_RGB, GL_FLOAT, FloatBuffer.wrap( rgb ) );
+		gl.glGetTexImage( GL_TEXTURE_2D, 0, GL_RGBA, GL_FLOAT, FloatBuffer.wrap( rgba ) );
 		gl.glBindTexture( GL_TEXTURE_2D, texDepthBuffer );
 		gl.glGetTexImage( GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, GL_FLOAT, FloatBuffer.wrap( depth ) );
 		gl.glBindTexture( GL_TEXTURE_2D, 0 );

@@ -29,6 +29,7 @@
 package bvv.vistools.examples;
 
 import ij.IJ;
+import ij.ImageJ;
 import ij.ImagePlus;
 import net.imglib2.img.Img;
 import net.imglib2.img.display.imagej.ImageJFunctions;
@@ -49,7 +50,8 @@ public class Example07
 	 */
 	public static void main( final String[] args )
 	{
-		final ImagePlus imp = IJ.openImage( "https://imagej.nih.gov/ij/images/t1-head.zip" );
+		new ImageJ();
+		final ImagePlus imp = IJ.openImage( "/home/eugene/Desktop/projects/BigTrace/BigTrace_data/t1-head.zip" );
 		final Img< UnsignedShortType > img = ImageJFunctions.wrapShort( imp );
 
 		final BvvSource source = BvvFunctions.show( img, "t1-head",
