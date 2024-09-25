@@ -58,6 +58,8 @@ public class TexturedUnitCube
 	private int vao;
 
 	private int texId;
+	
+	public float fOpacity = 1.0f;
 
 	public TexturedUnitCube( final String imageFilename )
 	{
@@ -166,6 +168,7 @@ public class TexturedUnitCube
 		JoglGpuContext context = JoglGpuContext.get( gl );
 
 		prog.getUniformMatrix4f( "pvm" ).set( pvm );
+		prog.getUniform1f( "opacity" ).set( fOpacity );
 		prog.setUniforms( context );
 		prog.use( context );
 

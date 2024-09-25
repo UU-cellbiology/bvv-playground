@@ -1044,10 +1044,11 @@ public class VolumeViewerPanel
 				sceneBuf.bind( gl );
 				gl.glEnable( GL_DEPTH_TEST );
 				gl.glDepthFunc( GL_LESS );
+				
 				if ( renderScene != null )
 					renderScene.render( gl, renderData );
 				//sceneBuf.unbind( gl, false );
-				sceneBuf.unbind( gl, false );
+				sceneBuf.unbind( gl, true );
 			}
 
 			if ( type == FULL || type == LOAD )

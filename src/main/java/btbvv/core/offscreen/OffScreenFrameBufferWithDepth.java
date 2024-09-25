@@ -44,6 +44,7 @@ import net.imglib2.img.Img;
 import net.imglib2.img.array.ArrayImgs;
 import net.imglib2.img.display.imagej.ImageJFunctions;
 import net.imglib2.type.numeric.real.FloatType;
+import net.imglib2.view.IntervalView;
 import net.imglib2.view.Views;
 
 import static com.jogamp.opengl.GL.GL_ARRAY_BUFFER;
@@ -230,7 +231,7 @@ public class OffScreenFrameBufferWithDepth
 
 	private void initImgs()
 	{
-		System.out.println( "OffScreenFrameBufferWithDepth.initImgs" );
+		
 		if ( imgsInitialized )
 			return;
 		imgsInitialized = true;
@@ -314,10 +315,35 @@ public class OffScreenFrameBufferWithDepth
 		if ( getTexture )
 		{
 			getTexture( gl );
-			ImageJFunctions.show( Views.permute(  rgbaImg , 0, 2) );
+			//correctDepth(gl);
+			//getTexture( gl );
+			IntervalView< FloatType > alpha = Views.permute(Views.permute(  rgbaImg , 0, 2),0,1);
+			ImageJFunctions.show( Views.hyperSlice( alpha,2,3 ));
+			ImageJFunctions.show( depthImg );
 		}
 	}
 
+	public void correctDepth(GL3 gl)
+	{
+		//final int nOffset = 3*fbWidth*fbHeight;
+		//change depth of transparent objects
+		for (int i = 0; i<fbWidth*fbHeight; i++)
+		{
+			if(rgba[i*4+3]<0.99f)
+			//if(rgba[nOffset+i]<0.99f)
+			{
+				depth[i] = 1.0f;
+			}
+		}
+		//upload to the depth texture
+		gl.glBindTexture( GL_TEXTURE_2D, texDepthBuffer );
+		gl.glTexImage2D( GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, fbWidth, fbHeight, 0, GL_DEPTH_COMPONENT, GL_FLOAT, FloatBuffer.wrap( depth ) );
+		gl.glBindTexture( GL_TEXTURE_2D, 0 );
+		JoglGpuContext.get( gl ).delete( depthTexture );
+		JoglGpuContext.get( gl ).registerTexture( depthTexture, texDepthBuffer );
+		//JoglGpuContext.get( gl ).registerTexture( depthTexture, texDepthBuffer );
+	}
+	
 	/**
 	 * Render fullscreen quad with the texture.
 	 */
@@ -356,6 +382,7 @@ public class OffScreenFrameBufferWithDepth
 		gl.glBindTexture( GL_TEXTURE_2D, texDepthBuffer );
 		gl.glGetTexImage( GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, GL_FLOAT, FloatBuffer.wrap( depth ) );
 		gl.glBindTexture( GL_TEXTURE_2D, 0 );
+		
 	}
 
 	public int getWidth()

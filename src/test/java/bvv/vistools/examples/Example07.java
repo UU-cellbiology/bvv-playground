@@ -55,15 +55,20 @@ public class Example07
 		final Img< UnsignedShortType > img = ImageJFunctions.wrapShort( imp );
 
 		final BvvSource source = BvvFunctions.show( img, "t1-head",
-				Bvv.options().maxAllowedStepInVoxels( 0 ).renderWidth( 1024 ).renderHeight( 1024 ).preferredSize( 1024, 1024 ) );
+				Bvv.options().maxAllowedStepInVoxels( 0 ).renderWidth( 1280 ).renderHeight( 720).preferredSize( 1024, 1024 ) );
 		source.setDisplayRange( 0, 800 );
 		source.setColor( new ARGBType( 0xffff8800 ) );
 
 		final TexturedUnitCube cube = new TexturedUnitCube( "imglib2.png" );
+		final TexturedUnitCube cube2 = new TexturedUnitCube( "imglib2.png" );
+		cube.fOpacity = 0.75f;
 		final VolumeViewerPanel viewer = source.getBvvHandle().getViewerPanel();
 		viewer.setRenderScene( ( gl, data ) -> {
-			final Matrix4f cubetransform = new Matrix4f().translate( 140, 150, 65 ).scale( 80 );
+			final Matrix4f cubetransform = new Matrix4f().translate( 100, 150, 65 ).scale( 80 );
 			cube.draw( gl, new Matrix4f( data.getPv() ).mul( cubetransform ) );
+			final Matrix4f cubetransform2 = new Matrix4f().translate( 170, 150, 65 ).scale( 80 );
+			cube2.draw( gl, new Matrix4f( data.getPv() ).mul( cubetransform2 ) );
+
 		} );
 
 		viewer.requestRepaint();
