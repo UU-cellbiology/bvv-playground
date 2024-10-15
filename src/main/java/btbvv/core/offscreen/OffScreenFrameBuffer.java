@@ -147,8 +147,8 @@ public class OffScreenFrameBuffer
 		this.withDepthAndStencil = withDepthAndStencil;
 		this.flipY = flipY;
 
-		final Segment quadvp = new SegmentTemplate( OffScreenFrameBuffer.class, "osfbquad.vp" ).instantiate();
-		final Segment quadfp = new SegmentTemplate( OffScreenFrameBuffer.class, "osfbquad.fp" ).instantiate();
+		final Segment quadvp = new SegmentTemplate( OffScreenFrameBuffer.class, "osfbquad_edge.vp" ).instantiate();
+		final Segment quadfp = new SegmentTemplate( OffScreenFrameBuffer.class, "osfbquad_edge.fp" ).instantiate();
 		progQuad = new DefaultShader( quadvp.getCode(), quadfp.getCode() );
 	}
 
@@ -340,8 +340,61 @@ public class OffScreenFrameBuffer
 	public void drawQuad( GL3 gl, int minFilter, int magFilter )
 	{
 		initQuad( gl );
-
-		progQuad.use( JoglGpuContext.get( gl ) );
+		 //float offset = 1.0f / 512.0f;
+		float offset =  1.0f/512.0f;
+		float [][] offsets = new float[25][2];
+		for (int i=0;i<5;i++)
+			for (int j=0;j<5;j++)
+			{
+				offsets[i*5+j][0]=offset*(i-2);
+				offsets[i*5+j][1]=offset*(j-2);
+			}
+//		for (int i=0;i<3;i++)
+//			for (int j=0;j<3;j++)
+//			{
+//				offsets[i*3+j][0]=offset*(i-1);
+//				offsets[i*3+j][1]=offset*(j-1);
+//			}
+		
+//		    float [][] offsets = new float[][]  {
+//		        { -offset,  offset  },  // top-left
+//		        {  0.0f,    offset  },  // top-center
+//		        {  offset,  offset  },  // top-right
+//		        { -offset,  0.0f    },  // center-left
+//		        {  0.0f,    0.0f    },  // center-center
+//		        {  offset,  0.0f    },  // center - right
+//		        { -offset, -offset  },  // bottom-left
+//		        {  0.0f,   -offset  },  // bottom-center
+//		        {  offset, -offset  }   // bottom-right    
+//		    };
+//		    float [] blur_kernel = new float [] {
+//		            1.0f / 16.0f, 2.0f / 16.0f, 1.0f / 16.0f,
+//		            2.0f / 16.0f, 4.0f / 16.0f, 2.0f / 16.0f,
+//		            1.0f / 16.0f, 2.0f / 16.0f, 1.0f / 16.0f
+//		        };
+		    float [] blur_kernel = new float [] {
+		            1.0f , 1.0f, 1.0f,
+		            1.0f , 1.0f, 1.0f,
+		            1.0f , 1.0f, 1.0f
+		        };
+			int [] edge_kernel = new int[]  {
+					-1, -1, -1, -1, -1,
+					-1, -1, -1, -1, -1,
+					-1, -1, 24, -1, -1,
+					-1, -1, -1, -1, -1,
+					-1, -1, -1, -1, -1
+				    };
+//		int [] edge_kernel = new int[]  {
+//				 -1, -1, -1,
+//			        -1,  8, -1,
+//			        -1, -1, -1
+//			    };
+		progQuad.getUniform2fv( "offsets").set( offsets);
+		progQuad.getUniform1fv( "blurkernel").set( blur_kernel);
+		progQuad.getUniform1iv( "edge_kernel").set( edge_kernel);
+		JoglGpuContext context = JoglGpuContext.get( gl );
+		progQuad.setUniforms( context );
+		progQuad.use( context );
 		gl.glActiveTexture( GL_TEXTURE0 );
 		gl.glBindTexture( GL_TEXTURE_2D, texColorBuffer );
 		gl.glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, minFilter );

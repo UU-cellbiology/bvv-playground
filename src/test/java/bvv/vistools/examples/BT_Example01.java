@@ -93,36 +93,36 @@ public class BT_Example01 {
 	
 		source.setDisplayRangeBounds( 0, 40000 );
 		source.setDisplayRange(0, 655);
-		source.setDisplayGamma(0.5);
-		
-		
-		//set volumetric rendering (1), instead of max intensity max intensity (0)
-		source.setRenderType(1);
-		
-		//DisplayRange maps colors (or LUT values) to intensity values
-		source.setDisplayRange(0, 400);
-		//it is also possible to change LUT gamma value
-		//source.setDisplayGamma(0.9);
-		
-		//alpha channel to intensity mapping can be changed independently
-		source.setAlphaRange(0, 500);
-		//it is also possible to change alpha-channel gamma value
-		//source.setAlphaGamma(0.9);
-		
-		//assign a "Fire" lookup table to this source
-		source.setLUT("Fire");
-		
-		//or one can assign custom IndexColorModel + name as string
-		//in this illustration we going to get IndexColorModel from IJ 
-		//(but it could be made somewhere else)
-		//final IndexColorModel icm_lut = LutLoader.getLut("Spectrum");
-		//source.setLUT( icm_lut, "SpectrumLUT" );
-
-		
-		//clip half of the volume along Z axis in the shaders
-		//clipInterval is defined inside the "raw", non-transformed data interval		
-		minI[2]=0.5*maxI[2];		
-		source.setClipInterval(new FinalRealInterval(minI,maxI));		
+//		source.setDisplayGamma(0.5);
+//		
+//		
+//		//set volumetric rendering (1), instead of max intensity max intensity (0)
+//		source.setRenderType(1);
+//		
+//		//DisplayRange maps colors (or LUT values) to intensity values
+//		source.setDisplayRange(0, 400);
+//		//it is also possible to change LUT gamma value
+//		//source.setDisplayGamma(0.9);
+//		
+//		//alpha channel to intensity mapping can be changed independently
+//		source.setAlphaRange(0, 500);
+//		//it is also possible to change alpha-channel gamma value
+//		//source.setAlphaGamma(0.9);
+//		
+//		//assign a "Fire" lookup table to this source
+//		source.setLUT("Fire");
+//		
+//		//or one can assign custom IndexColorModel + name as string
+//		//in this illustration we going to get IndexColorModel from IJ 
+//		//(but it could be made somewhere else)
+//		//final IndexColorModel icm_lut = LutLoader.getLut("Spectrum");
+//		//source.setLUT( icm_lut, "SpectrumLUT" );
+//
+//		
+//		//clip half of the volume along Z axis in the shaders
+//		//clipInterval is defined inside the "raw", non-transformed data interval		
+//		minI[2]=0.5*maxI[2];		
+//		source.setClipInterval(new FinalRealInterval(minI,maxI));		
 		
 	}
 	
