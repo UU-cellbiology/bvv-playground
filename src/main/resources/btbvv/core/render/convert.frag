@@ -27,8 +27,15 @@ vec4 convert(vec4 acc, float v )
 	
 	if(renderType==0)
 	{	
-		//need to think about it, if it is true
-		return max(acc, finC);
+		//compare it only on the basis of alpha
+		if(acc.a>finC.a)
+		{	
+			return acc;
+		}
+		else
+		{
+			return finC;
+		}
 	}
 	else
 	{

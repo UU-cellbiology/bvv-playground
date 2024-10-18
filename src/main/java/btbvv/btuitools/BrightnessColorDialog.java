@@ -57,7 +57,7 @@ import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 
 
-import bdv.util.DelayedPackDialog;
+import bdv.tools.DelayedPackDialog;
 import bdv.util.InvokeOnEDT;
 import bdv.viewer.AbstractViewerPanel;
 import bdv.viewer.ConverterSetups;
