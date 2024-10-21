@@ -81,13 +81,13 @@ public class VolumeTextureU16 implements Texture3D
 	@Override
 	public MinFilter texMinFilter()
 	{
-		return MinFilter.LINEAR;
+		return MinFilter.NEAREST;
 	}
 
 	@Override
 	public MagFilter texMagFilter()
 	{
-		return MagFilter.LINEAR;
+		return MagFilter.NEAREST;//.LINEAR;
 	}
 
 	@Override

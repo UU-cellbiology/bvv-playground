@@ -50,7 +50,11 @@ import static com.jogamp.opengl.GL.GL_ACTIVE_TEXTURE;
 import static com.jogamp.opengl.GL.GL_CLAMP_TO_EDGE;
 import static com.jogamp.opengl.GL.GL_FLOAT;
 import static com.jogamp.opengl.GL.GL_LINEAR;
+import static com.jogamp.opengl.GL.GL_LINEAR_MIPMAP_LINEAR;
+import static com.jogamp.opengl.GL.GL_LINEAR_MIPMAP_NEAREST;
 import static com.jogamp.opengl.GL.GL_NEAREST;
+import static com.jogamp.opengl.GL.GL_NEAREST_MIPMAP_NEAREST;
+import static com.jogamp.opengl.GL.GL_NEAREST_MIPMAP_LINEAR;
 import static com.jogamp.opengl.GL.GL_R32F;
 import static com.jogamp.opengl.GL.GL_R8;
 import static com.jogamp.opengl.GL.GL_REPEAT;
@@ -502,6 +506,14 @@ public class JoglGpuContext implements GpuContext
 			return GL_NEAREST;
 		case LINEAR:
 			return GL_LINEAR;
+		case NEAREST_MIPMAP_NEAREST:
+			return GL_NEAREST_MIPMAP_NEAREST;
+		case LINEAR_MIPMAP_NEAREST:
+			return GL_LINEAR_MIPMAP_NEAREST;
+		case NEAREST_MIPMAP_LINEAR:
+			return GL_NEAREST_MIPMAP_LINEAR;
+		case LINEAR_MIPMAP_LINEAR:
+			return GL_LINEAR_MIPMAP_LINEAR;
 		default:
 			throw new IllegalArgumentException();
 		}
@@ -515,6 +527,14 @@ public class JoglGpuContext implements GpuContext
 			return GL_NEAREST;
 		case LINEAR:
 			return GL_LINEAR;
+		case NEAREST_MIPMAP_NEAREST:
+			return GL_NEAREST_MIPMAP_NEAREST;
+		case LINEAR_MIPMAP_NEAREST:
+			return GL_LINEAR_MIPMAP_NEAREST;
+		case NEAREST_MIPMAP_LINEAR:
+			return GL_NEAREST_MIPMAP_LINEAR;
+		case LINEAR_MIPMAP_LINEAR:
+			return GL_LINEAR_MIPMAP_LINEAR;
 		default:
 			throw new IllegalArgumentException();
 		}
