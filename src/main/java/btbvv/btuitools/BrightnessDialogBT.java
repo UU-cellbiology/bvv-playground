@@ -79,7 +79,6 @@ import bdv.tools.brightness.ConverterSetup;
 import bdv.tools.brightness.SliderPanel;
 import bdv.tools.brightness.SliderPanelDouble;
 import bdv.util.BoundedValueDouble;
-import bdv.tools.DelayedPackDialog;
 import btbvv.core.VolumeViewerFrame;
 import mpicbg.spim.data.generic.sequence.BasicViewSetup;
 import net.imglib2.type.numeric.ARGBType;
@@ -91,7 +90,7 @@ import net.imglib2.type.numeric.ARGBType;
  * @author Tobias Pietzsch
  */
 @Deprecated
-public class BrightnessDialogBT extends DelayedPackDialog
+public class BrightnessDialogBT extends DelayedPackDialogBT
 {
 	ConverterSetupsBT convSet;
 	

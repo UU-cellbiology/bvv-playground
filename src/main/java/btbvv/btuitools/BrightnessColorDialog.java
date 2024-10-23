@@ -56,8 +56,6 @@ import javax.swing.JPanel;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 
-
-import bdv.tools.DelayedPackDialog;
 import bdv.util.InvokeOnEDT;
 import bdv.viewer.AbstractViewerPanel;
 import bdv.viewer.ConverterSetups;
@@ -70,7 +68,7 @@ import btbvv.btcards.sourcetable.SourceTableModelBT.StateModel;
 import btbvv.core.VolumeViewerFrame;
 
 
-public class BrightnessColorDialog extends DelayedPackDialog
+public class BrightnessColorDialog extends DelayedPackDialogBT
 {
 	private final SourceToConverterSetupBimap converters;
 
