@@ -25,23 +25,23 @@ vec4 convert(vec4 acc, float v )
 	
 	finC.a = pow(clamp(offset.a + scale.a * v,0.0,1.0),alphagamma);		
 	
+	//max projection
 	if(renderType==0)
 	{	
-		//compare it only on the basis of alpha
-		if(acc.a>finC.a)
-		{	
-			return acc;
-		}
-		else
-		{
-			return finC;
-		}
+		return max(acc, finC);
 	}
-	else
+	
+	//volumetric
+	if(renderType==1)
 	{
 		finC = acc + (1.-acc.a) * vec4( finC.rgb, 1 ) *finC.a;		 
 		return finC;
 
+	}
+	//min projection
+	else
+	{
+		return min(acc, finC);
 	}
 	
 }
