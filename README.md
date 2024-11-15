@@ -57,8 +57,8 @@ The left mouse button click still activates a dialog for a monochromatic, "singl
 
 ## For developers
 
-A list of additional methods (adjusting gamma and opacity, adding LUTs and volume clipping) is illustrated by [this example](https://github.com/ekatrukha/bvv-playground/blob/master/src/test/java/bvv/vistools/examples/BT_Example01.java).  
-There is a possibility to specify "clipping transform", shown [here](https://github.com/ekatrukha/bvv-playground/blob/master/src/test/java/bvv/vistools/examples/BT_Example02.java).   
+A list of additional methods (adjusting gamma and opacity, adding LUTs and volume clipping) is illustrated by [this example](https://github.com/UU-cellbiology/bvv-playground/blob/master/src/test/java/bvv/vistools/examples/PG_Example01.java).  
+There is a possibility to specify "clipping transform", shown [here](https://github.com/UU-cellbiology/bvv-playground/blob/master/src/test/java/bvv/vistools/examples/PG_Example02.java).   
    
 The project is currently under development and has a lot of "experimental" code (i.e. not clean and in the state of "well, at least it works"). So comments and optimization suggestions are welcome.
 
