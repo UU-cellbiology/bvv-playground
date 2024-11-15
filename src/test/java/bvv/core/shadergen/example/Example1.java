@@ -33,12 +33,12 @@ import com.jogamp.opengl.GL3;
 import com.jogamp.opengl.GLAutoDrawable;
 import com.jogamp.opengl.GLEventListener;
 
-import btbvv.core.backend.jogl.JoglGpuContext;
-import btbvv.core.shadergen.Uniform3f;
-import btbvv.core.shadergen.generate.Segment;
-import btbvv.core.shadergen.generate.SegmentTemplate;
-import btbvv.core.shadergen.generate.SegmentedShader;
-import btbvv.core.shadergen.generate.SegmentedShaderBuilder;
+import bvvpg.core.backend.jogl.JoglGpuContext;
+import bvvpg.core.shadergen.Uniform3f;
+import bvvpg.core.shadergen.generate.Segment;
+import bvvpg.core.shadergen.generate.SegmentTemplate;
+import bvvpg.core.shadergen.generate.SegmentedShader;
+import bvvpg.core.shadergen.generate.SegmentedShaderBuilder;
 
 import java.nio.FloatBuffer;
 

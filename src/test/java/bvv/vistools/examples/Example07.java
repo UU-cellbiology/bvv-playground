@@ -36,11 +36,11 @@ import net.imglib2.type.numeric.ARGBType;
 import net.imglib2.type.numeric.integer.UnsignedShortType;
 import org.joml.Matrix4f;
 
-import btbvv.core.VolumeViewerPanel;
-import btbvv.vistools.Bvv;
-import btbvv.vistools.BvvFunctions;
-import btbvv.vistools.BvvSource;
 import bvv.vistools.examples.scene.TexturedUnitCube;
+import bvvpg.core.VolumeViewerPanel;
+import bvvpg.vistools.Bvv;
+import bvvpg.vistools.BvvFunctions;
+import bvvpg.vistools.BvvSource;
 
 public class Example07
 {

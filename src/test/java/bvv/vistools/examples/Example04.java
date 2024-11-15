@@ -28,9 +28,6 @@
  */
 package bvv.vistools.examples;
 
-import btbvv.vistools.Bvv;
-import btbvv.vistools.BvvFunctions;
-import btbvv.vistools.BvvSource;
 import ij.IJ;
 import ij.ImagePlus;
 import net.imglib2.img.Img;
@@ -39,6 +36,10 @@ import net.imglib2.realtransform.AffineTransform3D;
 import net.imglib2.type.numeric.ARGBType;
 import net.imglib2.type.numeric.integer.UnsignedShortType;
 import net.imglib2.view.Views;
+
+import bvvpg.vistools.Bvv;
+import bvvpg.vistools.BvvFunctions;
+import bvvpg.vistools.BvvSource;
 
 public class Example04
 {

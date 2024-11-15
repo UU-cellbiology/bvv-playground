@@ -28,13 +28,14 @@
  */
 package bvv.vistools.examples;
 
-import btbvv.vistools.Bvv;
-import btbvv.vistools.BvvFunctions;
 import ij.IJ;
 import ij.ImagePlus;
 import net.imglib2.img.Img;
 import net.imglib2.img.display.imagej.ImageJFunctions;
 import net.imglib2.type.numeric.ARGBType;
+
+import bvvpg.vistools.Bvv;
+import bvvpg.vistools.BvvFunctions;
 
 public class Example02
 {

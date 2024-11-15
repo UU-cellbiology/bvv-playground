@@ -29,9 +29,9 @@
 package bvv.vistools.examples;
 
 import bdv.util.AxisOrder;
-import btbvv.vistools.Bvv;
-import btbvv.vistools.BvvFunctions;
-import btbvv.vistools.BvvStackSource;
+import bvvpg.vistools.Bvv;
+import bvvpg.vistools.BvvFunctions;
+import bvvpg.vistools.BvvStackSource;
 import ij.IJ;
 import ij.ImagePlus;
 import net.imglib2.img.Img;

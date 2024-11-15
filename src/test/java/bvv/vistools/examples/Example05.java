@@ -30,8 +30,8 @@ package bvv.vistools.examples;
 
 import bdv.spimdata.SpimDataMinimal;
 import bdv.spimdata.XmlIoSpimDataMinimal;
-import btbvv.vistools.BvvFunctions;
-import btbvv.vistools.BvvStackSource;
+import bvvpg.vistools.BvvFunctions;
+import bvvpg.vistools.BvvStackSource;
 
 import java.util.List;
 import mpicbg.spim.data.SpimDataException;

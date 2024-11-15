@@ -29,7 +29,7 @@
 package bvv.core.shadergen.example;
 
 import bdv.viewer.render.PainterThread;
-import btbvv.core.InteractiveGLDisplayCanvas;
+import bvvpg.core.InteractiveGLDisplayCanvas;
 
 import com.jogamp.opengl.GLAutoDrawable;
 import com.jogamp.opengl.GLEventListener;

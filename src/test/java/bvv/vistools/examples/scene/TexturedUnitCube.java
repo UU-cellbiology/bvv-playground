@@ -31,11 +31,11 @@ package bvv.vistools.examples.scene;
 import com.jogamp.opengl.GL;
 import com.jogamp.opengl.GL3;
 
-import btbvv.core.backend.jogl.JoglGpuContext;
-import btbvv.core.shadergen.DefaultShader;
-import btbvv.core.shadergen.Shader;
-import btbvv.core.shadergen.generate.Segment;
-import btbvv.core.shadergen.generate.SegmentTemplate;
+import bvvpg.core.backend.jogl.JoglGpuContext;
+import bvvpg.core.shadergen.DefaultShader;
+import bvvpg.core.shadergen.Shader;
+import bvvpg.core.shadergen.generate.Segment;
+import bvvpg.core.shadergen.generate.SegmentTemplate;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;

@@ -31,11 +31,6 @@ package bvv.vistools.examples;
 import bdv.viewer.AbstractViewerPanel;
 import bdv.viewer.SourceAndConverter;
 import bdv.viewer.ViewerState;
-import btbvv.core.VolumeViewerPanel;
-import btbvv.core.render.RenderData;
-import btbvv.vistools.Bvv;
-import btbvv.vistools.BvvFunctions;
-import btbvv.vistools.BvvSource;
 
 import com.jogamp.opengl.GL3;
 import ij.IJ;
@@ -55,6 +50,11 @@ import org.scijava.ui.behaviour.io.InputTriggerConfig;
 import org.scijava.ui.behaviour.util.Actions;
 
 import bvv.vistools.examples.scene.TexturedUnitCube;
+import bvvpg.core.VolumeViewerPanel;
+import bvvpg.core.render.RenderData;
+import bvvpg.vistools.Bvv;
+import bvvpg.vistools.BvvFunctions;
+import bvvpg.vistools.BvvSource;
 
 public class ExampleBoxes
 {
