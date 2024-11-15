@@ -76,8 +76,6 @@ class Instances
 
 		private final ARGBType color = new ARGBType( ARGBType.rgba( 255, 255, 255, 255 ) );
 
-		//private int A;
-
 		private double scaleR;
 
 		private double scaleG;
