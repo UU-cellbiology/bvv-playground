@@ -35,7 +35,7 @@ import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
 
 @Plugin(type = Command.class, menuPath = "Plugins>BigDataViewer>BVV-playground")
-public class BigVolumeViewerBTCommand implements Command
+public class BigVolumeViewerPGCommand implements Command
 {
 
 	@Parameter( label = "Select a BDV xml file", style = "extensions:xml" )
@@ -120,7 +120,7 @@ public class BigVolumeViewerBTCommand implements Command
 
 		try
 		{
-			BigVolumeViewerBT.run( xmlFilename, windowWidth, windowHeight, renderWidth, renderHeight, ditherWidth, numDitherSamples, cacheBlockSize, maxCacheSizeInMB, dCam, dClip );
+			BigVolumeViewerPG.run( xmlFilename, windowWidth, windowHeight, renderWidth, renderHeight, ditherWidth, numDitherSamples, cacheBlockSize, maxCacheSizeInMB, dCam, dClip );
 		}
 		catch ( SpimDataException e )
 		{

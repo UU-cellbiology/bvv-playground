@@ -249,9 +249,9 @@ public class BigVolumeViewerActions
 	 * @param actions
 	 *            navigation actions are installed here.
 	 * @param bvv
-	 *            Actions are targeted at this {@link BigVolumeViewerBT}.
+	 *            Actions are targeted at this {@link BigVolumeViewerPG}.
 	 */
-	public static void install( final Actions actions, final BigVolumeViewerBT bvv )
+	public static void install( final Actions actions, final BigVolumeViewerPG bvv )
 	{
 		toggleDialogAction( actions, bvv.brightnessDialog, BRIGHTNESS_SETTINGS, BRIGHTNESS_SETTINGS_KEYS );
 		toggleDialogAction( actions, bvv.preferencesDialog, PREFERENCES_DIALOG, PREFERENCES_DIALOG_KEYS );

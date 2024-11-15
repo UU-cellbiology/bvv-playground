@@ -33,7 +33,7 @@ import bdv.tools.brightness.ConverterSetup;
 import bdv.tools.transformation.ManualTransformationEditor;
 import bdv.viewer.DisplayMode;
 import bdv.viewer.SourceAndConverter;
-import bvvpg.core.BigVolumeViewerBT;
+import bvvpg.core.BigVolumeViewerPG;
 import bvvpg.core.VolumeViewerFrame;
 import bvvpg.core.VolumeViewerOptions;
 
@@ -45,7 +45,7 @@ import org.scijava.ui.behaviour.util.TriggerBehaviourBindings;
 
 public class BvvHandleFrame extends BvvHandle
 {
-	private BigVolumeViewerBT bvv;
+	private BigVolumeViewerPG bvv;
 
 	private final String frameTitle;
 
@@ -57,7 +57,7 @@ public class BvvHandleFrame extends BvvHandle
 		cacheControls = new CacheControls();
 	}
 
-	public BigVolumeViewerBT getBigVolumeViewer()
+	public BigVolumeViewerPG getBigVolumeViewer()
 	{
 		return bvv;
 	}
@@ -99,7 +99,7 @@ public class BvvHandleFrame extends BvvHandle
 			final int numTimepoints )
 	{
 		final VolumeViewerOptions viewerOptions = bvvOptions.values.getVolumeViewerOptions();
-		bvv = new BigVolumeViewerBT(
+		bvv = new BigVolumeViewerPG(
 				new ArrayList<>( converterSetups ),
 				new ArrayList<>( sources ),
 				numTimepoints,

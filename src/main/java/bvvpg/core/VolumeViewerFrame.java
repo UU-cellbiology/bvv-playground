@@ -29,7 +29,6 @@
 package bvvpg.core;
 
 import bdv.TransformEventHandler;
-import bdv.ui.BdvDefaultCards;
 import bdv.ui.CardPanel;
 import bdv.ui.appearance.AppearanceManager;
 import bdv.ui.keymap.KeymapManager;
@@ -84,7 +83,7 @@ public class VolumeViewerFrame extends JFrame
 			final CacheControl cache,
 			final VolumeViewerOptions optional )
 	{
-		this( sources, numTimepoints, cache, new KeymapManager( BigVolumeViewerBT.configDir ), new AppearanceManager( BigVolumeViewerBT.configDir ), optional );
+		this( sources, numTimepoints, cache, new KeymapManager( BigVolumeViewerPG.configDir ), new AppearanceManager( BigVolumeViewerPG.configDir ), optional );
 	}
 
 	/**

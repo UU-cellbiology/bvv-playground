@@ -82,7 +82,7 @@ import mpicbg.spim.data.SpimDataException;
 import org.scijava.ui.behaviour.io.gui.CommandDescriptionsBuilder;
 import org.scijava.ui.behaviour.util.Actions;
 
-public class BigVolumeViewerBT
+public class BigVolumeViewerPG
 {
 	public static String configDir = ProjectDirectories.from( "sc", "fiji", "bigvolumeviewer" ).configDir;
 
@@ -119,7 +119,7 @@ public class BigVolumeViewerBT
 	 * @param options
 	 *            optional parameters. See {@link VolumeViewerOptions}.
 	 */
-	public BigVolumeViewerBT(
+	public BigVolumeViewerPG(
 			final List< ConverterSetup > converterSetups,
 			final List< SourceAndConverter< ? > > sources,
 			final int numTimepoints,
@@ -281,13 +281,13 @@ public class BigVolumeViewerBT
 			{
 				if(((GammaConverterSetup)setup).getRenderType()==0)
 				{
+					//viewer.showMessage("volumetric");
 					((GammaConverterSetup)setup).setRenderType(1);
-					viewer.showMessage("volumetric");
 				}
 				else
 				{
-					((GammaConverterSetup)setup).setRenderType(0);
-					viewer.showMessage("maximum intensity");
+					//viewer.showMessage("maximum intensity");
+					((GammaConverterSetup)setup).setRenderType(0);					
 				}
 			}
 		
@@ -420,7 +420,7 @@ public class BigVolumeViewerBT
 		final int numTimepoints = seq.getTimePoints().size();
 		final CacheControl cacheControl = ( ( ViewerImgLoader ) seq.getImgLoader() ).getCacheControl();
 
-		final BigVolumeViewerBT bvv = new BigVolumeViewerBT( converterSetups, sources, numTimepoints, cacheControl, new File( xmlFilename ).getName(),
+		final BigVolumeViewerPG bvv = new BigVolumeViewerPG( converterSetups, sources, numTimepoints, cacheControl, new File( xmlFilename ).getName(),
 				VolumeViewerOptions.options().
 						width( windowWidth ).
 						height( windowHeight ).
