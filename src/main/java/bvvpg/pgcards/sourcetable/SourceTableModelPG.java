@@ -147,7 +147,7 @@ public class SourceTableModelPG extends AbstractTableModel
 			if (c instanceof GammaConverterSetup)
 			{
 				final GammaConverterSetup gconverter = ((GammaConverterSetup)c);
-				if(gconverter.useLut())
+				if(gconverter.getLUTSize() > 0)
 				{
 					return gconverter.getLutICM();
 				}

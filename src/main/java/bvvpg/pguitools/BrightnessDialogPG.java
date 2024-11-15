@@ -201,7 +201,7 @@ public class BrightnessDialogPG extends DelayedPackDialogPG
 				if (setup instanceof GammaConverterSetup)
 				{
 					final GammaConverterSetup gconverter = ((GammaConverterSetup)setup);
-					if(gconverter.useLut())
+					if(gconverter.getLUTSize() > 0)
 					{
 						button = new JButton( new ColorIconPG( null, LutLoader.getLut(gconverter.getLUTName()) ) );
 					}

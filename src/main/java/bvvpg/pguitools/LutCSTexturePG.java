@@ -39,11 +39,12 @@ public class LutCSTexturePG implements Texture3D
 	/**
 	 * Size of the lut texture.
 	 */
-	private final int[] size = new int[ 1 ];
+	private final int[] size = new int[ 2 ];
 
 	public void init( final int size_)
 	{
-		this.size[ 0 ] = size_;
+		this.size[ 0 ] = 256;
+		this.size[ 1 ] = (int)Math.ceil(size_/256.0);
 	}
 	
 	public void upload( final GpuContext context, final Buffer data )
@@ -68,7 +69,7 @@ public class LutCSTexturePG implements Texture3D
 	@Override
 	public int texHeight() 
 	{
-		return 1;
+		return size[ 1 ];
 	}
 	@Override
 	public int texDepth() 

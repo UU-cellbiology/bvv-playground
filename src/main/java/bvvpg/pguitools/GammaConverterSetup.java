@@ -38,36 +38,54 @@ import net.imglib2.realtransform.AffineTransform3D;
 
 public interface GammaConverterSetup extends ConverterSetup {
 
+	// gamma of LUT
 	void setDisplayGamma( double gamma );
+	
 	double getDisplayGamma();
 	
+	// alpha value and its own gamma 
 	void setAlphaRange( double min, double max );
+	
 	double getAlphaRangeMin();
+	
 	double getAlphaRangeMax();
 	
+	
 	void setAlphaGamma( double gamma );
+	
 	double getAlphaGamma();
 	
+	// lookup tables
 	String getLUTName();
+	
 	void setLUT(IndexColorModel icm_, String sLUTName);
+	
 	void setLUT(String sLUTName);
+	
 	IndexColorModel getLutICM();
+	
 	boolean updateNeededLUT();
+	
 	LutCSTexturePG getLUTTexture();
-	void setLUTTexture(LutCSTexturePG lut_);
-
 	
-	boolean useLut();
+	void setLUTTexture(LutCSTexturePG lut_);	
 	
+	public int getLUTSize();
+	
+	//clipping
 	boolean clipActive();
+	
 	void setClipInterval(RealInterval clipInt);
+	
 	FinalRealInterval getClipInterval();
 	
 	AffineTransform3D getClipTransform();
-	void setClipTransform(AffineTransform3D t);
 	
+	void setClipTransform(AffineTransform3D t);	
 	
+	//render style
 	void setRenderType(int nRender);
+	
 	int getRenderType ();
 	
 }

@@ -47,7 +47,7 @@ import bdv.viewer.ViewerState;
 import bvvpg.pgcards.sourcetable.SourceTablePG;
 import bvvpg.pguitools.ConverterSetupsPG;
 
-public class BtBVVDefaultCards 
+public class BVVPGDefaultCards 
 {
 	public static final String DEFAULT_SOURCES_CARD = "default bdv sources card";
 

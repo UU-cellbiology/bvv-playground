@@ -200,7 +200,7 @@ public class ColorEditorPG {
 				if (converterSetup instanceof GammaConverterSetup)
 				{
 					final GammaConverterSetup gconverter = ((GammaConverterSetup)converterSetup);
-					if(gconverter.useLut())
+					if(gconverter.getLUTSize() > 0)
 					{
 						allColorsEqual = false;	
 					
