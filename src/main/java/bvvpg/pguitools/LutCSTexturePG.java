@@ -82,13 +82,15 @@ public class LutCSTexturePG implements Texture3D
 	@Override
 	public MinFilter texMinFilter() 
 	{
-		return MinFilter.LINEAR;
+		return MinFilter.NEAREST;
+		//return MinFilter.LINEAR;
 	}
 
 	@Override
 	public MagFilter texMagFilter() 
 	{
-		return MagFilter.LINEAR;
+		return MagFilter.NEAREST;
+		//return MagFilter.LINEAR;
 	}
 
 	@Override

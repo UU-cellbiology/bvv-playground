@@ -13,13 +13,21 @@ vec4 convert(vec4 acc, float v )
 	if(sizeLUT >0)
 	{
 		vec3 q = vec3(0);
+
+		//2D texture with fixed width of 256
+		
 		float val = (sizeLUT-1)*pow(clamp(offset.r + scale.r * v,0.0,1.0),gamma);
-		q.y = floor(val/256);
-		//q.y = 1.0/ceil(sizeLUT/256);
-		//q.x = (val - 256*q.y + 0.5)/256;
-		q.x = (val - 256*q.y)/255;
-		q.y = (q.y +0.5)/ceil(sizeLUT/256);
+
+		//q.x = (val/256.0)-floor(val/256.0);
+		//q.y = (floor(val/256.0)+0.5)/ceil(sizeLUT/256.0);
+		//or
+		q.y = floor(val/256.0);
+		q.x = (val/256.0)- q.y;
+		q.y = (q.y+0.5)/ceil(sizeLUT/256.0);
+	
+		//linear 1D texture (obsolete)
 		//q.x = pow(clamp(offset.r + scale.r * v,0.0,1.0),gamma);
+				
 		finC =  texture( lut, q);
 	}
 	else

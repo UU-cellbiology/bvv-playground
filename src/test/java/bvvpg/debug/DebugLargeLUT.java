@@ -21,7 +21,7 @@ public class DebugLargeLUT
 	public static void main( final String[] args )
 	{
 		
-		int nImageMaxRange = 300;
+		int nImageMaxRange = 1024;
 		ArrayImg< UnsignedShortType, ShortArray > dirsInt = ArrayImgs.unsignedShorts(new long [] {nImageMaxRange,1,1 });
 		Cursor< UnsignedShortType > cursor = Views.flatIterable( dirsInt ).cursor();
 		int i=0;
@@ -40,20 +40,22 @@ public class DebugLargeLUT
 		//final ImagePlus imp = IJ.openImage( "/home/eugene/Desktop/projects/BigTrace/BigTrace_data/t1-head.tif" );
 		//final Img< UnsignedShortType > img = ImageJFunctions.wrapShort( imp );
 		final BvvSource source = BvvFunctions.show( imgLUT, "LUTVIEW" );
-		int nLUTMAX = nImageMaxRange;
+		//int nLUTMAX = nImageMaxRange;
+		int nLUTMAX = 65535;
 		source.setLUT(  getLargeTestICM(nLUTMAX), null );
 		source.setDisplayRangeBounds( 0, nImageMaxRange -1);
 		//source.setAlphaGammaRangeBounds( 0, 1 );
 		//source.setAlphaRange( 0, 1 );
-		source.setAlphaRangeBounds( 0, 1 );
+		source.setRenderType( 1 );
+		source.setAlphaRangeBounds( -2, -1 );
 	}
 	
 	public static IndexColorModel getLargeTestICM(int nTotLength)
 	{
 		
 		final byte [][] colors = new byte [3][nTotLength];
-		colors[0][0] = ( byte ) 255;
-		colors[1][0] = ( byte )  255 ;
+		colors[0][0] = ( byte ) 0;
+		colors[1][0] = ( byte )  0 ;
 		colors[2][0] = ( byte ) 255 ;
 		for(int i=1;i<nTotLength;i++)
 		{

@@ -142,7 +142,7 @@ public class SimpleLUTTextureManager
 		
 		//upload dummy
 		texture.init( 1 );
-		data = ByteBuffer.allocateDirect( 4 ); // allocate a bit more than needed...
+		data = ByteBuffer.allocateDirect( 256*4 ); // minimum one row of 2D texture
 		data.order( ByteOrder.nativeOrder() );	
 		texture.upload( context, data );
 		return texture;
