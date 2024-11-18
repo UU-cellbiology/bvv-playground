@@ -127,11 +127,12 @@ public class SimpleLUTTextureManager
 					final int g = colors[1][i] & 0xff;
 					final int b = colors[2][i] & 0xff;
 					all = ( 255 << 24 ) | ( b << 16 ) | ( g << 8 ) | r;
-					sdata.put( i,all );
+					sdata.put( i, all );	
 				}
+				//fill the rest with the last color
 				for (int i=size_; i<nTextureSpan;i++)
 				{
-					sdata.put( i,all );
+					sdata.put( i, all );
 				}
 				texture.upload( context, data );
 				return texture;

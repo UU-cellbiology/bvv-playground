@@ -41,13 +41,14 @@ public class DebugLargeLUT
 		//final Img< UnsignedShortType > img = ImageJFunctions.wrapShort( imp );
 		final BvvSource source = BvvFunctions.show( imgLUT, "LUTVIEW" );
 		//int nLUTMAX = nImageMaxRange;
-		int nLUTMAX = 65535;
+		int nLUTMAX = 65500;
 		source.setLUT(  getLargeTestICM(nLUTMAX), null );
 		source.setDisplayRangeBounds( 0, nImageMaxRange -1);
 		//source.setAlphaGammaRangeBounds( 0, 1 );
 		//source.setAlphaRange( 0, 1 );
 		source.setRenderType( 1 );
 		source.setAlphaRangeBounds( -2, -1 );
+		source.setAlphaRange( -1.5, -1 );
 	}
 	
 	public static IndexColorModel getLargeTestICM(int nTotLength)
@@ -67,6 +68,6 @@ public class DebugLargeLUT
 		colors[0][nTotLength-1] = ( byte ) 255;
 		colors[1][nTotLength-1] = ( byte )  255 ;
 		colors[2][nTotLength-1] = ( byte ) 255 ;
-		return new IndexColorModel(8,nTotLength,colors[0],colors[1],colors[2]);
+		return new IndexColorModel(16,nTotLength,colors[0],colors[1],colors[2]);
 	}
 }
