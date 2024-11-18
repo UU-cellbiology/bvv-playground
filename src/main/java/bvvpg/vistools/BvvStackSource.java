@@ -32,8 +32,13 @@ import bdv.tools.brightness.ConverterSetup;
 import bdv.tools.brightness.MinMaxGroup;
 import bdv.util.Bounds;
 import bdv.viewer.ConverterSetupBounds;
+import bdv.viewer.ConverterSetups;
 import bdv.viewer.SourceAndConverter;
 import bvvpg.core.multires.SourceStacks;
+import bvvpg.pguitools.ConverterSetupBoundsAlpha;
+import bvvpg.pguitools.ConverterSetupBoundsGamma;
+import bvvpg.pguitools.ConverterSetupBoundsGammaAlpha;
+import bvvpg.pguitools.ConverterSetupsPG;
 import bvvpg.pguitools.GammaConverterSetup;
 import bvvpg.pguitools.MinMaxGroupPG;
 import bvvpg.pguitools.SetupAssignmentsPG;
@@ -279,6 +284,16 @@ public class BvvStackSource< T > extends BvvSource
 	@Override
 	public void setDisplayGammaRangeBounds( final double min, final double max )
 	{
+		
+		ConverterSetups cSetups = getBvvHandle().getConverterSetups();
+		
+		if(cSetups instanceof ConverterSetupsPG)
+		{
+			final ConverterSetupBoundsGamma bounds = ((ConverterSetupsPG)cSetups).getBoundsGamma();
+			for ( final ConverterSetup setup : converterSetups )
+				bounds.setBounds( setup, new Bounds( min, max ) );
+		}
+	
 		// TODO: REMOVE
 		final HashSet< MinMaxGroup > groups = new HashSet<>();
 		final SetupAssignmentsPG sa = getBvvHandle().getSetupAssignments();
@@ -294,6 +309,16 @@ public class BvvStackSource< T > extends BvvSource
 	@Override
 	public void setAlphaRangeBounds(final double min, final double max)
 	{
+		ConverterSetups cSetups = getBvvHandle().getConverterSetups();
+		
+		if(cSetups instanceof ConverterSetupsPG)
+		{
+			final ConverterSetupBoundsAlpha bounds = ((ConverterSetupsPG)cSetups).getBoundsAlpha();
+			for ( final ConverterSetup setup : converterSetups )
+				bounds.setBounds( setup, new Bounds( min, max ) );
+		}
+	
+		
 		// TODO: REMOVE
 		final HashSet< MinMaxGroup > groups = new HashSet<>();
 		final SetupAssignmentsPG sa = getBvvHandle().getSetupAssignments();
@@ -309,6 +334,16 @@ public class BvvStackSource< T > extends BvvSource
 	@Override
 	public void setAlphaGammaRangeBounds(final double min, final double max)
 	{
+		
+		ConverterSetups cSetups = getBvvHandle().getConverterSetups();
+		
+		if(cSetups instanceof ConverterSetupsPG)
+		{
+			final ConverterSetupBoundsGammaAlpha bounds = ((ConverterSetupsPG)cSetups).getBoundsGammaAlpha();
+			for ( final ConverterSetup setup : converterSetups )
+				bounds.setBounds( setup, new Bounds( min, max ) );
+		}
+		
 		// TODO: REMOVE
 		final HashSet< MinMaxGroup > groups = new HashSet<>();
 		final SetupAssignmentsPG sa = getBvvHandle().getSetupAssignments();
@@ -321,10 +356,6 @@ public class BvvStackSource< T > extends BvvSource
 		}
 	}
 
-//	public T getType()
-//	{
-//		return type;
-//	}
 
 	public List< ConverterSetup > getConverterSetups()
 	{

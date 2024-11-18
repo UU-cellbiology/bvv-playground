@@ -51,7 +51,7 @@ import org.scijava.ui.behaviour.util.TriggerBehaviourBindings;
 
 import bdv.cache.CacheControl;
 import bdv.viewer.SourceAndConverter;
-import bvvpg.pgcards.BtBVVDefaultCards;
+import bvvpg.pgcards.BVVPGDefaultCards;
 
 /**
  * A {@link JFrame} containing a {@link VolumeViewerPanel} and associated
@@ -115,7 +115,7 @@ public class VolumeViewerFrame extends JFrame
 
 		cards = new CardPanel();
 		//BdvDefaultCards.setup( cards, viewer, viewer.getConverterSetups() );
-		BtBVVDefaultCards.setup( cards, viewer, viewer.getConverterSetups() );
+		BVVPGDefaultCards.setup( cards, viewer, viewer.getConverterSetups() );
 		splitPanel = new SplitPanel( viewer, cards );
 
 		getRootPane().setDoubleBuffered( true );

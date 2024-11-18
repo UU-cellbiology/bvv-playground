@@ -56,7 +56,7 @@ public class RealARGBColorGammaConverterSetup implements GammaConverterSetup
 	/**0 = maximum intensity projection; 1 = transparency **/
 	private int nRenderType = 0; 
 	
-	private boolean useLUT = false;
+	private int sizeLUT = 0;
 	
 	private boolean clipActive = false;
 	
@@ -196,7 +196,7 @@ public class RealARGBColorGammaConverterSetup implements GammaConverterSetup
 			}
 			if(converter instanceof ColorGammaConverter)
 			{
-				useLUT = false;
+				sizeLUT = 0;
 				icm = null;
 				bUpdateTexture = true;
 				changed = true;
@@ -284,7 +284,7 @@ public class RealARGBColorGammaConverterSetup implements GammaConverterSetup
 		
 		this.sLUTName = sLUTName;
 		icm = icm_;
-		useLUT = true;
+		sizeLUT = icm.getMapSize();
 		bUpdateTexture = true;
 		
 		listeners.list.forEach( l -> l.setupParametersChanged( this ) );
@@ -300,23 +300,25 @@ public class RealARGBColorGammaConverterSetup implements GammaConverterSetup
 		}
 		setLUT(icm_lut ,sLUTName);
 	}
+	
 	@Override
 	public String getLUTName()
 	{
-		if(useLUT)
+		if(sizeLUT>0)
 			return sLUTName;
 		
 		return null;
 	}
+	
 	@Override
-	public LutCSTexturePG getLUTTexture() {
-		
+	public LutCSTexturePG getLUTTexture() 
+	{		
 			return texLUT;
 	}
 
-
 	@Override
-	public void setRenderType(int nRender) {
+	public void setRenderType(int nRender) 
+	{
 		if (nRender >2 || nRender <0)
 			nRenderType = 0;
 		else
@@ -325,14 +327,15 @@ public class RealARGBColorGammaConverterSetup implements GammaConverterSetup
 	}
 
 	@Override
-	public int getRenderType() {
+	public int getRenderType() 
+	{
 		return nRenderType;
 	}
 
 	@Override
-	public boolean useLut() {
-
-		return useLUT;
+	public int getLUTSize() 
+	{
+		return sizeLUT;
 	}
 
 	@Override

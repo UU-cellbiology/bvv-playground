@@ -280,7 +280,7 @@ public class MultiVolumeShaderMip
 				"volume", "sampleVolume" ) );
 		segments.put( SegmentType.Convert, new SegmentTemplate(
 				"convert.frag",
-				"convert", "offset", "scale", "gamma", "alphagamma","renderType","useLUT","lut", "zzz" ) );
+				"convert", "offset", "scale", "gamma", "alphagamma","renderType","sizeLUT","lut", "zzz" ) );
 		segments.put( SegmentType.ConvertRGBA, new SegmentTemplate(
 				"convert_rgba.frag",
 				"convert", "offset", "scale", "gamma", "alphagamma" ) );
@@ -525,7 +525,7 @@ public class MultiVolumeShaderMip
 		private final Uniform4f uniformScale;
 		private final Uniform1f uniformGamma;
 		private final Uniform1f uniformGammaAlpha;
-		private final Uniform1i uniformUseLUT;
+		private final Uniform1i uniformSizeLUT;
 		private final Uniform1i uniformRenderType;
 		private final UniformSampler uniformLUT;
 		private final Uniform1i uniformClipActive;
@@ -543,7 +543,7 @@ public class MultiVolumeShaderMip
 			uniformGamma = prog.getUniform1f( segmentConv,"gamma" );
 			uniformGammaAlpha = prog.getUniform1f( segmentConv,"alphagamma" );
 			uniformRenderType = prog.getUniform1i( segmentConv,"renderType" );
-			uniformUseLUT = prog.getUniform1i( segmentConv,"useLUT" );
+			uniformSizeLUT = prog.getUniform1i( segmentConv,"sizeLUT" );
 			uniformLUT = prog.getUniformSampler(segmentConv, "lut");
 			uniformClipActive = prog.getUniform1i( segmentVol,"clipactive" );
 			uniformClipMin = prog.getUniform3f( segmentVol,"clipmin" );
@@ -602,7 +602,7 @@ public class MultiVolumeShaderMip
 
 			if ( pixelType == VolumeShaderSignature.PixelType.ARGB )
 			{
-				uniformUseLUT.set(0);
+				uniformSizeLUT.set(0);
 				uniformOffset.set( ( float ) o, ( float ) o, ( float ) o, ( float ) o );
 				uniformScale.set( ( float ) s, ( float ) s, ( float ) s, ( float ) s );
 			}
@@ -612,10 +612,11 @@ public class MultiVolumeShaderMip
 				
 				if (converter instanceof GammaConverterSetup)
 				{
-					if(((GammaConverterSetup) converter).useLut())
+					final int nLUTSize = ((GammaConverterSetup) converter).getLUTSize();
+					if(nLUTSize > 0)
 					{
 						bUseLUT = true;
-						uniformUseLUT.set(1);
+						uniformSizeLUT.set(nLUTSize);
 						uniformOffset.set(
 								( float ) ( o * 1.0 ),
 								( float ) ( o * 1.0 ),
@@ -633,7 +634,7 @@ public class MultiVolumeShaderMip
 				
 				if(!bUseLUT)
 				{
-					uniformUseLUT.set(0);
+					uniformSizeLUT.set(0);
 				
 					final int color = converter.getColor().get();
 					final double r = ARGBType.red( color ) / 255.0;

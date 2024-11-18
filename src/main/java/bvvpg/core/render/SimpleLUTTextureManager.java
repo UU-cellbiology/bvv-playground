@@ -36,13 +36,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-import net.imglib2.RandomAccessibleInterval;
-import net.imglib2.type.numeric.ARGBType;
-import net.imglib2.type.numeric.integer.UnsignedShortType;
-import net.imglib2.util.Intervals;
-
 import bvvpg.core.backend.GpuContext;
-import bvvpg.core.backend.Texture3D;
 import bvvpg.pguitools.GammaConverterSetup;
 import bvvpg.pguitools.LutCSTexturePG;
 
@@ -114,32 +108,45 @@ public class SimpleLUTTextureManager
 		if(icm != null)
 		{
 			int size_ = icm.getMapSize();
-			texture.init( size_ );
-			final int numBytes = 4 *  size_;
-			data = ByteBuffer.allocateDirect( numBytes ); // allocate a bit more than needed...
-			data.order( ByteOrder.nativeOrder() );	
-			final IntBuffer sdata = data.asIntBuffer();
-			byte [][] colors = new byte[3][size_];
-			icm.getReds(colors[0]);
-			icm.getGreens(colors[1]);
-			icm.getBlues(colors[2]);
-			for (int i=0; i<size_;i++)
+			if (size_ < 65536)
 			{
-				final int r = colors[0][i] & 0xff;
-				final int g = colors[1][i] & 0xff;
-				final int b = colors[2][i] & 0xff;
-				final int all = ( 255 << 24 ) | ( b << 16 ) | ( g << 8 ) | r;
-				sdata.put( i,all );
+				int nTextureSpan = 256*(int)Math.ceil(size_/256.0);
+				texture.init( size_ );
+				final int numBytes = 4 * nTextureSpan;
+				data = ByteBuffer.allocateDirect( numBytes ); // allocate a bit more than needed...
+				data.order( ByteOrder.nativeOrder() );	
+				final IntBuffer sdata = data.asIntBuffer();
+				byte [][] colors = new byte[3][nTextureSpan];
+				icm.getReds(colors[0]);
+				icm.getGreens(colors[1]);
+				icm.getBlues(colors[2]);
+				int all = 0;
+				for (int i=0; i<size_;i++)
+				{
+					final int r = colors[0][i] & 0xff;
+					final int g = colors[1][i] & 0xff;
+					final int b = colors[2][i] & 0xff;
+					all = ( 255 << 24 ) | ( b << 16 ) | ( g << 8 ) | r;
+					sdata.put( i, all );	
+				}
+				//fill the rest with the last color
+				for (int i=size_; i<nTextureSpan;i++)
+				{
+					sdata.put( i, all );
+				}
+				texture.upload( context, data );
+				return texture;
 			}
+			
+			System.out.println("Error! Provided LUT exceeds current maximum LUT size of 65536, loading dummy LUT.");
 		}
+		
 		//upload dummy
-		else
-		{
-			texture.init( 1 );
-			data = ByteBuffer.allocateDirect( 4 ); // allocate a bit more than needed...
-			data.order( ByteOrder.nativeOrder() );	
-		}
+		texture.init( 1 );
+		data = ByteBuffer.allocateDirect( 256*4 ); // minimum one row of 2D texture
+		data.order( ByteOrder.nativeOrder() );	
 		texture.upload( context, data );
 		return texture;
+
 	}
 }
