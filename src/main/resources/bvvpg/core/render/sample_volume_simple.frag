@@ -1,6 +1,7 @@
 uniform mat4 im;
 uniform vec3 sourcemax;
 uniform int clipactive;
+uniform int voxelInterpolation;
 uniform vec3 clipmin;
 uniform vec3 clipmax;
 uniform mat4 cliptransform;
@@ -40,5 +41,9 @@ float sampleVolume( vec4 wpos )
 		if(s.x * s.y * s.z==0.0)
 			return 0.0;
 	} 
+	if(voxelInterpolation!=0)
+	{
+		pos = floor(pos);
+	}
 	return texture( volume, (pos+0.5) / textureSize( volume, 0 ) ).r;
 }
