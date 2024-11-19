@@ -11,7 +11,7 @@
 
 	<groupId>nl.uu.science.cellbiology</groupId>
 	<artifactId>bvv-playground</artifactId>
-	<version>0.3.0-SNAPSHOT</version>
+	<version>0.3.0</version>
 
 	<name>BVV-playground</name>
 	<description>Volume rendering of bdv datasets with gamma and transparency option</description>
@@ -69,7 +69,7 @@
 	<scm>
 		<connection>scm:git:git://github.com/UU-cellbiology/bvv-playground</connection>
 		<developerConnection>scm:git:git@github.com:UU-cellbiology/bvv-playground</developerConnection>
-		<tag>HEAD</tag>
+		<tag>bvv-playground-0.3.0</tag>
 		<url>https://github.com/UU-cellbiology/bvv-playground</url>
 	</scm>
 	<issueManagement>
