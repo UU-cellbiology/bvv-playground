@@ -41,7 +41,7 @@ vec4 sampleVolume( vec4 wpos )
 		if(s.x * s.y * s.z==0.0)
 			return vec4(0.0,0.0,0.0,0.0);
 	} 
-	if(voxelInterpolation!=0)
+	if(voxelInterpolation == 0)
 	{
 		pos = floor(pos);
 	}

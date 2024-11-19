@@ -55,7 +55,7 @@ float sampleVolume( vec4 wpos, sampler3D volumeCache, vec3 cacheSize, vec3 block
 	vec3 B0 = lutv.xyz * paddedBlockSize + padOffset;
 	vec3 sj = blockScales[ lutv.w ];
 	pos = pos*sj;
-	if(voxelInterpolation!=0)
+	if(voxelInterpolation == 0)
 	{
 		pos = floor(pos);
 	}

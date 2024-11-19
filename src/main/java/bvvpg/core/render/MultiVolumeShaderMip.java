@@ -586,7 +586,7 @@ public class MultiVolumeShaderMip
 				uniformGamma.set(1.0f/(float)gconverter.getDisplayGamma());
 				uniformGammaAlpha.set(1.0f/(float)gconverter.getAlphaGamma());
 				uniformRenderType.set(gconverter.getRenderType());
-				uniformVoxelInterpolation.set(gconverter.getVoxelRenderInterpotlation());
+				uniformVoxelInterpolation.set(gconverter.getVoxelRenderInterpolation());
 				fminA = gconverter.getAlphaRangeMin() / rangeScale;
 				fmaxA = gconverter.getAlphaRangeMax() / rangeScale;
 				if(gconverter.clipActive())
