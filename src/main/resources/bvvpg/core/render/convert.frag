@@ -16,7 +16,7 @@ vec4 convert(vec4 acc, float v )
 
 		//2D texture with fixed width of 256
 		
-		float val = (sizeLUT-1)*pow(clamp(offset.r + scale.r * v,0.0,1.0),gamma);
+		float val = (sizeLUT)*pow(clamp(offset.r + scale.r * v,0.0,1.0),gamma);
 
 		//q.x = (val/256.0)-floor(val/256.0);
 		//q.y = (floor(val/256.0)+0.5)/ceil(sizeLUT/256.0);
