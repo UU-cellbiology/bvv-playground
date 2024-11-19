@@ -32,14 +32,9 @@ package bvv.vistools.examples;
 import java.awt.image.IndexColorModel;
 import java.util.List;
 
-import javax.swing.UIManager;
-
-
-import com.formdev.flatlaf.FlatIntelliJLaf;
-import com.formdev.flatlaf.FlatLaf;
-
 import bdv.spimdata.SpimDataMinimal;
 import bdv.spimdata.XmlIoSpimDataMinimal;
+
 import bvvpg.vistools.Bvv;
 import bvvpg.vistools.BvvFunctions;
 import bvvpg.vistools.BvvOptions;
@@ -47,8 +42,6 @@ import bvvpg.vistools.BvvSource;
 import bvvpg.vistools.BvvStackSource;
 import ij.IJ;
 import ij.ImagePlus;
-import ij.plugin.LutLoader;
-import ij.process.ByteProcessor;
 import mpicbg.spim.data.SpimDataException;
 import net.imglib2.FinalRealInterval;
 import net.imglib2.img.Img;
@@ -76,7 +69,7 @@ public class PG_Example01 {
 		double [] maxI = img.maxAsDoubleArray();
 		/**/
 
-		//BDV XML init
+		//BDV XML init (multiscale cached)
 		/*
 		final String xmlFilename = "/home/eugene/Desktop/projects/BigTrace/BigTrace_data/head_2ch.xml";
 		SpimDataMinimal spimData = null;
@@ -101,7 +94,7 @@ public class PG_Example01 {
 		
 		//DisplayRange maps colors (or LUT values) to intensity values
 		source.setDisplayRange(0, 400);
-		//it is also possible to change LUT gamma value
+		//it is also possible to change gamma value
 		//source.setDisplayGamma(0.9);
 		
 		//alpha channel to intensity mapping can be changed independently

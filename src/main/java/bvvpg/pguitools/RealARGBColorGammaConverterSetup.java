@@ -53,8 +53,11 @@ public class RealARGBColorGammaConverterSetup implements GammaConverterSetup
 	
 	private LutCSTexturePG texLUT = new LutCSTexturePG();
 	
-	/**0 = maximum intensity projection; 1 = transparency **/
+	/** 0 = maximum intensity projection; 1 = "volumetric" **/
 	private int nRenderType = 0; 
+	
+	/** 0 = nearest neighbor (cubes); 1 = tri-linear **/
+	private int nVoxelInterpolation = 1;
 	
 	private int sizeLUT = 0;
 	
@@ -388,6 +391,18 @@ public class RealARGBColorGammaConverterSetup implements GammaConverterSetup
 	{
 		texLUT = lut_;	
 		bUpdateTexture = false;
+	}
+
+	@Override
+	public void setVoxelRenderInterpolation( int nInterpolation )
+	{
+		nVoxelInterpolation = nInterpolation;		
+	}
+
+	@Override
+	public int getVoxelRenderInterpolation()
+	{
+		return nVoxelInterpolation;
 	}
 
 

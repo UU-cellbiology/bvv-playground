@@ -88,4 +88,9 @@ public interface GammaConverterSetup extends ConverterSetup {
 	
 	int getRenderType ();
 	
+	// voxel interpolation
+	void setVoxelRenderInterpolation(int nInterpolation);
+	
+	int getVoxelRenderInterpolation();
+	
 }

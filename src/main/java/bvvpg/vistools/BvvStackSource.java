@@ -391,4 +391,18 @@ public class BvvStackSource< T > extends BvvSource
 		
 	}
 
+	@Override
+	public void setVoxelRenderInterpolation( int nInterpolationType )
+	{
+		for ( final ConverterSetup setup : converterSetups )
+		{
+			if (setup instanceof GammaConverterSetup)
+			{
+				final GammaConverterSetup gconverter = ((GammaConverterSetup)setup);
+				gconverter.setVoxelRenderInterpolation( nInterpolationType );
+			}
+		}
+		
+	}
+
 }

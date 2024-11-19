@@ -262,19 +262,19 @@ public class MultiVolumeShaderMip
 
 		segments.put( SegmentType.SampleMultiresolutionVolume, new SegmentTemplate(
 				"sample_volume_blocks.frag",
-				"im", "sourcemin", "sourcemax", 
+				"im", "sourcemin", "sourcemax","voxelInterpolation", 
 				"clipactive", "clipmin", "clipmax", "cliptransform",
 				"intersectBoundingBox",
 				"lutSampler", "blockScales", "lutSize", "lutOffset", "sampleVolume" ) );
 		segments.put( SegmentType.SampleVolume, new SegmentTemplate(
 				"sample_volume_simple.frag",
-				"im", "sourcemax", 
+				"im", "sourcemax", "voxelInterpolation",
 				"clipactive", "clipmin", "clipmax", "cliptransform",
 				"intersectBoundingBox",
 				"volume", "sampleVolume" ) );
 		segments.put( SegmentType.SampleRGBAVolume, new SegmentTemplate(
 				"sample_volume_simple_rgba.frag",
-				"im", "sourcemax", 
+				"im", "sourcemax", "voxelInterpolation",
 				"clipactive", "clipmin", "clipmax", "cliptransform",
 				"intersectBoundingBox",
 				"volume", "sampleVolume" ) );
@@ -529,6 +529,7 @@ public class MultiVolumeShaderMip
 		private final Uniform1i uniformRenderType;
 		private final UniformSampler uniformLUT;
 		private final Uniform1i uniformClipActive;
+		private final Uniform1i uniformVoxelInterpolation;
 		private final Uniform3f uniformClipMin;
 		private final Uniform3f uniformClipMax;
 		private final UniformMatrix4f uniformClipTransform;
@@ -543,6 +544,7 @@ public class MultiVolumeShaderMip
 			uniformGamma = prog.getUniform1f( segmentConv,"gamma" );
 			uniformGammaAlpha = prog.getUniform1f( segmentConv,"alphagamma" );
 			uniformRenderType = prog.getUniform1i( segmentConv,"renderType" );
+			uniformVoxelInterpolation = prog.getUniform1i( segmentVol,"voxelInterpolation" );
 			uniformSizeLUT = prog.getUniform1i( segmentConv,"sizeLUT" );
 			uniformLUT = prog.getUniformSampler(segmentConv, "lut");
 			uniformClipActive = prog.getUniform1i( segmentVol,"clipactive" );
@@ -576,6 +578,7 @@ public class MultiVolumeShaderMip
 			uniformGammaAlpha.set(1.0f);
 			uniformRenderType.set(0);
 			uniformClipActive.set(0);
+			uniformVoxelInterpolation.set( 0 );
 
 			if (converter instanceof GammaConverterSetup)
 			{	
@@ -583,6 +586,7 @@ public class MultiVolumeShaderMip
 				uniformGamma.set(1.0f/(float)gconverter.getDisplayGamma());
 				uniformGammaAlpha.set(1.0f/(float)gconverter.getAlphaGamma());
 				uniformRenderType.set(gconverter.getRenderType());
+				uniformVoxelInterpolation.set(gconverter.getVoxelRenderInterpolation());
 				fminA = gconverter.getAlphaRangeMin() / rangeScale;
 				fmaxA = gconverter.getAlphaRangeMax() / rangeScale;
 				if(gconverter.clipActive())

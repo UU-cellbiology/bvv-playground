@@ -28,71 +28,76 @@
  */
 package bvv.vistools.examples;
 
-import ij.IJ;
-import ij.ImagePlus;
+
+import java.util.List;
+
+import bdv.spimdata.SpimDataMinimal;
+import bdv.spimdata.XmlIoSpimDataMinimal;
+import bdv.tools.transformation.TransformedSource;
+import bdv.viewer.SourceAndConverter;
+import bvvpg.core.VolumeViewerPanel;
+import bvvpg.vistools.BvvFunctions;
+import bvvpg.vistools.BvvSource;
+import bvvpg.vistools.BvvStackSource;
+import mpicbg.spim.data.SpimDataException;
 import net.imglib2.FinalInterval;
 import net.imglib2.FinalRealInterval;
 import net.imglib2.Interval;
-import net.imglib2.img.Img;
-import net.imglib2.img.display.imagej.ImageJFunctions;
 import net.imglib2.realtransform.AffineTransform3D;
 import net.imglib2.type.numeric.ARGBType;
-import net.imglib2.type.numeric.integer.UnsignedShortType;
 
-import bvvpg.vistools.Bvv;
-import bvvpg.vistools.BvvFunctions;
-import bvvpg.vistools.BvvSource;
 
-public class PG_Example03 {
+public class PG_Example04 {
 	public static void main( final String[] args )
 	{
 		
-		//regular tif init
-		/**/
-		//final ImagePlus imp = IJ.openImage( "https://imagej.nih.gov/ij/images/t1-head.zip" );
-		final ImagePlus imp = IJ.openImage( "/home/eugene/Desktop/projects/BigTrace/BigTrace_data/BioFormats/small_crop.tif" );
-		final Img< UnsignedShortType > img = ImageJFunctions.wrapShort( imp );
-
-	
-		long [] minI = img.minAsLongArray();
-		long [] maxI = img.maxAsLongArray();
-
+		final String xmlFilename = "/home/eugene/Desktop/BigTrace_data/BioFormats/small_crop.xml";
+		SpimDataMinimal spimData = null;
+		try {
+			spimData = new XmlIoSpimDataMinimal().load( xmlFilename );
+		} catch (SpimDataException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return;
+		}				
+				
 		//create a deskew transform
 		
 		AffineTransform3D deskew = new AffineTransform3D();
 		//deskew.translate(100.,100,100);
-		makeLLS7Transform(img, deskew);
+		makeLLS7Transform(spimData.getSequenceDescription().getImgLoader().getSetupImgLoader(0).getImage(0), deskew);
 		
-		final BvvSource source = BvvFunctions.show( img, "t1-head", Bvv.options().sourceTransform(deskew));
-		final BvvSource source2 = BvvFunctions.show( img, "t1-head", Bvv.options().sourceTransform(deskew).addTo(source));
-
+		final List< BvvStackSource< ? > > sources = BvvFunctions.show( spimData );
+		final BvvSource source = sources.get(0);
+		final BvvSource source2 = sources.get(1);
+		VolumeViewerPanel panel = source.getBvvHandle().getViewerPanel();
+		for ( SourceAndConverter< ? > sourceC : panel.state().getSources() )
+		{
+			(( TransformedSource< ? > ) sourceC.getSpimSource() ).setFixedTransform(deskew);
+		}
+		
+		long [] minI = spimData.getSequenceDescription().getImgLoader().getSetupImgLoader(0).getImage(0).minAsLongArray();
+		long [] maxI = spimData.getSequenceDescription().getImgLoader().getSetupImgLoader(0).getImage(0).maxAsLongArray();
+	
+		
 		source.setColor(new ARGBType(ARGBType.rgba(255, 0.0, 0.0, 255.0)));
-		source.setDisplayRange(0, 2100);
-		source2.setColor(new ARGBType(ARGBType.rgba(0.0, 255.0, 0.0, 255.0)));
-		source2.setDisplayRange(0, 2100);
-		
-		
-		int nAxes = 1;
-		
-		//clip source 1 in 'data' coordinates		
-		double [] newMin2 =  img.minAsDoubleArray();
-		double [] newMax2 =  img.maxAsDoubleArray();
-		newMin2[nAxes] = newMin2[nAxes]+0.5*(newMax2[nAxes]-newMin2[nAxes]);
-		source.setClipInterval(new FinalRealInterval(newMin2,newMax2));
+		source.setDisplayRange(0, 200);
+		source2.setColor(new ARGBType(ARGBType.rgba(0.0,255.0, 0.0, 255.0)));
+		source2.setDisplayRange(0, 200);
 
-		//clip source 2 in 'clip' coordinates		
-		source2.setClipTransform(deskew);
-			
+		source.setClipTransform(deskew);
+		
+		
 		//clip half of the volume along Z axis in the shaders
 		//clipInterval is defined inside the "raw", non-transformed data interval	
 		FinalRealInterval finRealAfter = deskew.estimateBounds(new FinalInterval(minI,maxI));
 		double [] newMin =  finRealAfter.minAsDoubleArray();
 		double [] newMax =  finRealAfter.maxAsDoubleArray();
-	
+		int nAxes = 1;
 		newMin[nAxes] = newMin[nAxes]+0.5*(newMax[nAxes]-newMin[nAxes]);		
-		source2.setClipInterval(new FinalRealInterval(newMin,newMax));
+		source.setClipInterval(new FinalRealInterval(newMin,newMax));
 		
-
+		
 	}
 	
 	/** function assigns new LLS7 transform to bt.afDataTransform (using provided voxel size of original data) 

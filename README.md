@@ -3,10 +3,11 @@
 # BigVolumeViewer-playground
 
 This is a fork of [BVV](https://github.com/bigdataviewer/bigvolumeviewer-core) with some additional features:
-- "alpha-bending" volume rendering method (transparency/illumination);
 - alpha opacity/transparency slider;
-- gamma correction for brightness/opacity;
-- Lookup tables (LUTs, custom and coming from ImageJ);
+- gamma correction for brightness/opacity (and alpha);
+- "volumetric" rendering method ("alpha-blending");
+- nearest-neighbor and trilinear interpolation;
+- lookup tables (LUTs, custom and coming from ImageJ);
 - clipping of displayed sources in shaders (optionally using custom transform).
 
 Currently synced to BVV version 0.3.4 (this [commit](https://github.com/bigdataviewer/bigvolumeviewer-core/tree/2b8367ef592ede840ecba932deb7ff19b1896d6a)).
@@ -49,16 +50,26 @@ A new additional checkbox on the left is used to synchronize top pair of sliders
 
 ### Lookup tables (LUTs)
 
-In a brightness dialog, right clicking on the color icon displayes the list of ImageJ LUTs that can be selected and applied to a specific source.   
+In a brightness dialog, right clicking on the color icon displays the list of ImageJ LUTs that can be selected and applied to a specific source.   
 
 ![LUT selection](https://katpyxa.info/software/bvv_playground/bvvPG_lut_selection_0.2.0.gif)   
 
 The left mouse button click still activates a dialog for a monochromatic, "single-color" painting of voxels. LUTs can be specified in Cards dialog, also on the Source and Group tables by using the right mouse button click too.   
 
+## Different interpolation schemes
+
+For each source one can specify how voxels' intensity is interpolated: via nearest neighbor or trilinear. In the example below, a left part of the sphere (filled with random numbers) is interpolated trilinearly (deafult), on the right side the nearest neighbor interpolation is shown.  
+
+![voxel interpolation example](https://katpyxa.info/software/bvv_playground/bvvPG_voxel_interpolation.png) 
+
+The code for this example can be found [here](https://github.com/UU-cellbiology/bvv-playground/blob/master/src/test/java/bvv/vistools/examples/PG_Example02.java).
+
 ## For developers
 
 A list of additional methods (adjusting gamma and opacity, adding LUTs and volume clipping) is illustrated by [this example](https://github.com/UU-cellbiology/bvv-playground/blob/master/src/test/java/bvv/vistools/examples/PG_Example01.java).  
-There is a possibility to specify "clipping transform", shown [here](https://github.com/UU-cellbiology/bvv-playground/blob/master/src/test/java/bvv/vistools/examples/PG_Example02.java).   
+There is a possibility to specify "clipping transform", shown [here](https://github.com/UU-cellbiology/bvv-playground/blob/master/src/test/java/bvv/vistools/examples/PG_Example03.java).   
+
+Newly added functions of BvvSource can be found [here](https://github.com/UU-cellbiology/bvv-playground/blob/c65494c3c2be4bcd30d1d000ad68ead9d8804a7f/src/main/java/bvvpg/vistools/BvvSource.java#L66). 
    
 The project is currently under development and has a lot of "experimental" code (i.e. not clean and in the state of "well, at least it works"). So comments and optimization suggestions are welcome.
 
@@ -83,6 +94,9 @@ and add the corresponding dependency:
   <version>X.X.X</version>
 </dependency>
 ```
+### Shipping of bvv-playground with FIJI
+
+Apart from [bvv-playground.jar](https://maven.scijava.org/#nexus-search;quick~bvv-playground) you would have to additionally upload to the update site [jide-oss.jar](https://mvnrepository.com/artifact/com.formdev/jide-oss/3.7.15) and its [flatlaf theme](https://mvnrepository.com/artifact/com.formdev/flatlaf-jide-oss/3.5). 
 
 
 ----------

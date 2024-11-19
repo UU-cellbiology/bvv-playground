@@ -77,14 +77,22 @@ public abstract class BvvSource implements Bvv
 	
 	public abstract void setAlphaGammaRangeBounds(final double min, final double max);
 	
+	/** 0 = maximum intensity projection; 1 = "volumetric" **/
 	public abstract void setRenderType(final int nRenderType);
 	
+	/** 0 = no interpolation; 1 = trilinear **/
+	public abstract void setVoxelRenderInterpolation(final int nInterpolationType);
+	
+	/** applies the LUT specified by IndexColorModel. The name can be arbirary **/
 	public abstract void setLUT(final IndexColorModel icm_, String sLUTName);
 	
+	/** tries to load a LUT with this name from available ImageJ/Fiji LUTs **/
 	public abstract void setLUT(String sLUTName);
 	
+	/** provided 3D interval, volumetric data outside of it will be clipped. setClipTransform can be applied **/
 	public abstract void setClipInterval(RealInterval clipInt);
 	
+	/** set transform applied to the clip interval  **/
 	public abstract void setClipTransform(AffineTransform3D clipTransform);
 
 	@Override
