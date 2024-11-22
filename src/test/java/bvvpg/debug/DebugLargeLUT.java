@@ -69,33 +69,40 @@ public class DebugLargeLUT
 		//final Img< UnsignedShortType > img = ImageJFunctions.wrapShort( imp );
 		final BvvSource source = BvvFunctions.show( imgLUT, "LUTVIEW" );
 		//int nLUTMAX = nImageMaxRange;
-		int nLUTMAX = 65500;
+		int nLUTMAX = 256;
 		source.setLUT(  getLargeTestICM(nLUTMAX), null );
 		source.setDisplayRangeBounds( 0, nImageMaxRange -1);
 		//source.setAlphaGammaRangeBounds( 0, 1 );
 		//source.setAlphaRange( 0, 1 );
 		source.setRenderType( 1 );
-		source.setAlphaRangeBounds( -2, -1 );
-		source.setAlphaRange( -1.5, -1 );
+		source.setAlphaRangeBounds( 0, 2 );
+		source.setAlphaRange( 0, 2 );
 	}
 	
 	public static IndexColorModel getLargeTestICM(int nTotLength)
 	{
 		
-		final byte [][] colors = new byte [3][nTotLength];
+		final byte [][] colors = new byte [4][nTotLength];
 		colors[0][0] = ( byte ) 0;
 		colors[1][0] = ( byte )  0 ;
 		colors[2][0] = ( byte ) 255 ;
+		colors[3][0] = ( byte ) 0 ;
 		for(int i=1;i<nTotLength;i++)
 		{
 			int nStep = (int) Math.round( 255.0*i/(nTotLength));
 			colors[0][i] = ( byte ) nStep ;
 			colors[1][i] = ( byte )  (255-nStep ) ;
 			colors[2][i] = ( byte ) 0 ;
+			colors[3][0] = ( byte ) 0 ;
+
 		}
 		colors[0][nTotLength-1] = ( byte ) 255;
 		colors[1][nTotLength-1] = ( byte )  255 ;
 		colors[2][nTotLength-1] = ( byte ) 255 ;
-		return new IndexColorModel(16,nTotLength,colors[0],colors[1],colors[2]);
+		colors[3][0] = ( byte ) 255 ;
+		colors[3][(int)Math.round( nTotLength*0.5 )] = ( byte ) 255 ;
+
+		//return new IndexColorModel(16,nTotLength,colors[0],colors[1],colors[2]);
+		return new IndexColorModel(16,nTotLength,colors[0],colors[1],colors[2],colors[3]);
 	}
 }
