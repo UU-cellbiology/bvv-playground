@@ -76,14 +76,16 @@ void main()
 	if (tnear < tfar)
 	{
 		vec4 fb = wback - wfront;
-		int numSteps =
-			(fwnw > 0.00001)
-			? int (log((tfar * fwnw + nw) / (tnear * fwnw + nw)) / log (1 + fwnw))
-			: int (trunc((tfar - tnear) / nw + 1));
+		float nk =  0.01*nw;
+		int numSteps = int (ceil((tfar - tnear) / nk + 1));
+			//(fwnw > 0.00001)
+			//? int (log((tfar * fwnw + nw) / (tnear * fwnw + nw)) / log (1 + fwnw))
+			//: int (ceil((tfar - tnear) / nw + 1));
 
 		float step = tnear;
 		vec4 v = vec4(0);
-		for (int i = 0; i < numSteps; ++i, step += nw + step * fwnw)
+		for (int i = 0; i < numSteps; ++i, step += nk)
+		//for (int i = 0; i < numSteps; ++i, step += nw + step * fwnw)
 		{
 			vec4 wpos = mix(wfront, wback, step);
 
@@ -97,7 +99,7 @@ void main()
 				v = max(v, convert(x));
 			}
 			*/
-			if(v.a>0.99)
+			if(v.a>0.999)
 			{
 				v.a=1.0;
 				i=numSteps;

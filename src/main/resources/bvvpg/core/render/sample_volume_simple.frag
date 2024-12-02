@@ -41,9 +41,17 @@ float sampleVolume( vec4 wpos )
 		if(s.x * s.y * s.z==0.0)
 			return 0.0;
 	} 
+	
 	if(voxelInterpolation == 0)
 	{
+		vec3 posFl = pos;
 		pos = floor(pos);
+		vec3 dis = posFl-pos-0.5;
+		float ms = min(abs(dis.x),abs(dis.y));
+		ms = min(ms,abs(dis.z));
+		//if(ms>0.5)
+		if(length(dis)>0.2)
+			return 0.0;
 	}
-	return texture( volume, (pos+0.5) / textureSize( volume, 0 ) ).r;
+	return texture( volume, (pos +0.5) / textureSize( volume, 0 ) ).r;
 }
