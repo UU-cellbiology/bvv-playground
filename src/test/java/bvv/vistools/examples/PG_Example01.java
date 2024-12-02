@@ -28,8 +28,6 @@
  */
 package bvv.vistools.examples;
 
-
-import java.awt.image.IndexColorModel;
 import java.util.List;
 
 import bdv.spimdata.SpimDataMinimal;

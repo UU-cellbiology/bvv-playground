@@ -116,17 +116,19 @@ public class SimpleLUTTextureManager
 				data = ByteBuffer.allocateDirect( numBytes ); // allocate a bit more than needed...
 				data.order( ByteOrder.nativeOrder() );	
 				final IntBuffer sdata = data.asIntBuffer();
-				byte [][] colors = new byte[3][nTextureSpan];
-				icm.getReds(colors[0]);
-				icm.getGreens(colors[1]);
-				icm.getBlues(colors[2]);
+				byte [][] colorsARGB = new byte[4][nTextureSpan];
+				icm.getAlphas( colorsARGB[0] );
+				icm.getReds( colorsARGB[1] );
+				icm.getGreens( colorsARGB[2] );
+				icm.getBlues( colorsARGB[3] );
 				int all = 0;
 				for (int i=0; i<size_;i++)
 				{
-					final int r = colors[0][i] & 0xff;
-					final int g = colors[1][i] & 0xff;
-					final int b = colors[2][i] & 0xff;
-					all = ( 255 << 24 ) | ( b << 16 ) | ( g << 8 ) | r;
+					final int a = colorsARGB[0][i] & 0xff;
+					final int r = colorsARGB[1][i] & 0xff;
+					final int g = colorsARGB[2][i] & 0xff;
+					final int b = colorsARGB[3][i] & 0xff;
+					all = ( a << 24 ) | ( b << 16 ) | ( g << 8 ) | r;
 					sdata.put( i, all );	
 				}
 				//fill the rest with the last color

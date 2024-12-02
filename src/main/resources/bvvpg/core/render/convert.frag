@@ -29,15 +29,17 @@ vec4 convert(vec4 acc, float v )
 		//q.x = pow(clamp(offset.r + scale.r * v,0.0,1.0),gamma);
 				
 		finC =  texture( lut, q);
+		finC.a = finC.a*pow(clamp(offset.a + scale.a * v,0.0,1.0),alphagamma);	
 	}
 	else
 	{
 		finC.r = pow(clamp(offset.r + scale.r * v,0.0,1.0),gamma);
 		finC.g = pow(clamp(offset.g + scale.g * v,0.0,1.0),gamma);
 		finC.b = pow(clamp(offset.b + scale.b * v,0.0,1.0),gamma);
+		finC.a = pow(clamp(offset.a + scale.a * v,0.0,1.0),alphagamma);			
 	}
 	
-	finC.a = pow(clamp(offset.a + scale.a * v,0.0,1.0),alphagamma);		
+		
 	
 	//max projection
 	if(renderType==0)
