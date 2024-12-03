@@ -76,7 +76,7 @@ void main()
 	if (tnear < tfar)
 	{
 		vec4 fb = wback - wfront;
-		float nk =  0.01*nw;
+		float nk =  0.1*nw;
 		int numSteps = int (ceil((tfar - tnear) / nk + 1));
 			//(fwnw > 0.00001)
 			//? int (log((tfar * fwnw + nw) / (tnear * fwnw + nw)) / log (1 + fwnw))

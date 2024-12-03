@@ -47,6 +47,9 @@ import net.imglib2.img.display.imagej.ImageJFunctions;
 
 import net.imglib2.type.numeric.integer.UnsignedShortType;
 
+import org.scijava.ui.behaviour.io.InputTriggerConfig;
+import org.scijava.ui.behaviour.util.Actions;
+
 
 public class PG_Example01 {
 	
@@ -90,6 +93,8 @@ public class PG_Example01 {
 		//set volumetric rendering (1), instead of max intensity max intensity (0)
 		source.setRenderType(1);
 		
+		//source.setVoxelRenderInterpolation(2);
+		
 		//DisplayRange maps colors (or LUT values) to intensity values
 		source.setDisplayRange(0, 400);
 		//it is also possible to change gamma value
@@ -113,8 +118,21 @@ public class PG_Example01 {
 		//clip half of the volume along Z axis in the shaders
 		//clipInterval is defined inside the "raw", non-transformed data interval		
 		minI[2]=0.5*maxI[2];		
-		source.setClipInterval(new FinalRealInterval(minI,maxI));		
-		
+		//source.setClipInterval(new FinalRealInterval(minI,maxI));		
+		final Actions actions = new Actions( new InputTriggerConfig() );
+		actions.runnableAction(() -> {
+			source.setVoxelRenderInterpolation(0);
+			source.getBvvHandle().getViewerPanel().requestRepaint();
+			},"trilinear", "D" );
+		actions.runnableAction(() -> {
+			source.setVoxelRenderInterpolation(1);
+			source.getBvvHandle().getViewerPanel().requestRepaint();
+			},"floor", "S" );
+		actions.runnableAction(() -> {
+			source.setVoxelRenderInterpolation(2);
+			source.getBvvHandle().getViewerPanel().requestRepaint();
+			},"boxes", "A" );
+		actions.install( source.getBvvHandle().getKeybindings(), "spheres actions" );
 	}
 	
 }

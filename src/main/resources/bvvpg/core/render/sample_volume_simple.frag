@@ -41,17 +41,31 @@ float sampleVolume( vec4 wpos )
 		if(s.x * s.y * s.z==0.0)
 			return 0.0;
 	} 
+
+	if(voxelInterpolation == 1)	
+	{
+		pos = floor(pos);
+	}
 	
-	if(voxelInterpolation == 0)
+	if(voxelInterpolation == 2)
 	{
 		vec3 posFl = pos;
 		pos = floor(pos);
 		vec3 dis = posFl-pos-0.5;
-		float ms = min(abs(dis.x),abs(dis.y));
-		ms = min(ms,abs(dis.z));
-		//if(ms>0.5)
-		if(length(dis)>0.2)
-			return 0.0;
+		
+		//if(voxelInterpolation == 2)
+		//{
+			//sphere
+			//if(length(dis)-0.5>0)
+			//	return 0.0;
+			
+			//box
+			vec3 q = abs(dis)-0.48;
+			float boxl = length(max(q,0))+min(max(q.x,max(q.y,q.z)),0.0);
+			float valout = texture( volume, (pos +0.5) / textureSize( volume, 0 ) ).r;
+			if(boxl>0)
+				return 0.0;
+		//}
 	}
 	return texture( volume, (pos +0.5) / textureSize( volume, 0 ) ).r;
 }
