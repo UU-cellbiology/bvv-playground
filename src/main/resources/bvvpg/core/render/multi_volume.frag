@@ -84,6 +84,10 @@ void main()
 
 		float step = tnear;
 		vec4 v = vec4(0);
+		//vec4 v = -99.0;
+		float maxval = -99999.0;
+		float scaled = 0.0;
+		float sumval = 0.0;
 		for (int i = 0; i < numSteps; ++i, step += nk)
 		//for (int i = 0; i < numSteps; ++i, step += nw + step * fwnw)
 		{
@@ -99,13 +103,21 @@ void main()
 				v = max(v, convert(x));
 			}
 			*/
-			if(v.a>0.999)
+			//if(v.a>0.999)
+			//{
+			//	v.a=1.0;
+			//	i=numSteps;
+			//}
+			
+			sumval = sumval + v.r;
+			scaled = v.r * exp(-0.21 * (sumval -1) / 0.5);
+			if( scaled > maxval ) 
 			{
-				v.a=1.0;
-				i=numSteps;
-			}
+            	maxval = scaled;
+            }
 		}
-		FragColor = v;
+		//FragColor = v;
+		FragColor = getColorVal(maxval);
 	}
 	else
 	FragColor = vec4(0, 0, 0, 0);
