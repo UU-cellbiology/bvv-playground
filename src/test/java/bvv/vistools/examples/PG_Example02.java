@@ -42,10 +42,10 @@ import bvvpg.vistools.Bvv;
 import bvvpg.vistools.BvvFunctions;
 import bvvpg.vistools.BvvSource;
 
-/** show difference in the source (volume) interpolation **/
-
 public class PG_Example02
 {
+	/** Show difference in the source (volume) interpolation **/
+
 	public static void main( final String[] args )
 	{
 		int nRadius = 35;
@@ -56,10 +56,13 @@ public class PG_Example02
 		center.setPosition( nRadius+1 , 0 );
 		center.setPosition( nRadius+1 , 1 );
 		center.setPosition( nRadius+1 , 2 );
+		
 		ArrayImg< UnsignedShortType, ShortArray > sphereRai = ArrayImgs.unsignedShorts(dim);
 		HyperSphere< UnsignedShortType > hyperSphere =
 				new HyperSphere<>( sphereRai, center, nRadius);			
+		
 		HyperSphereCursor< UnsignedShortType > cursor = hyperSphere.localizingCursor();
+		
 		while ( cursor.hasNext() )
 		{
 			cursor.fwd();
@@ -81,6 +84,7 @@ public class PG_Example02
 		source2.setDisplayRangeBounds( 0, 255 );
 		source2.setRenderType( 1 );
 		source2.setAlphaRangeBounds( 0, 255 );
+		
 		//set source as no interpolation
 		source2.setVoxelRenderInterpolation( 0 );
 		source2.setLUT( "Spectrum" );

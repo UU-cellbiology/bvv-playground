@@ -293,7 +293,7 @@ public class MultiVolumeShaderMip
 				"intersectBoundingBox", "vis", "SampleVolume", "Convert", "Accumulate" ) );
 		segments.put( SegmentType.AccumulatorMultiresolution, new SegmentTemplate(
 				"accumulate_mip_blocks.frag",
-				"vis", "sampleVolume", "convert" ) );
+				"vis", "sampleVolume", "convert", "renderType" ) );
 		segments.put( SegmentType.Accumulator, new SegmentTemplate(
 				"accumulate_mip_simple.frag",
 				"vis", "sampleVolume", "convert", "renderType" ) );

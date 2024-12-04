@@ -6,7 +6,7 @@ uniform int renderType;
 uniform int sizeLUT;
 uniform sampler3D lut;
 
-vec4 convert(float v )
+vec4 convert(float v)
 {
 	vec4 finC = vec4(0);
 	
