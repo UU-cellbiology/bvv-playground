@@ -1,8 +1,6 @@
 if (vis)
 {
-	float x = sampleVolume(wpos);
-
-	vnew = convert(x);	
+	vnew = convert(sampleVolume(wpos));	
 	
 	//max projection
 	if(renderType == 0)
