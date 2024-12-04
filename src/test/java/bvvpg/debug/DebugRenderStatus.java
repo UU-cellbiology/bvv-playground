@@ -26,7 +26,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  * #L%
  */
-package bvv.vistools.examples;
+package bvvpg.debug;
 
 import java.util.List;
 
@@ -36,7 +36,7 @@ import bvvpg.vistools.BvvFunctions;
 import bvvpg.vistools.BvvStackSource;
 import mpicbg.spim.data.SpimDataException;
 
-public class PG_RenderFrame
+public class DebugRenderStatus
 {
 	public static void main( final String[] args )
 	{

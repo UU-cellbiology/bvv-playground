@@ -33,25 +33,25 @@ import java.util.List;
 import bdv.spimdata.SpimDataMinimal;
 import bdv.spimdata.XmlIoSpimDataMinimal;
 
-import bvvpg.vistools.Bvv;
 import bvvpg.vistools.BvvFunctions;
-import bvvpg.vistools.BvvOptions;
 import bvvpg.vistools.BvvSource;
 import bvvpg.vistools.BvvStackSource;
 import ij.IJ;
 import ij.ImagePlus;
 import mpicbg.spim.data.SpimDataException;
+import mpicbg.spim.data.sequence.VoxelDimensions;
+
 import net.imglib2.FinalRealInterval;
 import net.imglib2.img.Img;
 import net.imglib2.img.display.imagej.ImageJFunctions;
-
 import net.imglib2.type.numeric.integer.UnsignedShortType;
 
 
 public class PG_Example01 {
 	
 	/**
-	 * Show 16-bit volume, change rendering type and gamma
+	 * Show 16-bit volume, change display range, change gamma,
+	 * rendering type, alpha value, apply LUT and clip volume in half
 	 */
 	public static void main( final String[] args )
 	{
@@ -69,7 +69,7 @@ public class PG_Example01 {
 
 		//BDV XML init (multiscale cached)
 		/*
-		final String xmlFilename = "/home/eugene/Desktop/projects/BigTrace/BigTrace_data/head_2ch.xml";
+		final String xmlFilename = "/home/eugene/Desktop/projects/BigTrace/BigTrace_data/t1-head.xml";
 		SpimDataMinimal spimData = null;
 		try {
 			spimData = new XmlIoSpimDataMinimal().load( xmlFilename );
@@ -80,6 +80,15 @@ public class PG_Example01 {
 		final BvvSource source = sources.get(0);
 		double [] minI = spimData.getSequenceDescription().getImgLoader().getSetupImgLoader(0).getImage(0).minAsDoubleArray();
 		double [] maxI = spimData.getSequenceDescription().getImgLoader().getSetupImgLoader(0).getImage(0).maxAsDoubleArray();
+		
+		//scale clipping interval
+		VoxelDimensions voxSize = spimData.getSequenceDescription().getViewSetupsOrdered().get( 0 ).getVoxelSize();
+		for(int d=0; d<3; d++)
+		{
+			minI[d] *= voxSize.dimension( d );
+			maxI[d] *= voxSize.dimension( d );
+
+		}
 		*/
 	
 		source.setDisplayRangeBounds( 0, 40000 );
@@ -110,8 +119,7 @@ public class PG_Example01 {
 		//source.setLUT( icm_lut, "SpectrumLUT" );
 
 		
-		//clip half of the volume along Z axis in the shaders
-		//clipInterval is defined inside the "raw", non-transformed data interval		
+		//clip half of the volume along Z axis in the shaders	
 		minI[2]=0.5*maxI[2];		
 		source.setClipInterval(new FinalRealInterval(minI,maxI));		
 		

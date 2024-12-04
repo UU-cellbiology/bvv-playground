@@ -207,6 +207,7 @@ public class MultiVolumeShaderMip
 			fp.bind( "vis", i, accumulate );
 			accumulate.bind( "sampleVolume", sampleVolume );
 			accumulate.bind( "convert", convert );
+			accumulate.bind( "renderType", convert );
 
 			sampleVolumeSegs[ i ] = sampleVolume;
 			convertSegs[ i ] = convert;
@@ -280,10 +281,10 @@ public class MultiVolumeShaderMip
 				"volume", "sampleVolume" ) );
 		segments.put( SegmentType.Convert, new SegmentTemplate(
 				"convert.frag",
-				"convert", "offset", "scale", "gamma", "alphagamma","renderType","sizeLUT","lut", "zzz" ) );
+				"convert", "offset", "scale", "gamma", "alphagamma","renderType","sizeLUT","lut" ) );
 		segments.put( SegmentType.ConvertRGBA, new SegmentTemplate(
 				"convert_rgba.frag",
-				"convert", "offset", "scale", "gamma", "alphagamma" ) );
+				"convert", "offset", "scale", "gamma", "alphagamma", "renderType", "sizeLUT","lut" ) );
 		segments.put( SegmentType.MaxDepth, new SegmentTemplate(
 				useDepthTexture ? "maxdepthtexture.frag" : "maxdepthone.frag" ) );
 		segments.put( SegmentType.VertexShader, new SegmentTemplate( "multi_volume.vert" ) );
@@ -292,10 +293,10 @@ public class MultiVolumeShaderMip
 				"intersectBoundingBox", "vis", "SampleVolume", "Convert", "Accumulate" ) );
 		segments.put( SegmentType.AccumulatorMultiresolution, new SegmentTemplate(
 				"accumulate_mip_blocks.frag",
-				"vis", "sampleVolume", "convert" ) );
+				"vis", "sampleVolume", "convert", "renderType" ) );
 		segments.put( SegmentType.Accumulator, new SegmentTemplate(
 				"accumulate_mip_simple.frag",
-				"vis", "sampleVolume", "convert" ) );
+				"vis", "sampleVolume", "convert", "renderType" ) );
 
 		return segments;
 	}
