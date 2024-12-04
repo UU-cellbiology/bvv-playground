@@ -6,7 +6,7 @@ uniform int renderType;
 uniform int sizeLUT;
 uniform sampler3D lut;
 
-vec4 convert(vec4 acc, float v )
+vec4 convert(float v )
 {
 	vec4 finC = vec4(0);
 	
@@ -29,6 +29,7 @@ vec4 convert(vec4 acc, float v )
 		//q.x = pow(clamp(offset.r + scale.r * v,0.0,1.0),gamma);
 				
 		finC =  texture( lut, q);
+		
 		finC.a = finC.a*pow(clamp(offset.a + scale.a * v,0.0,1.0),alphagamma);	
 	}
 	else
@@ -39,25 +40,6 @@ vec4 convert(vec4 acc, float v )
 		finC.a = pow(clamp(offset.a + scale.a * v,0.0,1.0),alphagamma);			
 	}
 	
-		
-	
-	//max projection
-	if(renderType==0)
-	{	
-		return max(acc, finC);
-	}
-	
-	//volumetric
-	if(renderType==1)
-	{
-		finC = acc + (1.-acc.a) * vec4( finC.rgb, 1 ) *finC.a;		 
-		return finC;
-
-	}
-	//min projection
-	else
-	{
-		return min(acc, finC);
-	}
-	
+	return finC;
 }
+		

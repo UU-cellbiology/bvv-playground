@@ -83,6 +83,7 @@ void main()
 
 		float step = tnear;
 		vec4 v = vec4(0);
+		vec4 vnew = vec4(0);
 		for (int i = 0; i < numSteps; ++i, step += nw + step * fwnw)
 		{
 			vec4 wpos = mix(wfront, wback, step);
@@ -99,8 +100,8 @@ void main()
 			*/
 			if(v.a>0.99)
 			{
-				v.a=1.0;
-				i=numSteps;
+				v.a = 1.0;
+				i = numSteps;
 			}
 		}
 		FragColor = v;

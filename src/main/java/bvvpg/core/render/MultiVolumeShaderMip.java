@@ -207,6 +207,7 @@ public class MultiVolumeShaderMip
 			fp.bind( "vis", i, accumulate );
 			accumulate.bind( "sampleVolume", sampleVolume );
 			accumulate.bind( "convert", convert );
+			accumulate.bind( "renderType", convert );
 
 			sampleVolumeSegs[ i ] = sampleVolume;
 			convertSegs[ i ] = convert;
@@ -248,12 +249,12 @@ public class MultiVolumeShaderMip
 		uniformTransform.set( new Matrix4f() );
 		uniformDsp.set( new Vector2f() );
 
-//		final StringBuilder vertexShaderCode = prog.getVertexShaderCode();
-//		System.out.println( "vertexShaderCode = " + vertexShaderCode );
-//		System.out.println( "\n\n--------------------------------\n\n" );
-//		final StringBuilder fragmentShaderCode = prog.getFragmentShaderCode();
-//		System.out.println( "fragmentShaderCode = " + fragmentShaderCode );
-//		System.out.println( "\n\n--------------------------------\n\n" );
+		final StringBuilder vertexShaderCode = prog.getVertexShaderCode();
+		System.out.println( "vertexShaderCode = " + vertexShaderCode );
+		System.out.println( "\n\n--------------------------------\n\n" );
+		final StringBuilder fragmentShaderCode = prog.getFragmentShaderCode();
+		System.out.println( "fragmentShaderCode = " + fragmentShaderCode );
+		System.out.println( "\n\n--------------------------------\n\n" );
 	}
 
 	public static Map< SegmentType, SegmentTemplate > getDefaultSegments( boolean useDepthTexture )
@@ -295,7 +296,7 @@ public class MultiVolumeShaderMip
 				"vis", "sampleVolume", "convert" ) );
 		segments.put( SegmentType.Accumulator, new SegmentTemplate(
 				"accumulate_mip_simple.frag",
-				"vis", "sampleVolume", "convert" ) );
+				"vis", "sampleVolume", "convert", "renderType" ) );
 
 		return segments;
 	}
