@@ -281,10 +281,10 @@ public class MultiVolumeShaderMip
 				"volume", "sampleVolume" ) );
 		segments.put( SegmentType.Convert, new SegmentTemplate(
 				"convert.frag",
-				"convert", "offset", "scale", "gamma", "alphagamma","renderType","sizeLUT","lut", "zzz" ) );
+				"convert", "offset", "scale", "gamma", "alphagamma","renderType","sizeLUT","lut" ) );
 		segments.put( SegmentType.ConvertRGBA, new SegmentTemplate(
 				"convert_rgba.frag",
-				"convert", "offset", "scale", "gamma", "alphagamma" ) );
+				"convert", "offset", "scale", "gamma", "alphagamma", "renderType", "sizeLUT","lut" ) );
 		segments.put( SegmentType.MaxDepth, new SegmentTemplate(
 				useDepthTexture ? "maxdepthtexture.frag" : "maxdepthone.frag" ) );
 		segments.put( SegmentType.VertexShader, new SegmentTemplate( "multi_volume.vert" ) );
