@@ -10,7 +10,7 @@ vec4 convert(float v)
 {
 	vec4 finC = vec4(0);
 	
-	if(sizeLUT >0)
+	if(sizeLUT > 0)
 	{
 		vec3 q = vec3(0);
 

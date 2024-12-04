@@ -1,6 +1,7 @@
 if (vis)
 {
-	vnew = convert(sampleVolume(wpos));	
+	float currVal =  sampleVolume(wpos);
+	vnew = convert(currVal);	
 	
 	//max projection
 	if(renderType == 0)
@@ -14,10 +15,17 @@ if (vis)
 		v = v + (1.-v.a) * vec4( vnew.rgb, 1 ) *vnew.a;		 
 	}
 	
-	//min projection
+	//MIDA projection
 	if(renderType == 2)
 	{
-		v = min(v, vnew);
+		beta = 1.0;
+		float currNorm = pow(clamp(offset.r + scale.r * currVal,0.0,1.0),gamma);
+		if(currNorm>valMax)
+		{
+			beta = 1.0 - (currNorm - valMax);
+			valMax = currNorm;
+		}
+		v = v*beta + (1.0-v.a*beta) * vec4( vnew.rgb, 1 ) *vnew.a;		 
 	}
 
 }

@@ -208,6 +208,9 @@ public class MultiVolumeShaderMip
 			accumulate.bind( "sampleVolume", sampleVolume );
 			accumulate.bind( "convert", convert );
 			accumulate.bind( "renderType", convert );
+			accumulate.bind( "offset", convert );
+			accumulate.bind( "scale", convert );
+			accumulate.bind( "gamma", convert );
 
 			sampleVolumeSegs[ i ] = sampleVolume;
 			convertSegs[ i ] = convert;
@@ -296,7 +299,7 @@ public class MultiVolumeShaderMip
 				"vis", "sampleVolume", "convert", "renderType" ) );
 		segments.put( SegmentType.Accumulator, new SegmentTemplate(
 				"accumulate_mip_simple.frag",
-				"vis", "sampleVolume", "convert", "renderType" ) );
+				"vis", "sampleVolume", "convert", "renderType","offset","scale","gamma" ) );
 
 		return segments;
 	}

@@ -59,7 +59,12 @@ public class PG_Example01 {
 		//regular tif init
 		/**/
 		//final ImagePlus imp = IJ.openImage( "https://imagej.nih.gov/ij/images/t1-head.zip" );
-		final ImagePlus imp = IJ.openImage( "/home/eugene/Desktop/projects/BigTrace/BigTrace_data/t1-head.tif" );
+//		final ImagePlus imp = IJ.openImage( "/home/eugene/Desktop/projects/BigTrace/BigTrace_data/t1-head.tif" );
+
+		final ImagePlus imp = IJ.openImage( "/home/eugene/Desktop/projects/BigTrace/BigTrace_data/ExM_MT.tif" );
+//		final ImagePlus imp = IJ.openImage( "/home/eugene/Desktop/projects/BigTrace/BigTrace_data/MRI/106_image.tif" );
+
+		
 		final Img< UnsignedShortType > img = ImageJFunctions.wrapShort( imp );
 		final BvvSource source = BvvFunctions.show( img, "t1-head" );
 

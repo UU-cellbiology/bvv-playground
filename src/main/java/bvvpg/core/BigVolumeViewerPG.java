@@ -279,16 +279,22 @@ public class BigVolumeViewerPG
 		for ( final ConverterSetup setup : setupAssignments.getConverterSetups() )
 			if (setup instanceof GammaConverterSetup)
 			{
-				if(((GammaConverterSetup)setup).getRenderType()==0)
-				{
-					//viewer.showMessage("volumetric");
-					((GammaConverterSetup)setup).setRenderType(1);
-				}
-				else
-				{
-					//viewer.showMessage("maximum intensity");
-					((GammaConverterSetup)setup).setRenderType(0);					
-				}
+				int nCurrRender = ((GammaConverterSetup)setup).getRenderType();
+				nCurrRender ++;
+				if(nCurrRender >2)
+					nCurrRender =0;
+				((GammaConverterSetup)setup).setRenderType(nCurrRender);
+				
+//				if(((GammaConverterSetup)setup).getRenderType()==0)
+//				{
+//					//viewer.showMessage("volumetric");
+//					((GammaConverterSetup)setup).setRenderType(1);
+//				}
+//				else
+//				{
+//					//viewer.showMessage("maximum intensity");
+//					((GammaConverterSetup)setup).setRenderType(0);					
+//				}
 			}
 		
 		viewer.requestRepaint();
