@@ -249,12 +249,12 @@ public class MultiVolumeShaderMip
 		uniformTransform.set( new Matrix4f() );
 		uniformDsp.set( new Vector2f() );
 
-		final StringBuilder vertexShaderCode = prog.getVertexShaderCode();
-		System.out.println( "vertexShaderCode = " + vertexShaderCode );
-		System.out.println( "\n\n--------------------------------\n\n" );
-		final StringBuilder fragmentShaderCode = prog.getFragmentShaderCode();
-		System.out.println( "fragmentShaderCode = " + fragmentShaderCode );
-		System.out.println( "\n\n--------------------------------\n\n" );
+//		final StringBuilder vertexShaderCode = prog.getVertexShaderCode();
+//		System.out.println( "vertexShaderCode = " + vertexShaderCode );
+//		System.out.println( "\n\n--------------------------------\n\n" );
+//		final StringBuilder fragmentShaderCode = prog.getFragmentShaderCode();
+//		System.out.println( "fragmentShaderCode = " + fragmentShaderCode );
+//		System.out.println( "\n\n--------------------------------\n\n" );
 	}
 
 	public static Map< SegmentType, SegmentTemplate > getDefaultSegments( boolean useDepthTexture )
