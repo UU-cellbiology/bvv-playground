@@ -33,9 +33,7 @@ import java.util.List;
 import bdv.spimdata.SpimDataMinimal;
 import bdv.spimdata.XmlIoSpimDataMinimal;
 
-import bvvpg.vistools.Bvv;
 import bvvpg.vistools.BvvFunctions;
-import bvvpg.vistools.BvvOptions;
 import bvvpg.vistools.BvvSource;
 import bvvpg.vistools.BvvStackSource;
 import ij.IJ;
@@ -46,9 +44,7 @@ import mpicbg.spim.data.sequence.VoxelDimensions;
 import net.imglib2.FinalRealInterval;
 import net.imglib2.img.Img;
 import net.imglib2.img.display.imagej.ImageJFunctions;
-
 import net.imglib2.type.numeric.integer.UnsignedShortType;
-
 
 
 public class PG_Example01 {
@@ -84,6 +80,8 @@ public class PG_Example01 {
 		final BvvSource source = sources.get(0);
 		double [] minI = spimData.getSequenceDescription().getImgLoader().getSetupImgLoader(0).getImage(0).minAsDoubleArray();
 		double [] maxI = spimData.getSequenceDescription().getImgLoader().getSetupImgLoader(0).getImage(0).maxAsDoubleArray();
+		
+		//scale clipping interval
 		VoxelDimensions voxSize = spimData.getSequenceDescription().getViewSetupsOrdered().get( 0 ).getVoxelSize();
 		for(int d=0; d<3; d++)
 		{
@@ -121,8 +119,7 @@ public class PG_Example01 {
 		//source.setLUT( icm_lut, "SpectrumLUT" );
 
 		
-		//clip half of the volume along Z axis in the shaders
-		//clipInterval is defined inside the "raw", non-transformed data interval		
+		//clip half of the volume along Z axis in the shaders	
 		minI[2]=0.5*maxI[2];		
 		source.setClipInterval(new FinalRealInterval(minI,maxI));		
 		
