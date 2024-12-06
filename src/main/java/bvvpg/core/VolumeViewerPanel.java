@@ -54,7 +54,6 @@ import bdv.viewer.animate.TextOverlayAnimator.TextPosition;
 import bdv.viewer.overlay.MultiBoxOverlayRenderer;
 import bdv.viewer.overlay.ScaleBarOverlayRenderer;
 import bdv.viewer.overlay.SourceInfoOverlayRenderer;
-import bdv.viewer.render.PainterThread;
 import bdv.viewer.state.SourceGroup;
 import bdv.viewer.state.ViewerState;
 import bdv.viewer.state.XmlIoViewerState;
@@ -110,7 +109,7 @@ import static com.jogamp.opengl.GL.GL_RGB8;
 
 public class VolumeViewerPanel
 		extends AbstractViewerPanel
-		implements OverlayRenderer, PainterThread.Paintable, ViewerStateChangeListener
+		implements OverlayRenderer, PainterThreadPG.Paintable, ViewerStateChangeListener
 {
 	protected final CacheControl cacheControl;
 
@@ -228,7 +227,7 @@ public class VolumeViewerPanel
 	/**
 	 * Thread that triggers repainting of the display.
 	 */
-	protected final PainterThread painterThread;
+	protected final PainterThreadPG painterThread;
 
 	/**
 	 * Manages visibility and currentness of sources and groups, as well as
@@ -321,7 +320,7 @@ public class VolumeViewerPanel
 		setups.listeners().add( s -> requestRepaint() );
 
 		threadGroup = new ThreadGroup( this.toString() );
-		painterThread = new PainterThread( threadGroup, this );
+		painterThread = new PainterThreadPG( threadGroup, this );
 		painterThread.setDaemon( true );
 		transformEventHandler = options.getTransformEventHandlerFactory().create(
 				TransformState.from( state()::getViewerTransform, state()::setViewerTransform ) );
