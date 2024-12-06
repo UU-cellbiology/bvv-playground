@@ -96,8 +96,7 @@ public class PainterThreadPG extends Thread implements RequestRepaint
 				}
 				catch ( final GLException e )
 				{
-					// this happens when the rendering threadpool
-					// is killed before the painter thread.
+					//catch exception from OpenGL
 					break;
 				}
 			synchronized ( this )
@@ -117,7 +116,7 @@ public class PainterThreadPG extends Thread implements RequestRepaint
 
 	/**
 	 * Request repaint. This will trigger a call to {@link Paintable#paint()}
-	 * from the {@link PainterThread}.
+	 * from the {@link PainterThreadPG}.
 	 */
 	@Override
 	public void requestRepaint()
