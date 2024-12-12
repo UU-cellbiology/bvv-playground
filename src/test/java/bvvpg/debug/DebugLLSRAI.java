@@ -35,12 +35,17 @@ public class DebugLLSRAI
 {
 	public static void main( final String[] args )
 	{
-		
-		final ImagePlus imp = IJ.openImage( "/home/eugene/Desktop/projects/BigTrace/LLS_interp/0.6.tif" );
+		// TIF file can be downloaded here
+		// https://surfdrive.surf.nl/files/index.php/s/E02134XsrLdTdbi
+		final ImagePlus imp = IJ.openImage( "/home/eugene/Desktop/projects/BigTrace/LLS_interp/LLS_interpolation.tif" );
 		
 		final Img< UnsignedShortType > img3d = ImageJFunctions.wrapShort( imp );
 		
 		final BvvSource source = BvvFunctions.show( img3d, "LLS" );
+		
+		//////////////////////////
+		// one step interpolation
+		///////////////////////////
 		
 		AffineTransform3D deskew = makeLLS7Transform();
 		VolumeViewerPanel panel = source.getBvvHandle().getViewerPanel();
@@ -59,6 +64,9 @@ public class DebugLLSRAI
 		viewSideAT.translate( new double [] {-200.0,100.0,0.0} );
 		source.getBvvHandle().getViewerPanel().state().setViewerTransform( viewSideAT );
 
+		//////////////////////////
+		// two steps interpolation
+		//////////////////////////
 		
 		//calculate per slice shift and then interpolation
 				
