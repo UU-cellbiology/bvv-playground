@@ -35,6 +35,7 @@ import net.imglib2.RandomAccessibleInterval;
 import net.imglib2.img.array.ArrayImg;
 import net.imglib2.img.array.ArrayImgs;
 import net.imglib2.img.basictypeaccess.array.ShortArray;
+import net.imglib2.img.display.imagej.ImageJFunctions;
 import net.imglib2.realtransform.AffineTransform3D;
 import net.imglib2.type.numeric.integer.UnsignedShortType;
 import net.imglib2.view.IntervalView;
@@ -51,7 +52,7 @@ public class DebugLargeLUT
 	public static void main( final String[] args )
 	{
 		
-		int nImageMaxRange = 1024;
+		int nImageMaxRange = 256;
 		ArrayImg< UnsignedShortType, ShortArray > dirsInt = ArrayImgs.unsignedShorts(new long [] {nImageMaxRange,1,1 });
 		Cursor< UnsignedShortType > cursor = Views.flatIterable( dirsInt ).cursor();
 		int i = 0;
@@ -64,7 +65,7 @@ public class DebugLargeLUT
 		new ImageJ();
 		
 		IntervalView< UnsignedShortType > imgLUT = Views.expandBorder( ( RandomAccessibleInterval< UnsignedShortType > ) dirsInt, new long [] {0,50,50 });
-
+		ImageJFunctions.show( imgLUT );
 		final BvvSource source = BvvFunctions.show( imgLUT, "LargeLUTView" );
 		//int nLUTMAX = nImageMaxRange;
 		int nLUTMAX = 256;
@@ -72,18 +73,18 @@ public class DebugLargeLUT
 		source.setDisplayRangeBounds( 0, nImageMaxRange -1);
 
 		source.setRenderType( 1 );
-		source.setAlphaRangeBounds( 0, 2 );
-		source.setAlphaRange( 0, 2 );
+		source.setAlphaRangeBounds( 0, 255 );
+		source.setAlphaRange( 0, 1 );
 		
-		//add lut with variable alphas
-		AffineTransform3D transform = new AffineTransform3D();
-		transform.translate( 0.0,150.0,0.0 );
-		final BvvSource source2 = BvvFunctions.show( imgLUT, "LargeLUTAlphaView", Bvv.options().sourceTransform( transform ).addTo( source ) );
-		source2.setLUT(  getLargeICMwithWaveAlphas(nLUTMAX), null );
-		source2.setDisplayRangeBounds( 0, nImageMaxRange -1);
-		source2.setRenderType( 1 );
-		source2.setAlphaRangeBounds( 0, 2 );
-		source2.setAlphaRange( 0, 2 );
+//		//add lut with variable alphas
+//		AffineTransform3D transform = new AffineTransform3D();
+//		transform.translate( 0.0,150.0,0.0 );
+//		final BvvSource source2 = BvvFunctions.show( imgLUT, "LargeLUTAlphaView", Bvv.options().sourceTransform( transform ).addTo( source ) );
+//		source2.setLUT(  getLargeICMwithWaveAlphas(nLUTMAX), null );
+//		source2.setDisplayRangeBounds( 0, nImageMaxRange -1);
+//		source2.setRenderType( 1 );
+//		source2.setAlphaRangeBounds( 0, 2 );
+//		source2.setAlphaRange( 0, 2 );
 	}
 	
 	public static IndexColorModel getLargeICM(int nTotLength)
