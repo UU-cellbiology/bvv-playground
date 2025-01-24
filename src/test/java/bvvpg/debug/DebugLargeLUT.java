@@ -28,7 +28,12 @@
  */
 package bvvpg.debug;
 
+import com.formdev.flatlaf.FlatIntelliJLaf;
+import com.formdev.flatlaf.FlatLaf;
+
 import java.awt.image.IndexColorModel;
+
+import javax.swing.UIManager;
 
 import net.imglib2.Cursor;
 import net.imglib2.RandomAccessibleInterval;
@@ -50,6 +55,14 @@ public class DebugLargeLUT
 {
 	public static void main( final String[] args )
 	{
+		//switch to FlatLaf theme		
+		try {
+		    UIManager.setLookAndFeel( new FlatIntelliJLaf() );
+		    FlatLaf.registerCustomDefaultsSource( "flatlaf" );
+		    FlatIntelliJLaf.setup();
+		} catch( Exception ex ) {
+		    System.err.println( "Failed to initialize LaF" );
+		}
 		
 		int nImageMaxRange = 1024;
 		ArrayImg< UnsignedShortType, ShortArray > dirsInt = ArrayImgs.unsignedShorts(new long [] {nImageMaxRange,1,1 });

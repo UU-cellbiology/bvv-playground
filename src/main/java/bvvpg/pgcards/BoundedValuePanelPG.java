@@ -123,7 +123,8 @@ public class BoundedValuePanelPG extends JPanel {
 		spinner = new JSpinner(new SpinnerNumberModel( 0.0, 0.0, 1.0, 1.0 ));
 		//minSpinner = new JSpinner( new SpinnerNumberModel( 0.0, 0.0, 1.0, 1.0 ) );
 		//maxSpinner = new JSpinner( new SpinnerNumberModel( 1.0, 0.0, 1.0, 1.0 ) );
-		slider = new ValueSlider( 0, SLIDER_LENGTH );
+		//slider = new ValueSlider( 0, SLIDER_LENGTH );
+		slider = new JSlider( 0, SLIDER_LENGTH );
 		upperBoundLabel = new JLabel();
 		lowerBoundLabel = new JLabel();
 
