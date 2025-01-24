@@ -60,8 +60,8 @@ import net.miginfocom.swing.MigLayout;
 import org.scijava.listeners.Listeners;
 
 import bdv.ui.UIUtils;
-//import bdv.ui.rangeslider.RangeSlider;
-import com.jidesoft.swing.RangeSlider;
+import bdv.ui.rangeslider.RangeSlider;
+//import com.jidesoft.swing.RangeSlider;
 import bdv.util.BoundedRange;
 
 /**
@@ -265,8 +265,8 @@ class BoundedRangePanelPG extends JPanel
 		rangeSlider.setFocusable( false );
 
 		rangeSlider.addChangeListener( e -> {
-			//updateRange( range.withMin( posToValue( rangeSlider.getValue() ) ).withMax( posToValue( rangeSlider.getUpperValue() ) ) );
-			updateRange( range.withMin( posToValue( rangeSlider.getValue() ) ).withMax( posToValue( rangeSlider.getHighValue() ) ) );
+			updateRange( range.withMin( posToValue( rangeSlider.getValue() ) ).withMax( posToValue( rangeSlider.getUpperValue() ) ) );
+			//updateRange( range.withMin( posToValue( rangeSlider.getValue() ) ).withMax( posToValue( rangeSlider.getHighValue() ) ) );
 		} );
 
 		rangeSlider.addComponentListener( new ComponentAdapter()
@@ -405,9 +405,9 @@ class BoundedRangePanelPG extends JPanel
 		maxSpinnerModel.setMaximum( maxBound );
 		maxSpinnerModel.setValue( range.getMax() );
 
-		//rangeSlider.setRange( valueToPos( range.getMin() ), valueToPos( range.getMax() ) );
-		rangeSlider.setLowValue(valueToPos( range.getMin() ));
-		rangeSlider.setHighValue(valueToPos( range.getMax() ));
+		rangeSlider.setRange( valueToPos( range.getMin() ), valueToPos( range.getMax() ) );
+		///rangeSlider.setLowValue(valueToPos( range.getMin() ));
+		//rangeSlider.setHighValue(valueToPos( range.getMax() ));
 		//.setRange( ), valueToPos( range.getMax() ) );
 
 		final double frac = Math.max(

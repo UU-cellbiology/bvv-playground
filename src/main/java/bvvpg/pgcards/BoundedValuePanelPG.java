@@ -58,6 +58,8 @@ import org.scijava.listeners.Listeners;
 
 import bdv.ui.UIUtils;
 import bdv.util.BoundedValueDouble;
+import bvvpg.pguitools.ValueSlider;
+
 import net.miginfocom.swing.MigLayout;
 
 public class BoundedValuePanelPG extends JPanel {
@@ -121,7 +123,7 @@ public class BoundedValuePanelPG extends JPanel {
 		spinner = new JSpinner(new SpinnerNumberModel( 0.0, 0.0, 1.0, 1.0 ));
 		//minSpinner = new JSpinner( new SpinnerNumberModel( 0.0, 0.0, 1.0, 1.0 ) );
 		//maxSpinner = new JSpinner( new SpinnerNumberModel( 1.0, 0.0, 1.0, 1.0 ) );
-		slider = new JSlider( 0, SLIDER_LENGTH );
+		slider = new ValueSlider( 0, SLIDER_LENGTH );
 		upperBoundLabel = new JLabel();
 		lowerBoundLabel = new JLabel();
 
