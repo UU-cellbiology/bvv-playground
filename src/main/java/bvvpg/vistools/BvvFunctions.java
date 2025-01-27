@@ -45,7 +45,6 @@ import bdv.util.volatiles.VolatileView;
 import bdv.util.volatiles.VolatileViewData;
 import bdv.viewer.Source;
 import bdv.viewer.SourceAndConverter;
-import bvvpg.pguitools.BvvGamma;
 
 import java.util.ArrayList;
 import java.util.Collections;

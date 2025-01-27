@@ -50,7 +50,7 @@ import bvvpg.core.shadergen.generate.SegmentType;
 import bvvpg.core.shadergen.generate.SegmentedShader;
 import bvvpg.core.shadergen.generate.SegmentedShaderBuilder;
 import bvvpg.core.util.MatrixMath;
-import bvvpg.pguitools.GammaConverterSetup;
+import bvvpg.source.converters.GammaConverterSetup;
 
 import java.util.Arrays;
 import java.util.HashMap;

@@ -31,7 +31,7 @@ package bvvpg.pgcards.sourcetable;
 
 import bdv.tools.brightness.ColorIcon;
 import bdv.ui.UIUtils;
-import bvvpg.pguitools.ColorIconPG;
+import bvvpg.ui.panels.ColorIconPG;
 
 import java.awt.BasicStroke;
 import java.awt.Color;

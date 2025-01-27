@@ -76,7 +76,7 @@ import bvvpg.core.multires.Stack3D;
 import bvvpg.core.offscreen.OffScreenFrameBufferWithDepth;
 import bvvpg.core.render.VolumeShaderSignature.VolumeSignature;
 import bvvpg.core.util.DefaultQuad;
-import bvvpg.pguitools.GammaConverterSetup;
+import bvvpg.source.converters.GammaConverterSetup;
 
 public class VolumeRenderer
 {

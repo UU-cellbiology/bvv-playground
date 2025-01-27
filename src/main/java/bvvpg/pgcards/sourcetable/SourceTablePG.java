@@ -35,7 +35,7 @@ import bdv.viewer.ConverterSetups;
 import bdv.viewer.SourceAndConverter;
 import bdv.viewer.SourceToConverterSetupBimap;
 import bdv.viewer.ViewerState;
-import bvvpg.pguitools.GammaConverterSetup;
+import bvvpg.source.converters.GammaConverterSetup;
 import ij.IJ;
 
 import com.formdev.flatlaf.ui.FlatUIUtils;
