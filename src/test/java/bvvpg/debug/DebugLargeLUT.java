@@ -56,13 +56,13 @@ public class DebugLargeLUT
 	public static void main( final String[] args )
 	{
 		//switch to FlatLaf theme		
-		try {
-		    UIManager.setLookAndFeel( new FlatIntelliJLaf() );
-		    FlatLaf.registerCustomDefaultsSource( "flatlaf" );
-		    FlatIntelliJLaf.setup();
-		} catch( Exception ex ) {
-		    System.err.println( "Failed to initialize LaF" );
-		}
+//		try {
+//		    UIManager.setLookAndFeel( new FlatIntelliJLaf() );
+//		    FlatLaf.registerCustomDefaultsSource( "flatlaf" );
+//		    FlatIntelliJLaf.setup();
+//		} catch( Exception ex ) {
+//		    System.err.println( "Failed to initialize LaF" );
+//		}
 		
 		int nImageMaxRange = 1024;
 		ArrayImg< UnsignedShortType, ShortArray > dirsInt = ArrayImgs.unsignedShorts(new long [] {nImageMaxRange,1,1 });

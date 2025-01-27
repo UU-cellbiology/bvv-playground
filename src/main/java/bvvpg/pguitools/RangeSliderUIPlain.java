@@ -42,6 +42,11 @@ class RangeSliderUIPlain extends BasicSliderUI
 	 * Indicator that determines whether upper thumb is being dragged.
 	 */
 	private transient boolean upperDragging;
+	
+	/**
+	 * Indicator that determines whether track is being dragged.
+	 */
+	private transient boolean trackDragging;
 
 	/**
 	 * Constructs a RangeSliderUIPlain for the specified slider component.
@@ -448,11 +453,12 @@ class RangeSliderUIPlain extends BasicSliderUI
 		}
 	}
 
-	/**
-	 * Listener to handle mouse movements in the slider track.
-	 */
 	public class RangeTrackListener extends TrackListener
 	{
+		//int trackStartDrag;
+		int trackDragMin;
+		int trackDragMax;
+		int lowerPos, upperPos;
 
 		@Override
 		public void mousePressed( final MouseEvent e )
@@ -495,6 +501,31 @@ class RangeSliderUIPlain extends BasicSliderUI
 					upperPressed = true;
 				}
 			}
+			
+			if(!lowerPressed && !upperPressed)
+			{
+				if( slider.getOrientation() == SwingConstants.HORIZONTAL )
+				{	
+					offset = currentMouseX;
+
+					trackDragMin = trackRect.x - thumbRect.x - thumbRect.width / 2;
+					trackDragMax = trackRect.x + trackRect.width - upperThumbRect.x-upperThumbRect.width/2;
+					lowerPos = thumbRect.x;
+					upperPos = upperThumbRect.x;
+				}
+				else
+				{
+					offset = currentMouseY;
+				}
+				
+				System.out.println( "range pressed" );
+				upperThumbSelected = false;
+				lowerDragging = false;
+				upperDragging = false;
+				trackDragging = true;
+				return;
+			}
+			trackDragging = false;
 
 			// Handle lower thumb pressed.
 			if ( lowerPressed )
@@ -510,6 +541,7 @@ class RangeSliderUIPlain extends BasicSliderUI
 				}
 				upperThumbSelected = false;
 				lowerDragging = true;
+				trackDragging = false;
 				return;
 			}
 			lowerDragging = false;
@@ -528,6 +560,7 @@ class RangeSliderUIPlain extends BasicSliderUI
 				}
 				upperThumbSelected = true;
 				upperDragging = true;
+				trackDragging = false;
 				return;
 			}
 			upperDragging = false;
@@ -538,6 +571,7 @@ class RangeSliderUIPlain extends BasicSliderUI
 		{
 			lowerDragging = false;
 			upperDragging = false;
+			trackDragging = false;
 			slider.setValueIsAdjusting( false );
 			super.mouseReleased( e );
 		}
@@ -562,12 +596,37 @@ class RangeSliderUIPlain extends BasicSliderUI
 				slider.setValueIsAdjusting( true );
 				moveUpperThumb();
 			}
+			else if (trackDragging)
+			{
+				slider.setValueIsAdjusting( true );
+				moveTrack();
+			}
 		}
 
 		@Override
 		public boolean shouldScroll( final int direction )
 		{
+			//int thumbTop = currentMouseY - offset;
 			return false;
+		}
+		
+		private void moveTrack()
+		{
+			
+			//implement vertical dragging + inverted left right?!!
+			int trackDisp = currentMouseX - offset;
+			
+			trackDisp = Math.max( trackDisp, trackDragMin );
+			trackDisp = Math.min( trackDisp, trackDragMax );
+			int thumbLeft = lowerPos + trackDisp;
+			int thumbRight = upperPos + trackDisp;
+			setThumbLocation(thumbLeft, trackRect.y );
+			setUpperThumbLocation(thumbRight, trackRect.y );
+			
+			// Update slider range.
+			final RangeSliderPG slider_ = ( RangeSliderPG ) RangeSliderUIPlain.this.slider;
+			slider_.setRange( valueForXPosition(thumbLeft+thumbRect.width / 2), valueForXPosition(thumbRight+upperThumbRect.width / 2) );
+			
 		}
 
 		/**
