@@ -10,6 +10,7 @@ import java.awt.Shape;
 import java.awt.geom.Ellipse2D;
 
 import javax.swing.JComponent;
+import javax.swing.SwingConstants;
 import javax.swing.plaf.basic.BasicSliderUI;
 
 
@@ -91,6 +92,71 @@ public class ValueSliderUI extends BasicSliderUI
 
 		// Dispose graphics.
 		g2d.dispose();
+	}
+	
+	/**
+	 * Paints the track.
+	 */
+	@Override
+	public void paintTrack( final Graphics g )
+	{
+		// Draw track.
+		super.paintTrack( g );
+
+		final Rectangle trackBounds = trackRect;
+
+		if ( slider.getOrientation() == SwingConstants.HORIZONTAL )
+		{
+			// Determine position of selected range by moving from the middle
+			// of one thumb to the other.
+			final int lowerX = trackRect.x;
+			final int upperX = thumbRect.x + ( thumbRect.width / 2 );
+			//final int upperX = upperThumbRect.x + ( upperThumbRect.width / 2 );
+
+			// Determine track position.
+			final int cy = ( trackBounds.height / 2 ) - 2;
+
+			// Save color and shift position.
+			final Color oldColor = g.getColor();
+			g.translate( trackBounds.x, trackBounds.y + cy );
+
+			// Draw selected range.
+			g.setColor( getSliderColor() );
+			for ( int y = 0; y <= 2; y++ )
+			{
+				g.drawLine( lowerX - trackBounds.x, y, upperX - trackBounds.x, y );
+			}
+
+			// Restore position and color.
+			g.translate( -trackBounds.x, -( trackBounds.y + cy ) );
+			g.setColor( oldColor );
+
+		}
+		else
+		{
+			// Determine position of selected range by moving from the middle
+			// of one thumb to the other.
+			final int lowerY = trackRect.y;
+			final int upperY = thumbRect.y + ( thumbRect.height / 2 );
+
+			// Determine track position.
+			final int cx = ( trackBounds.width / 2 ) - 2;
+
+			// Save color and shift position.
+			final Color oldColor = g.getColor();
+			g.translate( trackBounds.x + cx, trackBounds.y );
+
+			// Draw selected range.
+			g.setColor( getSliderColor() );
+			for ( int x = 0; x <= 2; x++ )
+			{
+				g.drawLine( x, lowerY - trackBounds.y, x, upperY - trackBounds.y );
+			}
+
+			// Restore position and color.
+			g.translate( -( trackBounds.x + cx ), -trackBounds.y );
+			g.setColor( oldColor );
+		}
 	}
 
 }

@@ -52,7 +52,6 @@ import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.ChangeEvent;
-import javax.swing.plaf.SliderUI;
 import javax.swing.text.DefaultFormatterFactory;
 import javax.swing.text.NumberFormatter;
 
@@ -61,7 +60,7 @@ import net.miginfocom.swing.MigLayout;
 import org.scijava.listeners.Listeners;
 
 import bdv.ui.UIUtils;
-import bdv.ui.rangeslider.RangeSlider;
+//import bdv.ui.rangeslider.RangeSlider;
 //import com.jidesoft.swing.RangeSlider;
 import bdv.util.BoundedRange;
 import bvvpg.pguitools.RangeSliderPG;
@@ -139,7 +138,7 @@ class BoundedRangePanelPG extends JPanel
 		minSpinner = new JSpinner( new SpinnerNumberModel( 0.0, 0.0, 1.0, 1.0 ) );
 		maxSpinner = new JSpinner( new SpinnerNumberModel( 1.0, 0.0, 1.0, 1.0 ) );
 		rangeSlider = new RangeSliderPG( 0, SLIDER_LENGTH );
-		SliderUI sliderUI = rangeSlider.getUI();
+
 		upperBoundLabel = new JLabel();
 		lowerBoundLabel = new JLabel();
 

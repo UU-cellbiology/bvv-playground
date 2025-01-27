@@ -2,6 +2,8 @@ package bvvpg.pguitools;
 
 
 import javax.swing.JSlider;
+import javax.swing.UIManager;
+
 
 /**
  * An extension of JSlider to select a range of values using two thumb controls.
@@ -85,7 +87,15 @@ public class RangeSliderPG extends JSlider
 	@Override
 	public void updateUI()
 	{
-		setUI( new RangeSliderUIPG( this ) );
+		String currLF = UIManager.getLookAndFeel().getName();
+		if(currLF.contains( "FlatLaf" ))
+		{
+			setUI( new RangeSliderUIFL( this ) );
+		}
+		else
+		{
+			setUI( new RangeSliderUIPlain( this ) );
+		}
 		// Update UI for slider labels. This must be called after updating the
 		// UI of the slider. Refer to JSlider.updateUI().
 		updateLabelUIs();

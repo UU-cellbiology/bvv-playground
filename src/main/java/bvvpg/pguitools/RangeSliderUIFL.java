@@ -3,70 +3,25 @@ package bvvpg.pguitools;
 
 import com.formdev.flatlaf.ui.FlatSliderUI;
 import com.formdev.flatlaf.ui.FlatUIUtils;
+import com.formdev.flatlaf.util.UIScale;
 
 import java.awt.Color;
-import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
-import java.awt.RenderingHints;
-import java.awt.Shape;
 import java.awt.event.MouseEvent;
-import java.awt.geom.Ellipse2D;
+import java.awt.geom.RoundRectangle2D;
 
 import javax.swing.JComponent;
 import javax.swing.JSlider;
+import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-import javax.swing.plaf.basic.BasicSliderUI;
 
-/**
- * UI delegate for the RangeSlider component. RangeSliderUI paints two thumbs,
- * one for the lower value and one for the upper value.
- * <p>
- * This is copied from https://github.com/ernieyu/Swing-range-slider with the
- * following changes:
- * <ul>
- * <li>The slider thumbs push each other. That is, the upper thumb can be
- * dragged below the lower thumb, and it will drag the lower thumb with it, and
- * vice versa</li>
- * <li>The {@link RangeSlider#setRange(int, int)} method was added, to set both
- * the lower and upper values simultaneously.</li>
- * </ul>
- * <p>
- *
- * <pre>
- * =============================================================================
- *
- * The MIT License Copyright (c) 2010 Ernest Yu. All rights reserved.
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- * </pre>
- */
-class RangeSliderUIPG extends FlatSliderUI
+class RangeSliderUIFL extends FlatSliderUI
 {
-	/**
-	 * Color of selected range.
-	 */
-	private final Color rangeColor = Color.gray;
 
 	/**
 	 * Location and size of thumb for upper value.
@@ -96,10 +51,9 @@ class RangeSliderUIPG extends FlatSliderUI
 	 * @param b
 	 *     RangeSlider
 	 */
-	public RangeSliderUIPG( final RangeSliderPG b )
+	public RangeSliderUIFL( final RangeSliderPG b )
 	{
-		super(  );
-		//slider = b;
+		super( );
 	}
 
 	/**
@@ -118,7 +72,7 @@ class RangeSliderUIPG extends FlatSliderUI
 	 * Creates a listener to handle track events in the specified slider.
 	 */
 	@Override
-	protected TrackListener createTrackListener( final JSlider slider )
+	protected TrackListener createTrackListener( final JSlider slider_ )
 	{
 		return new RangeTrackListener();
 	}
@@ -127,7 +81,7 @@ class RangeSliderUIPG extends FlatSliderUI
 	 * Creates a listener to handle change events in the specified slider.
 	 */
 	@Override
-	protected ChangeListener createChangeListener( final JSlider slider )
+	protected ChangeListener createChangeListener( final JSlider slider_ )
 	{
 		return new ChangeHandler();
 	}
@@ -191,7 +145,7 @@ class RangeSliderUIPG extends FlatSliderUI
 
 		// Calculate upper thumb location. The thumb is centered over its
 		// value on the track.
-		if ( slider.getOrientation() == JSlider.HORIZONTAL )
+		if ( slider.getOrientation() == SwingConstants.HORIZONTAL )
 		{
 			final int upperPosition = xPositionForValue( slider.getValue() + slider.getExtent() );
 			upperThumbRect.x = upperPosition - ( upperThumbRect.width / 2 );
@@ -205,15 +159,6 @@ class RangeSliderUIPG extends FlatSliderUI
 			upperThumbRect.y = upperPosition - ( upperThumbRect.height / 2 );
 		}
 	}
-
-	/**
-	 * Returns the size of a thumb.
-	 */
-//	@Override
-//	protected Dimension getThumbSize()
-//	{
-//		return new Dimension( 12, 12 );
-//	}
 
 	/**
 	 * Paints the slider. The selected thumb is always painted on top of the
@@ -255,64 +200,56 @@ class RangeSliderUIPG extends FlatSliderUI
 	/**
 	 * Paints the track.
 	 */
-//	@Override
+	@Override
 	public void paintTrack( final Graphics g )
 	{
-		// Draw track.
-		super.paintTrack( g );
+		boolean enabled = slider.isEnabled();
+		float tw = UIScale.scale( (float) trackWidth );
+		float arc = tw;
 
-		final Rectangle trackBounds = trackRect;
+		RoundRectangle2D coloredTrack = null;
+		RoundRectangle2D track;
 
-		if ( slider.getOrientation() == JSlider.HORIZONTAL )
-		{
-			// Determine position of selected range by moving from the middle
-			// of one thumb to the other.
+		if( slider.getOrientation() == SwingConstants.HORIZONTAL ) {
 			final int lowerX = thumbRect.x + ( thumbRect.width / 2 );
 			final int upperX = upperThumbRect.x + ( upperThumbRect.width / 2 );
-
-			// Determine track position.
-			final int cy = ( trackBounds.height / 2 ) - 2;
-
-			// Save color and shift position.
-			final Color oldColor = g.getColor();
-			g.translate( trackBounds.x, trackBounds.y + cy );
-
-			// Draw selected range.
-			g.setColor( getSliderColor() );
-			for ( int y = 0; y <= 2; y++ )
-			{
-				g.drawLine( lowerX - trackBounds.x, y, upperX - trackBounds.x, y );
-			}
-
-			// Restore position and color.
-			g.translate( -trackBounds.x, -( trackBounds.y + cy ) );
-			g.setColor( oldColor );
-
+			float y = trackRect.y + (trackRect.height - tw) / 2f;
+			if( enabled && isRoundThumb() ) {
+				if( slider.getComponentOrientation().isLeftToRight() ) {
+					//int cw = thumbRect.x + (thumbRect.width / 2) - trackRect.x;
+					int cw = upperX - lowerX;
+					coloredTrack = new RoundRectangle2D.Float( lowerX, y, cw, tw, arc, arc );
+					track = new RoundRectangle2D.Float( trackRect.x, y, trackRect.width, tw, arc, arc );
+				} else {
+					int cw = lowerX - upperX;
+					//int cw = trackRect.x + trackRect.width - thumbRect.x - (thumbRect.width / 2);
+					coloredTrack = new RoundRectangle2D.Float( upperX, y, cw, tw, arc, arc );
+					track = new RoundRectangle2D.Float( trackRect.x, y, trackRect.width, tw, arc, arc );
+				}
+			} else
+				track = new RoundRectangle2D.Float( trackRect.x, y, trackRect.width, tw, arc, arc );
+		//not tested, but should work
+		} else {
+			final int lowerY = thumbRect.y + ( thumbRect.height / 2 );
+			final int upperY = upperThumbRect.y + ( upperThumbRect.height / 2 );
+			float x = trackRect.x + (trackRect.width - tw) / 2f;
+			if( enabled && isRoundThumb() ) {
+				//int ch = thumbRect.y + (thumbRect.height / 2) - trackRect.y;
+				int ch = upperY - lowerY;
+				track = new RoundRectangle2D.Float( x, trackRect.y, tw, trackRect.height, arc, arc );
+				coloredTrack = new RoundRectangle2D.Float( x, lowerY, tw, trackRect.height - ch, arc, arc );
+			} else
+				track = new RoundRectangle2D.Float( x, trackRect.y, tw, trackRect.height, arc, arc );
 		}
-		else
+		
+		
+		g.setColor( enabled ? getTrackColor() : disabledTrackColor );
+		((Graphics2D)g).fill( track );
+		
+		if( coloredTrack != null ) 
 		{
-			// Determine position of selected range by moving from the middle
-			// of one thumb to the other.
-			final int lowerY = thumbRect.x + ( thumbRect.width / 2 );
-			final int upperY = upperThumbRect.x + ( upperThumbRect.width / 2 );
-
-			// Determine track position.
-			final int cx = ( trackBounds.width / 2 ) - 2;
-
-			// Save color and shift position.
-			final Color oldColor = g.getColor();
-			g.translate( trackBounds.x + cx, trackBounds.y );
-
-			// Draw selected range.
-			g.setColor( getSliderColor() );
-			for ( int x = 0; x <= 2; x++ )
-			{
-				g.drawLine( x, lowerY - trackBounds.y, x, upperY - trackBounds.y );
-			}
-
-			// Restore position and color.
-			g.translate( -( trackBounds.x + cx ), -trackBounds.y );
-			g.setColor( oldColor );
+			g.setColor( getTrackValueColor() );
+			((Graphics2D)g).fill( coloredTrack );
 		}
 	}
 
@@ -326,36 +263,35 @@ class RangeSliderUIPG extends FlatSliderUI
 		// Do nothing.
 	}
 
-	private Color getSliderFillColor()
+	private void paintThumbLU(final Graphics g, final Rectangle rec)
 	{
-		return slider.isEnabled() ? Color.lightGray : Color.white;
-	}
-
-	private Color getSliderColor()
-	{
-		return slider.isEnabled() ? Color.darkGray : Color.lightGray;
-	}
-
-	/**
-	 * Paints the thumb for the lower value using the specified graphics object.
-	 */
-	private void paintLowerThumb( final Graphics g )
-	{
-		//Color thumbColor = getThumbColor();
+		Object[] oldRenderingHints = FlatUIUtils.setRenderingHints( g );
+		Color thumbColor_ = getThumbColor();
 		Color defaultForeground = UIManager.getColor( "Slider.foreground" );
 		Color color = stateColor( slider, thumbHover, thumbPressed,
-			thumbColor, disabledThumbColor, null, hoverThumbColor, pressedThumbColor );
-		color = FlatUIUtils.deriveColor( color, thumbColor );
+			thumbColor_, disabledThumbColor, null, hoverThumbColor, pressedThumbColor );
+		color = FlatUIUtils.deriveColor( color, thumbColor_ );
 
 		Color foreground = slider.getForeground();
 		Color borderColor = (thumbBorderColor != null && foreground == defaultForeground)
 			? stateColor( slider, false, false, thumbBorderColor, disabledThumbBorderColor, focusedThumbBorderColor, null, null )
 			: null;
 
-		//Color focusedColor = FlatUIUtils.deriveColor( this.focusedColor,
-		//	(foreground != defaultForeground) ? foreground : focusBaseColor );
+		Color focusedColor_ = FlatUIUtils.deriveColor( this.focusedColor,
+			(foreground != defaultForeground) ? foreground : focusBaseColor );
 
-		paintThumb( g, slider, thumbRect, isRoundThumb(), color, borderColor, focusedColor, thumbBorderWidth, focusWidth );
+		paintThumb( g, slider, rec, isRoundThumb(), color, borderColor, focusedColor_, thumbBorderWidth, focusWidth );
+		FlatUIUtils.resetRenderingHints( g, oldRenderingHints );
+		oldRenderingHints = null;
+	}
+	/**
+	 * Paints the thumb for the lower value using the specified graphics object.
+	 */
+	private void paintLowerThumb( final Graphics g )
+	{
+		
+		paintThumbLU(g, thumbRect);
+		
 	}
 
 	/**
@@ -363,35 +299,9 @@ class RangeSliderUIPG extends FlatSliderUI
 	 */
 	private void paintUpperThumb( final Graphics g )
 	{
-		//final Rectangle knobBounds = upperThumbRect;
-		//Color thumbColor = getThumbColor();
-		Color defaultForeground = UIManager.getColor( "Slider.foreground" );
-		Color color = stateColor( slider, thumbHover, thumbPressed,
-			thumbColor, disabledThumbColor, null, hoverThumbColor, pressedThumbColor );
-		color = FlatUIUtils.deriveColor( color, thumbColor );
-
-		Color foreground = slider.getForeground();
-		Color borderColor = (thumbBorderColor != null && foreground == defaultForeground)
-			? stateColor( slider, false, false, thumbBorderColor, disabledThumbBorderColor, focusedThumbBorderColor, null, null )
-			: null;
-
-		//Color focusedColor = FlatUIUtils.deriveColor( this.focusedColor,
-		//	(foreground != defaultForeground) ? foreground : focusBaseColor );
-
-		paintThumb( g, slider, upperThumbRect, isRoundThumb(), color, borderColor, focusedColor, thumbBorderWidth, focusWidth );
-
+		paintThumbLU(g, upperThumbRect);
 	}
-
-	/**
-	 * Returns a Shape representing a thumb.
-	 */
-	private Shape createThumbShape( final int width, final int height )
-	{
-		// Use circular shape.
-		final Ellipse2D shape = new Ellipse2D.Double( 0, 0, width, height );
-		return shape;
-	}
-
+	
 	/**
 	 * Sets the location of the upper thumb, and repaints the slider. This is
 	 * called when the upper thumb is dragged to repaint the slider. The
@@ -533,10 +443,10 @@ class RangeSliderUIPG extends FlatSliderUI
 			{
 				switch ( slider.getOrientation() )
 				{
-				case JSlider.VERTICAL:
+				case SwingConstants.VERTICAL:
 					offset = currentMouseY - thumbRect.y;
 					break;
-				case JSlider.HORIZONTAL:
+				case SwingConstants.HORIZONTAL:
 					offset = currentMouseX - thumbRect.x;
 					break;
 				}
@@ -551,10 +461,10 @@ class RangeSliderUIPG extends FlatSliderUI
 			{
 				switch ( slider.getOrientation() )
 				{
-				case JSlider.VERTICAL:
+				case SwingConstants.VERTICAL:
 					offset = currentMouseY - upperThumbRect.y;
 					break;
-				case JSlider.HORIZONTAL:
+				case SwingConstants.HORIZONTAL:
 					offset = currentMouseX - upperThumbRect.x;
 					break;
 				}
@@ -610,8 +520,8 @@ class RangeSliderUIPG extends FlatSliderUI
 		{
 			int thumbMiddle = 0;
 
-			final RangeSliderPG slider = ( RangeSliderPG ) RangeSliderUIPG.this.slider;
-			if ( slider.getOrientation() == JSlider.VERTICAL )
+			final RangeSliderPG slider_ = ( RangeSliderPG ) RangeSliderUIFL.this.slider;
+			if ( slider_.getOrientation() == SwingConstants.VERTICAL )
 			{
 				final int halfThumbHeight = thumbRect.height / 2;
 				int thumbTop = currentMouseY - offset;
@@ -627,14 +537,14 @@ class RangeSliderUIPG extends FlatSliderUI
 				thumbMiddle = thumbTop + halfThumbHeight;
 
 				final int lower = valueForYPosition( thumbMiddle );
-				final int upper = Math.max( lower, slider.getUpperValue() );
+				final int upper = Math.max( lower, slider_.getUpperValue() );
 
 				final int upperThumbTop = yPositionForValue( upper ) - halfThumbHeight;
 				setUpperThumbLocation( thumbRect.x, upperThumbTop );
 
-				slider.setRange( lower, upper );
+				slider_.setRange( lower, upper );
 			}
-			else if ( slider.getOrientation() == JSlider.HORIZONTAL )
+			else if ( slider_.getOrientation() == SwingConstants.HORIZONTAL )
 			{
 				final int halfThumbWidth = thumbRect.width / 2;
 				int thumbLeft = currentMouseX - offset;
@@ -649,12 +559,12 @@ class RangeSliderUIPG extends FlatSliderUI
 				// Update slider range.
 				thumbMiddle = thumbLeft + halfThumbWidth;
 				final int lower = valueForXPosition( thumbMiddle );
-				final int upper = Math.max( lower, slider.getUpperValue() );
+				final int upper = Math.max( lower, slider_.getUpperValue() );
 
 				final int upperThumbLeft = xPositionForValue( upper ) - halfThumbWidth;
 				setUpperThumbLocation( upperThumbLeft, thumbRect.y );
 
-				slider.setRange( lower, upper );
+				slider_.setRange( lower, upper );
 			}
 		}
 
@@ -666,8 +576,8 @@ class RangeSliderUIPG extends FlatSliderUI
 		{
 			int thumbMiddle = 0;
 
-			final RangeSliderPG slider = ( RangeSliderPG ) RangeSliderUIPG.this.slider;
-			if ( slider.getOrientation() == JSlider.VERTICAL )
+			final RangeSliderPG slider_ = ( RangeSliderPG ) RangeSliderUIFL.this.slider;
+			if ( slider_.getOrientation() == SwingConstants.VERTICAL )
 			{
 				final int halfThumbHeight = thumbRect.height / 2;
 				int thumbTop = currentMouseY - offset;
@@ -682,14 +592,14 @@ class RangeSliderUIPG extends FlatSliderUI
 				// Update slider extent.
 				thumbMiddle = thumbTop + halfThumbHeight;
 				final int upper = valueForYPosition( thumbMiddle );
-				final int lower = Math.min( upper, slider.getValue() );
+				final int lower = Math.min( upper, slider_.getValue() );
 
 				final int lowerThumbTop = yPositionForValue( lower ) - halfThumbHeight;
 				setThumbLocation( thumbRect.x, lowerThumbTop );
 
-				slider.setRange( lower, upper );
+				slider_.setRange( lower, upper );
 			}
-			else if ( slider.getOrientation() == JSlider.HORIZONTAL )
+			else if ( slider_.getOrientation() == SwingConstants.HORIZONTAL )
 			{
 				final int halfThumbWidth = thumbRect.width / 2;
 				int thumbLeft = currentMouseX - offset;
@@ -704,12 +614,12 @@ class RangeSliderUIPG extends FlatSliderUI
 				// Update slider range.
 				thumbMiddle = thumbLeft + halfThumbWidth;
 				final int upper = valueForXPosition( thumbMiddle );
-				final int lower = Math.min( upper, slider.getValue() );
+				final int lower = Math.min( upper, slider_.getValue() );
 
 				final int lowerThumbLeft = xPositionForValue( lower ) - halfThumbWidth;
 				setThumbLocation( lowerThumbLeft, thumbRect.y );
 
-				slider.setRange( lower, upper );
+				slider_.setRange( lower, upper );
 			}
 		}
 	}

@@ -1,6 +1,8 @@
 package bvvpg.pguitools;
 
 import javax.swing.JSlider;
+import javax.swing.UIManager;
+import javax.swing.plaf.SliderUI;
 
 
 public class ValueSlider extends JSlider
@@ -29,7 +31,15 @@ public class ValueSlider extends JSlider
 	@Override
 	public void updateUI()
 	{
-		setUI( new ValueSliderUI( this ) );
+		String currLF = UIManager.getLookAndFeel().getName();
+		if(currLF.contains( "FlatLaf" ))
+		{
+			setUI((SliderUI) UIManager.getUI(this));
+		}
+		else
+		{
+			setUI( new ValueSliderUI( this ) );
+		}
 		// Update UI for slider labels. This must be called after updating the
 		// UI of the slider. Refer to JSlider.updateUI().
 		updateLabelUIs();
