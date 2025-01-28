@@ -50,7 +50,9 @@ class RangeSliderUIFL extends FlatSliderUI
 	 */
 	private transient boolean trackDragging;
 	
+	private boolean bLowerHover;
 	
+	private boolean bUpperHover;
 
 	/**
 	 * Constructs a RangeSliderUI for the specified slider component.
@@ -71,8 +73,6 @@ class RangeSliderUIFL extends FlatSliderUI
 	{
 		upperThumbRect = new Rectangle();
 		super.installUI( c );
-		
-		
 	}
 
 	/**
@@ -270,24 +270,44 @@ class RangeSliderUIFL extends FlatSliderUI
 		// Do nothing.
 	}
 
-	private void paintThumbLU(final Graphics g, final Rectangle rec)
+	private void paintThumbLU(final Graphics g, int nThumb)
 	{
+		final Rectangle rec;
+		boolean thumbHover_ = thumbHover;
+		boolean thumbPressed_ = thumbPressed;
+		if(nThumb == 0)
+		{
+			rec = thumbRect;
+			thumbHover_ = bLowerHover;
+			thumbPressed_ = lowerDragging;
+		}
+		else
+		{
+			rec = upperThumbRect;
+			thumbHover_ = bUpperHover;
+			thumbPressed_ = upperDragging;
+		}
+		
+		
 		Object[] oldRenderingHints = FlatUIUtils.setRenderingHints( g );
+		//thumbHover = false;
+		//thumbPressed = false;
+		
 		Color thumbColor_ = getThumbColor();
 		Color defaultForeground = UIManager.getColor( "Slider.foreground" );
-		Color color = stateColor( slider, thumbHover, thumbPressed,
+		Color color = FlatSliderUI.stateColor( slider, thumbHover_, thumbPressed_,
 			thumbColor_, disabledThumbColor, null, hoverThumbColor, pressedThumbColor );
 		color = FlatUIUtils.deriveColor( color, thumbColor_ );
 
 		Color foreground = slider.getForeground();
 		Color borderColor = (thumbBorderColor != null && foreground == defaultForeground)
-			? stateColor( slider, false, false, thumbBorderColor, disabledThumbBorderColor, focusedThumbBorderColor, null, null )
+			? FlatSliderUI.stateColor( slider, false, false, thumbBorderColor, disabledThumbBorderColor, focusedThumbBorderColor, null, null )
 			: null;
 
 		Color focusedColor_ = FlatUIUtils.deriveColor( this.focusedColor,
 			(foreground != defaultForeground) ? foreground : focusBaseColor );
 
-		paintThumb( g, slider, rec, isRoundThumb(), color, borderColor, focusedColor_, thumbBorderWidth, focusWidth );
+		FlatSliderUI.paintThumb( g, slider, rec, isRoundThumb(), color, borderColor, focusedColor_, thumbBorderWidth, focusWidth );
 		FlatUIUtils.resetRenderingHints( g, oldRenderingHints );
 		oldRenderingHints = null;
 	}
@@ -297,7 +317,7 @@ class RangeSliderUIFL extends FlatSliderUI
 	private void paintLowerThumb( final Graphics g )
 	{
 		
-		paintThumbLU(g, thumbRect);
+		paintThumbLU(g, 0);
 		
 	}
 
@@ -306,7 +326,7 @@ class RangeSliderUIFL extends FlatSliderUI
 	 */
 	private void paintUpperThumb( final Graphics g )
 	{
-		paintThumbLU(g, upperThumbRect);
+		paintThumbLU(g, 1);
 	}
 	
 	/**
@@ -715,7 +735,55 @@ class RangeSliderUIFL extends FlatSliderUI
 			{
 				setMouseCursor(Cursor.DEFAULT_CURSOR);
 			}
+			
+			boolean bRepaint = false;
+			
+			if(thumbRect.contains( currentMouseX, currentMouseY ) != bLowerHover)
+			{
+					bLowerHover = !bLowerHover;
+					bRepaint = true;
+			}
 
+			if(upperThumbRect.contains( currentMouseX, currentMouseY )!= bUpperHover)
+			{
+				bUpperHover = !bUpperHover;
+				bRepaint = true;
+			}
+
+			if(bRepaint)
+				slider.repaint();
+	
+
+		}
+		@Override
+		public void mouseClicked(MouseEvent e) 
+		{
+			if (e.getClickCount() == 2) 
+			{
+				final RangeSliderPG slider_ = ( RangeSliderPG ) RangeSliderUIFL.this.slider;
+				if(thumbRect.contains( currentMouseX, currentMouseY ))
+				{
+					slider_.setValue( slider_.getMinimum() );
+				}
+				if(upperThumbRect.contains( currentMouseX, currentMouseY ))
+				{
+					slider_.setUpperValue( slider_.getMaximum() );
+				}
+				Rectangle mid = getMiddleTrackRectangle();
+				if(mid.contains( currentMouseX, currentMouseY ))
+				{
+					slider_.setRange( slider_.getMinimum(), slider.getMaximum()  );
+				}
+			}
+		}	
+		
+		@Override
+		public void mouseExited(MouseEvent e) 
+		{
+			bUpperHover = false;
+			bLowerHover = false;
+			slider.repaint();
+			setMouseCursor(Cursor.DEFAULT_CURSOR);
 		}
 		
 		Rectangle getMiddleTrackRectangle()

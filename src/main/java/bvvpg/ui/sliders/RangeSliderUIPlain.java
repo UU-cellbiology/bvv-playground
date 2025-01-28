@@ -48,6 +48,10 @@ class RangeSliderUIPlain extends BasicSliderUI
 	 * Indicator that determines whether track is being dragged.
 	 */
 	private transient boolean trackDragging;
+	
+	private boolean bLowerHover;
+	
+	private boolean bUpperHover;
 
 	/**
 	 * Constructs a RangeSliderUIPlain for the specified slider component.
@@ -292,12 +296,27 @@ class RangeSliderUIPlain extends BasicSliderUI
 		return slider.isEnabled() ? Color.darkGray : Color.lightGray;
 	}
 
-	/**
-	 * Paints the thumb for the lower value using the specified graphics object.
-	 */
-	private void paintLowerThumb( final Graphics g )
+	private Color getSliderHoverColor()
 	{
-		final Rectangle knobBounds = thumbRect;
+		return Color.lightGray.darker();
+	}
+
+	
+	private void paintThumbLU(final Graphics g, int nThumb)
+	{
+		final Rectangle knobBounds;
+		boolean thumbHover_ = false;
+		if(nThumb == 0)
+		{
+			knobBounds = thumbRect;
+			thumbHover_ = bLowerHover || lowerDragging;
+		}
+		else
+		{
+			knobBounds = upperThumbRect;
+			thumbHover_ = bUpperHover || upperDragging;
+		}
+		
 		final int w = knobBounds.width;
 		final int h = knobBounds.height;
 
@@ -312,7 +331,11 @@ class RangeSliderUIPlain extends BasicSliderUI
 				RenderingHints.VALUE_ANTIALIAS_ON );
 		g2d.translate( knobBounds.x, knobBounds.y );
 
-		final Color sliderFillColor = getSliderFillColor();
+		final Color sliderFillColor;
+		if(!thumbHover_)
+			sliderFillColor = getSliderFillColor();
+		else
+			sliderFillColor = getSliderHoverColor();
 		g2d.setColor( sliderFillColor );
 		g2d.fill( thumbShape );
 
@@ -322,6 +345,7 @@ class RangeSliderUIPlain extends BasicSliderUI
 
 		// Dispose graphics.
 		g2d.dispose();
+		
 	}
 
 	/**
@@ -329,31 +353,15 @@ class RangeSliderUIPlain extends BasicSliderUI
 	 */
 	private void paintUpperThumb( final Graphics g )
 	{
-		final Rectangle knobBounds = upperThumbRect;
-		final int w = knobBounds.width;
-		final int h = knobBounds.height;
-
-		// Create graphics copy.
-		final Graphics2D g2d = ( Graphics2D ) g.create();
-
-		// Create default thumb shape.
-		final Shape thumbShape = createThumbShape( w - 1, h - 1 );
-
-		// Draw thumb.
-		g2d.setRenderingHint( RenderingHints.KEY_ANTIALIASING,
-				RenderingHints.VALUE_ANTIALIAS_ON );
-		g2d.translate( knobBounds.x, knobBounds.y );
-
-		final Color sliderFillColor = getSliderFillColor();
-		g2d.setColor( sliderFillColor );
-		g2d.fill( thumbShape );
-
-		final Color sliderColor = getSliderColor();
-		g2d.setColor( sliderColor );
-		g2d.draw( thumbShape );
-
-		// Dispose graphics.
-		g2d.dispose();
+		paintThumbLU(g,1);
+	}
+	
+	/**
+	 * Paints the thumb for the lower value using the specified graphics object.
+	 */
+	private void paintLowerThumb( final Graphics g )
+	{
+		paintThumbLU(g,0);
 	}
 
 	/**
@@ -772,7 +780,56 @@ class RangeSliderUIPlain extends BasicSliderUI
 			{
 				setMouseCursor(Cursor.DEFAULT_CURSOR);
 			}
+			
+			boolean bRepaint = false;
+			
+			if(thumbRect.contains( currentMouseX, currentMouseY ) != bLowerHover)
+			{
+					bLowerHover = !bLowerHover;
+					bRepaint = true;
+			}
 
+			if(upperThumbRect.contains( currentMouseX, currentMouseY )!= bUpperHover)
+			{
+				bUpperHover = !bUpperHover;
+				bRepaint = true;
+			}
+
+			if(bRepaint)
+				slider.repaint();
+
+		}
+		
+		//double click moves thumbs to min/max
+		@Override
+		public void mouseClicked(MouseEvent e) 
+		{
+			if (e.getClickCount() == 2) 
+			{
+				final RangeSliderPG slider_ = ( RangeSliderPG ) RangeSliderUIPlain.this.slider;
+				if(thumbRect.contains( currentMouseX, currentMouseY ))
+				{
+					slider_.setValue( slider_.getMinimum() );
+				}
+				if(upperThumbRect.contains( currentMouseX, currentMouseY ))
+				{
+					slider_.setUpperValue( slider_.getMaximum() );
+				}
+				Rectangle mid = getMiddleTrackRectangle();
+				if(mid.contains( currentMouseX, currentMouseY ))
+				{
+					slider_.setRange( slider_.getMinimum(), slider.getMaximum()  );
+				}
+			}
+		}
+		
+		@Override
+		public void mouseExited(MouseEvent e) 
+		{
+			bUpperHover = false;
+			bLowerHover = false;
+			slider.repaint();
+			setMouseCursor(Cursor.DEFAULT_CURSOR);
 		}
 		
 		Rectangle getMiddleTrackRectangle()
