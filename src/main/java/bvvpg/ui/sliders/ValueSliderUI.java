@@ -1,7 +1,6 @@
 package bvvpg.ui.sliders;
 
 import java.awt.Color;
-import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -15,7 +14,6 @@ import javax.swing.JComponent;
 import javax.swing.JSlider;
 import javax.swing.SwingConstants;
 import javax.swing.plaf.basic.BasicSliderUI;
-
 
 
 /** BigVolumeViewer style single thumb slider **/

@@ -96,7 +96,7 @@ and add the corresponding dependency:
 ```
 ### Shipping of bvv-playground with FIJI
 
-Apart from [bvv-playground.jar](https://maven.scijava.org/#nexus-search;quick~bvv-playground) you would have to additionally upload to the update site [jide-oss.jar](https://mvnrepository.com/artifact/com.formdev/jide-oss/3.7.15) and its [flatlaf theme](https://mvnrepository.com/artifact/com.formdev/flatlaf-jide-oss/3.5). 
+You need to download and ship the latest _bvv-playground-X.X.X.jar_ from [maven](https://maven.scijava.org/#nexus-search;quick~bvv-playground) or [release](https://github.com/UU-cellbiology/bvv-playground/releases). 
 
 
 ----------
