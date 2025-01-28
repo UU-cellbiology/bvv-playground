@@ -810,10 +810,12 @@ class RangeSliderUIPlain extends BasicSliderUI
 				if(thumbRect.contains( currentMouseX, currentMouseY ))
 				{
 					slider_.setValue( slider_.getMinimum() );
+					return;
 				}
 				if(upperThumbRect.contains( currentMouseX, currentMouseY ))
 				{
 					slider_.setUpperValue( slider_.getMaximum() );
+					return;
 				}
 				Rectangle mid = getMiddleTrackRectangle();
 				if(mid.contains( currentMouseX, currentMouseY ))
