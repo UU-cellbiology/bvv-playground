@@ -168,11 +168,6 @@
 			<artifactId>spim_data</artifactId>
 		</dependency>
 		<!-- Playground specific dependencies -->
-		<dependency> 
-    		<groupId>com.formdev</groupId> 
-    		<artifactId>jide-oss</artifactId> 
-    		<version>3.7.15</version>
-  		</dependency> 
   		<dependency>
 			<groupId>net.imagej</groupId>
 			<artifactId>ij</artifactId>

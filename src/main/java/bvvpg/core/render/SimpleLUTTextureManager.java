@@ -37,8 +37,7 @@ import java.util.Iterator;
 import java.util.Map;
 
 import bvvpg.core.backend.GpuContext;
-import bvvpg.pguitools.GammaConverterSetup;
-import bvvpg.pguitools.LutCSTexturePG;
+import bvvpg.source.converters.GammaConverterSetup;
 
 
 

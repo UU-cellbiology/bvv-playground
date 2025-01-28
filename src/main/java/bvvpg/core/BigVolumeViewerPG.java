@@ -40,11 +40,11 @@ import bdv.ui.keymap.KeymapSettingsPage;
 import bdv.viewer.ConverterSetups;
 import bdv.viewer.NavigationActions;
 import bdv.viewer.ViewerState;
-import bvvpg.pguitools.BrightnessColorDialog;
-import bvvpg.pguitools.BvvGamma;
-import bvvpg.pguitools.GammaConverterSetup;
-import bvvpg.pguitools.MinMaxGroupPG;
-import bvvpg.pguitools.SetupAssignmentsPG;
+import bvvpg.source.converters.GammaConverterSetup;
+import bvvpg.source.converters.MinMaxGroupPG;
+import bvvpg.source.converters.SetupAssignmentsPG;
+import bvvpg.ui.panels.BrightnessColorDialog;
+import bvvpg.vistools.BvvGamma;
 import dev.dirs.ProjectDirectories;
 import java.io.File;
 import java.io.FileWriter;
@@ -161,12 +161,12 @@ public class BigVolumeViewerPG
 		}
 
 		setupAssignments = new SetupAssignmentsPG( new ArrayList<>( converterSetups ), 0, 65535 );
-		if ( setupAssignments.getMinMaxGroups().size() > 0 )
-		{
-			final MinMaxGroupPG group = setupAssignments.getMinMaxGroups().get( 0 );
-			for ( final ConverterSetup setup : setupAssignments.getConverterSetups() )
-				setupAssignments.moveSetupToGroup( setup, group );
-		}
+//		if ( setupAssignments.getMinMaxGroups().size() > 0 )
+//		{
+//			final MinMaxGroupPG group = setupAssignments.getMinMaxGroups().get( 0 );
+//			for ( final ConverterSetup setup : setupAssignments.getConverterSetups() )
+//				setupAssignments.moveSetupToGroup( setup, group );
+//		}
 		
 		//brightnessDialog = new BrightnessDialogBT( viewerFrame, setupAssignments );
 		brightnessDialog = new BrightnessColorDialog( viewerFrame, viewer, setups );

@@ -65,7 +65,7 @@ import bvvpg.core.render.RenderData;
 import bvvpg.core.render.VolumeRenderer;
 import bvvpg.core.render.VolumeRenderer.RepaintType;
 import bvvpg.core.util.MatrixMath;
-import bvvpg.pguitools.ConverterSetupsPG;
+import bvvpg.source.converters.ConverterSetupsPG;
 
 import com.jogamp.opengl.GL3;
 import com.jogamp.opengl.GLAutoDrawable;

@@ -33,7 +33,7 @@ import bdv.viewer.ConverterSetups;
 import bdv.viewer.SourceAndConverter;
 import bdv.viewer.SourceToConverterSetupBimap;
 import bdv.viewer.ViewerState;
-import bvvpg.pguitools.GammaConverterSetup;
+import bvvpg.source.converters.GammaConverterSetup;
 import gnu.trove.map.TObjectIntMap;
 import gnu.trove.map.hash.TObjectIntHashMap;
 import java.util.ArrayList;

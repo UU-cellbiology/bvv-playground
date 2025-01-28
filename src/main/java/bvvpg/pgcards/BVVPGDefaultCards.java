@@ -45,7 +45,8 @@ import bdv.ui.viewermodepanel.DisplaySettingsPanel;
 import bdv.viewer.AbstractViewerPanel;
 import bdv.viewer.ViewerState;
 import bvvpg.pgcards.sourcetable.SourceTablePG;
-import bvvpg.pguitools.ConverterSetupsPG;
+import bvvpg.source.converters.ConverterSetupsPG;
+import bvvpg.ui.panels.ConverterSetupEditPanelPG;
 
 public class BVVPGDefaultCards 
 {

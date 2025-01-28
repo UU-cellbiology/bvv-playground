@@ -40,7 +40,7 @@ import bdv.viewer.TimePointListener;
 import bdv.viewer.TransformListener;
 import bdv.viewer.ViewerStateChangeListener;
 import bvvpg.core.VolumeViewerPanel;
-import bvvpg.pguitools.SetupAssignmentsPG;
+import bvvpg.source.converters.SetupAssignmentsPG;
 
 import java.awt.Dimension;
 import java.util.ArrayList;
