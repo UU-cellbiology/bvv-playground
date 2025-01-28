@@ -71,6 +71,17 @@ public class RangeSliderPG extends JSlider
 		super( min, max );
 		initSlider();
 	}
+	
+	/**
+	 * Constructs a RangeSlider with the specified default minimum and maximum
+	 * values and specified lower and upper value.
+	 */
+	public RangeSliderPG( final int min, final int max, final int lower, final int upper)
+	{
+		super( min, max );
+		initSlider();
+		this.setRange(lower, upper);
+	}
 
 	/**
 	 * Initializes the slider by setting default properties.
@@ -129,6 +140,11 @@ public class RangeSliderPG extends JSlider
 		getModel().setRangeProperties( newValue, newExtent, getMinimum(),
 				getMaximum(), getValueIsAdjusting() );
 	}
+	
+	public void setLowerValue( final int value )
+	{
+		setValue(value);
+	}
 
 	/**
 	 * Returns the upper value in the range.
@@ -136,6 +152,14 @@ public class RangeSliderPG extends JSlider
 	public int getUpperValue()
 	{
 		return getValue() + getExtent();
+	}
+	
+	/**
+	 * Returns the lower value in the range.
+	 */
+	public int getLowerValue()
+	{
+		return getValue() ;
 	}
 
 	/**
