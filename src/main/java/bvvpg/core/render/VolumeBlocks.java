@@ -226,7 +226,7 @@ public class VolumeBlocks
 	 * </ul>
 	 *
 	 * @param NUM_BLOCK_SCALES
-	 * @return
+	 * @return array for shader
 	 */
 	public float[][] getLutBlockScales( final int NUM_BLOCK_SCALES )
 	{

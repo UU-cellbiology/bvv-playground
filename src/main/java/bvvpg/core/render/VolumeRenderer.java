@@ -45,8 +45,6 @@ import static com.jogamp.opengl.GL.GL_ONE_MINUS_SRC_ALPHA;
 import static com.jogamp.opengl.GL.GL_SRC_ALPHA;
 import static com.jogamp.opengl.GL.GL_UNPACK_ALIGNMENT;
 
-import com.jogamp.opengl.GL2ES2;
-import com.jogamp.opengl.GL2ES3;
 import com.jogamp.opengl.GL3;
 
 import java.util.ArrayList;
@@ -109,10 +107,10 @@ public class VolumeRenderer
 			this.type = NONE;
 		}
 
-		void request( final RepaintType type )
+		void request( final RepaintType type_ )
 		{
-			if ( this.type.ordinal() < type.ordinal() )
-				this.type = type;
+			if ( this.type.ordinal() < type_.ordinal() )
+				this.type = type_;
 		}
 	}
 
@@ -227,9 +225,9 @@ public class VolumeRenderer
 
 	private MultiVolumeShaderMip createMultiVolumeShader( final VolumeShaderSignature signature )
 	{
-		final MultiVolumeShaderMip progvol = new MultiVolumeShaderMip( signature, true, 1.0 );
-		progvol.setTextureCache( textureCache );
-		return progvol;
+		final MultiVolumeShaderMip progvol_ = new MultiVolumeShaderMip( signature, true, 1.0 );
+		progvol_.setTextureCache( textureCache );
+		return progvol_;
 	}
 
 	public void init( final GL3 gl )

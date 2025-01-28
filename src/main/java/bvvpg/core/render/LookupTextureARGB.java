@@ -72,11 +72,11 @@ public class LookupTextureARGB implements Texture3D
 	 * Reinitialize the lut data.
 	 *
 	 * @param rmin min source grid coordinate that needs to be represented.
-	 * @param rmin max source grid coordinate that needs to be represented.
+	 * @param rmax max source grid coordinate that needs to be represented.
 	 */
-	public void init( final int[] rmin, final int[] rmax, final int baseLevel )
+	public void init( final int[] rmin, final int[] rmax, final int baseLevel_ )
 	{
-		this.baseLevel = baseLevel;
+		this.baseLevel = baseLevel_;
 
 		size[ 0 ] = rmax[ 0 ] - rmin[ 0 ] + 1 + 2 * pad[ 0 ];
 		size[ 1 ] = rmax[ 1 ] - rmin[ 1 ] + 1 + 2 * pad[ 1 ];

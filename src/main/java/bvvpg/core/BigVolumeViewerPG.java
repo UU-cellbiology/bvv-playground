@@ -41,7 +41,6 @@ import bdv.viewer.ConverterSetups;
 import bdv.viewer.NavigationActions;
 import bdv.viewer.ViewerState;
 import bvvpg.source.converters.GammaConverterSetup;
-import bvvpg.source.converters.MinMaxGroupPG;
 import bvvpg.source.converters.SetupAssignmentsPG;
 import bvvpg.ui.panels.BrightnessColorDialog;
 import bvvpg.vistools.BvvGamma;

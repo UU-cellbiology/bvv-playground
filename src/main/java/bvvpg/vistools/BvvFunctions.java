@@ -111,9 +111,9 @@ public class BvvFunctions
 			handle.getCacheControls().addCacheControl( viewData.getCacheControl() );
 		}
 		else
-			type = Util.getTypeFromInterval( img );
+			type = img.getType();
 
-		return (BvvStackSource<T>) addRandomAccessibleInterval( handle, ( RandomAccessibleInterval ) img, ( NumericType ) type, name, axisOrder, sourceTransform );
+		return addRandomAccessibleInterval( handle, ( RandomAccessibleInterval ) img, ( NumericType ) type, name, axisOrder, sourceTransform );
 	}
 
 	public static < T > BvvStackSource< T > show(
