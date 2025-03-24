@@ -88,7 +88,7 @@
 		<license.copyrightOwners>Cell Biology, Neurobiology and Biophysics Department of Utrecht University.</license.copyrightOwners>
 
 		<!-- NB: Deploy releases to the SciJava Maven repository. -->
-		<releaseProfiles>sign,deploy-to-scijava</releaseProfiles> 
+		<!-- releaseProfiles sign,deploy-to-scijava releaseProfiles --> 
 	</properties>
 
 	<dependencies>

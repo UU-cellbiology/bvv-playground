@@ -44,6 +44,8 @@ import bdv.ui.sourcegrouptree.SourceGroupTree;
 import bdv.ui.viewermodepanel.DisplaySettingsPanel;
 import bdv.viewer.AbstractViewerPanel;
 import bdv.viewer.ViewerState;
+import bvvpg.core.VolumeViewerPanel;
+import bvvpg.pgcards.sourcetable.SourceSelectionState;
 import bvvpg.pgcards.sourcetable.SourceTablePG;
 import bvvpg.source.converters.ConverterSetupsPG;
 import bvvpg.ui.panels.ConverterSetupEditPanelPG;
@@ -60,8 +62,10 @@ public class BVVPGDefaultCards
 	{
 		final ViewerState state = viewer.state();
 
+
 		// -- Sources table --
 		final SourceTablePG table = new SourceTablePG( state, converterSetups, viewer.getInputTriggerConfig() );
+		
 		table.setPreferredScrollableViewportSize( new Dimension( 340, 200 ) );
 		table.setFillsViewportHeight( true );
 		table.setDragEnabled( true );
@@ -92,6 +96,13 @@ public class BVVPGDefaultCards
 		treePanel.add( scrollPaneTree, BorderLayout.CENTER );
 		treePanel.add( editPanelTree, BorderLayout.SOUTH );
 		treePanel.setPreferredSize( new Dimension( 340, 225 ) );
+		
+		//add external listeners to sources selection
+		if(viewer instanceof VolumeViewerPanel)
+		{
+			((VolumeViewerPanel)viewer).sourceSelection = new SourceSelectionState(table);
+			((VolumeViewerPanel)viewer).sourceGroupSelection = new SourceSelectionState(tree, converterSetups);
+		}
 
 		cards.addCard( DEFAULT_VIEWERMODES_CARD, "Display Modes", new DisplaySettingsPanel( viewer.state() ), true, new Insets( 0, 4, 4, 0 ) );
 		cards.addCard( DEFAULT_SOURCES_CARD, "Sources", tablePanel, true, new Insets( 0, 0, 0, 0 ) );
