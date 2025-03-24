@@ -22,7 +22,7 @@ import mpicbg.spim.data.SpimDataException;
 
 import net.imglib2.realtransform.AffineTransform3D;
 
-public class DebugLLSInterpolation {
+public class DebugLLSShearIllustration {
 	public static void main( final String[] args )
 	{
 		
