@@ -66,6 +66,7 @@ import bvvpg.core.render.VolumeRenderer;
 import bvvpg.core.render.VolumeRenderer.RepaintType;
 import bvvpg.core.util.MatrixMath;
 import bvvpg.pgcards.sourcetable.SourceSelectionState;
+import bvvpg.pgcards.sourcetable.SourceSelectionWindowState;
 import bvvpg.source.converters.ConverterSetupsPG;
 
 import com.jogamp.opengl.GL3;
@@ -171,6 +172,7 @@ public class VolumeViewerPanel
 	
 	public SourceSelectionState sourceSelection;
 	public SourceSelectionState sourceGroupSelection;
+	public SourceSelectionWindowState sourceSelectionWindowState;
 
 	protected final OffScreenFrameBufferWithDepth sceneBuf;
 

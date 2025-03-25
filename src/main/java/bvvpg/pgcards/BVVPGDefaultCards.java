@@ -46,6 +46,7 @@ import bdv.viewer.AbstractViewerPanel;
 import bdv.viewer.ViewerState;
 import bvvpg.core.VolumeViewerPanel;
 import bvvpg.pgcards.sourcetable.SourceSelectionState;
+import bvvpg.pgcards.sourcetable.SourceSelectionWindowState;
 import bvvpg.pgcards.sourcetable.SourceTablePG;
 import bvvpg.source.converters.ConverterSetupsPG;
 import bvvpg.ui.panels.ConverterSetupEditPanelPG;
@@ -102,6 +103,7 @@ public class BVVPGDefaultCards
 		{
 			((VolumeViewerPanel)viewer).sourceSelection = new SourceSelectionState(table);
 			((VolumeViewerPanel)viewer).sourceGroupSelection = new SourceSelectionState(tree, converterSetups);
+			((VolumeViewerPanel)viewer).sourceSelectionWindowState = new SourceSelectionWindowState(table, tree, converterSetups);
 		}
 
 		cards.addCard( DEFAULT_VIEWERMODES_CARD, "Display Modes", new DisplaySettingsPanel( viewer.state() ), true, new Insets( 0, 4, 4, 0 ) );

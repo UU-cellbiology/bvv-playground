@@ -22,7 +22,7 @@ public class SourceSelectionState
 		public void selectionCSChanged(List< ConverterSetup > csList);
 
 	}
-	public SourceSelectionState( final SourceTablePG table)
+	public SourceSelectionState(final SourceTablePG table)
 	{
 		this( table::getSelectedConverterSetups);
 		table.getSelectionModel().addListSelectionListener( e -> updateSelection() );
