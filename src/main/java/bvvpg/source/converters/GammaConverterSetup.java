@@ -78,6 +78,8 @@ public interface GammaConverterSetup extends ConverterSetup {
 	
 	void setClipInterval(RealInterval clipInt);
 	
+	void setClipActive(boolean bEnabled);
+	
 	FinalRealInterval getClipInterval();
 	
 	AffineTransform3D getClipTransform();

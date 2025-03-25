@@ -293,6 +293,7 @@ public class RealARGBColorGammaConverterSetup implements GammaConverterSetup
 		
 		listeners.list.forEach( l -> l.setupParametersChanged( this ) );
 	}
+	
 	@Override
 	public void setLUT(String sLUTName)
 	{
@@ -347,7 +348,17 @@ public class RealARGBColorGammaConverterSetup implements GammaConverterSetup
 		
 		return clipActive;
 	}
-
+	
+	@Override
+	public void setClipActive(boolean bEnabled)
+	{
+		if(clipActive != bEnabled )
+		{
+			clipActive = bEnabled;
+			listeners.list.forEach( l -> l.setupParametersChanged( this ) );
+		}
+	}
+	
 	@Override
 	public void setClipInterval(RealInterval clipInt) {
 		this.clipInt = new FinalRealInterval(clipInt);

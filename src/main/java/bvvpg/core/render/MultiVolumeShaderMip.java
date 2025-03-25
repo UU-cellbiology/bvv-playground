@@ -590,7 +590,7 @@ public class MultiVolumeShaderMip
 				uniformVoxelInterpolation.set(gconverter.getVoxelRenderInterpolation());
 				fminA = gconverter.getAlphaRangeMin() / rangeScale;
 				fmaxA = gconverter.getAlphaRangeMax() / rangeScale;
-				if(gconverter.clipActive())
+				if(gconverter.clipActive() && gconverter.getClipInterval() != null)
 				{
 					uniformClipActive.set(1);
 					uniformClipMin.set(gconverter.getClipInterval(),bvvpg.core.shadergen.MinMax.MIN);
