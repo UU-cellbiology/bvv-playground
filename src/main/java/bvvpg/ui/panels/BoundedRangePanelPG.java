@@ -72,7 +72,7 @@ import bvvpg.ui.sliders.RangeSliderPG;
  * @author Tobias Pietzsch
  * @author Eugene Katrukha
  */
-class BoundedRangePanelPG extends JPanel
+public class BoundedRangePanelPG extends JPanel
 {
 	private Supplier< JPopupMenu > popup;
 
