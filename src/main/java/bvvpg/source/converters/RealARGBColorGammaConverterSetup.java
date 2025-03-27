@@ -367,10 +367,9 @@ public class RealARGBColorGammaConverterSetup implements GammaConverterSetup
 	}
 
 	@Override
-	public FinalRealInterval getClipInterval() {
-		if(clipActive)
-			return clipInt;
-		return null;
+	public FinalRealInterval getClipInterval() 
+	{
+		return clipInt;
 	}
 
 	@Override
