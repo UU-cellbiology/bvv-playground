@@ -755,6 +755,7 @@ class RangeSliderUIFL extends FlatSliderUI
 	
 
 		}
+		/** double click**/
 		@Override
 		public void mouseClicked(MouseEvent e) 
 		{
@@ -771,8 +772,8 @@ class RangeSliderUIFL extends FlatSliderUI
 					slider_.setUpperValue( slider_.getMaximum() );
 					return;
 				}
-				Rectangle mid = getMiddleTrackRectangle();
-				if(mid.contains( currentMouseX, currentMouseY ))
+				//Rectangle mid = getMiddleTrackRectangle();
+				if(trackRect.contains( currentMouseX, currentMouseY ))
 				{
 					slider_.setRange( slider_.getMinimum(), slider.getMaximum()  );
 				}
