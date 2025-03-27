@@ -13,16 +13,16 @@ void intersectBoundingBox( vec4 wfront, vec4 wback, out float tnear, out float t
 {
 	vec4 mfront = im * wfront;
 	vec4 mback = im * wback;	
-	if(clipactive>0)
-	{
-		vec3 rangemin = max(vec3((im*vec4(clipmin,1.0)).xyz), sourcemin - 0.5);
-		vec3 rangemax = min(vec3((im*vec4(clipmax,1.0)).xyz), sourcemax + 0.5);
-		intersectBox( mfront.xyz, (mback - mfront).xyz, rangemin, rangemax, tnear, tfar );
-	}
-	else
-	{
+//	if(clipactive>0)
+//	{
+//		vec3 rangemin = max(vec3((im*vec4(clipmin,1.0)).xyz), sourcemin - 0.5);
+//		vec3 rangemax = min(vec3((im*vec4(clipmax,1.0)).xyz), sourcemax + 0.5);
+//		intersectBox( mfront.xyz, (mback - mfront).xyz, rangemin, rangemax, tnear, tfar );
+//	}
+//	else
+//	{
 		intersectBox( mfront.xyz, (mback - mfront).xyz, sourcemin - 0.5, sourcemax + 0.5, tnear, tfar );
-	}
+//	}
 }
 
 
@@ -41,8 +41,14 @@ float sampleVolume( vec4 wpos, sampler3D volumeCache, vec3 cacheSize, vec3 block
 		//vec3 posclip = (cliptransform*vec4(pos-0.5,1.0)).xyz;
 		//vec3 cmin = (temp*vec4(clipmin,1.0)).xyz;
 		//vec3 cmax = (temp*vec4(clipmax,1.0)).xyz;
+		//vec3 cmin = (cliptransform*vec4(clipmin,1.0)).xyz;
+		//vec3 cmax = (cliptransform*vec4(clipmax,1.0)).xyz;
+		//vec3 posclip = wpos.xyz;
 		//vec3 s = step(cmin, posclip) - step(cmax, posclip);
-		vec3 s = step(clipmin, wpos.xyz) - step(clipmax, wpos.xyz);
+		
+		vec3 posclip = (cliptransform*wpos).xyz;
+		//vec3 s = step(cmin, posclip) - step(cmax, posclip);
+		vec3 s = step(clipmin, posclip) - step(clipmax, posclip);
 			
 		if(s.x * s.y * s.z==0.0)
 			return 0.0;

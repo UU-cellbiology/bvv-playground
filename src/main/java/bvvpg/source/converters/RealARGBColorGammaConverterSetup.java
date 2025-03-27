@@ -382,7 +382,7 @@ public class RealARGBColorGammaConverterSetup implements GammaConverterSetup
 	public void setClipTransform(AffineTransform3D t) {
 		
 		clipTransform = t.copy();
-		
+		listeners.list.forEach( l -> l.setupParametersChanged( this ) );
 	}
 
 	@Override
