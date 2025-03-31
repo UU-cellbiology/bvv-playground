@@ -360,7 +360,7 @@ public class RealARGBColorGammaConverterSetup implements GammaConverterSetup
 	}
 	
 	@Override
-	public void setClipInterval(RealInterval clipInt) {
+	public void setClipInterval(final RealInterval clipInt) {
 		this.clipInt = new FinalRealInterval(clipInt);
 		clipActive = true;
 		listeners.list.forEach( l -> l.setupParametersChanged( this ) );
@@ -373,15 +373,20 @@ public class RealARGBColorGammaConverterSetup implements GammaConverterSetup
 	}
 
 	@Override
-	public AffineTransform3D getClipTransform() {
+	public void getClipTransform(final AffineTransform3D t) 
+	{
+		//we need to inverse it before return
+		t.set( clipTransform.inverse());
 		
-		return clipTransform;
+		return;
 	}
 
 	@Override
-	public void setClipTransform(AffineTransform3D t) {
-		
-		clipTransform = t.copy();
+	public void setClipTransform(final AffineTransform3D t) 
+	{
+		//since we apply transform to the coordinate,
+		//but not the bounding box, we need to store inverse
+		clipTransform.set( t.inverse());
 		listeners.list.forEach( l -> l.setupParametersChanged( this ) );
 	}
 

@@ -59,7 +59,7 @@ public interface GammaConverterSetup extends ConverterSetup {
 	// lookup tables
 	String getLUTName();
 	
-	void setLUT(IndexColorModel icm_, String sLUTName);
+	void setLUT(final IndexColorModel icm_, String sLUTName);
 	
 	void setLUT(String sLUTName);
 	
@@ -76,15 +76,15 @@ public interface GammaConverterSetup extends ConverterSetup {
 	//clipping
 	boolean clipActive();
 	
-	void setClipInterval(RealInterval clipInt);
+	void setClipInterval(final RealInterval clipInt);
 	
 	void setClipActive(boolean bEnabled);
 	
 	FinalRealInterval getClipInterval();
 	
-	AffineTransform3D getClipTransform();
+	void getClipTransform(final AffineTransform3D t);
 	
-	void setClipTransform(AffineTransform3D t);	
+	void setClipTransform(final AffineTransform3D t);	
 	
 	//render style
 	void setRenderType(int nRender);

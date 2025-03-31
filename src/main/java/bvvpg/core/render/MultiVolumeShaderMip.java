@@ -56,6 +56,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
+import net.imglib2.realtransform.AffineTransform3D;
 import net.imglib2.type.numeric.ARGBType;
 import org.joml.Matrix4f;
 import org.joml.Matrix4fc;
@@ -594,8 +595,10 @@ public class MultiVolumeShaderMip
 				{
 					uniformClipActive.set(1);
 					uniformClipMin.set(gconverter.getClipInterval(),bvvpg.core.shadergen.MinMax.MIN);
-					uniformClipMax.set(gconverter.getClipInterval(),bvvpg.core.shadergen.MinMax.MAX);				
-					uniformClipTransform.set(MatrixMath.affine(gconverter.getClipTransform(), new Matrix4f()));
+					uniformClipMax.set(gconverter.getClipInterval(),bvvpg.core.shadergen.MinMax.MAX);	
+					final AffineTransform3D t = new AffineTransform3D();
+					gconverter.getClipTransform(t);
+					uniformClipTransform.set(MatrixMath.affine(t, new Matrix4f()));
 				}
 				uniformLUT.set(((GammaConverterSetup) converter).getLUTTexture());
 			}
