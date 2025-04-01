@@ -598,6 +598,7 @@ public class MultiVolumeShaderMip
 					uniformClipMax.set(gconverter.getClipInterval(),bvvpg.core.shadergen.MinMax.MAX);	
 					final AffineTransform3D t = new AffineTransform3D();
 					gconverter.getClipTransform(t);
+					//t.set(t.inverse());
 					uniformClipTransform.set(MatrixMath.affine(t, new Matrix4f()));
 				}
 				uniformLUT.set(((GammaConverterSetup) converter).getLUTTexture());
