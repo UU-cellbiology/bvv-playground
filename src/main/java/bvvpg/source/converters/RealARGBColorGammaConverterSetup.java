@@ -374,19 +374,15 @@ public class RealARGBColorGammaConverterSetup implements GammaConverterSetup
 
 	@Override
 	public void getClipTransform(final AffineTransform3D t) 
-	{
-		//we need to inverse it before return
-		t.set( clipTransform.inverse());
-		
+	{	
+		t.set( clipTransform );			
 		return;
 	}
 
 	@Override
 	public void setClipTransform(final AffineTransform3D t) 
 	{
-		//since we apply transform to the coordinate,
-		//but not the bounding box, we need to store inverse
-		clipTransform.set( t.inverse());
+		clipTransform.set( t );
 		listeners.list.forEach( l -> l.setupParametersChanged( this ) );
 	}
 
