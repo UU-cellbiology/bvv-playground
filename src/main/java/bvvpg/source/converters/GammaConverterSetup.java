@@ -73,7 +73,7 @@ public interface GammaConverterSetup extends ConverterSetup {
 	
 	public int getLUTSize();
 	
-	//clipping
+	/** whether the source's clipping is active **/
 	boolean clipActive();
 	
 	void setClipInterval(final RealInterval clipInt);
@@ -86,14 +86,16 @@ public interface GammaConverterSetup extends ConverterSetup {
 	
 	void setClipTransform(final AffineTransform3D t);	
 	
-	//render style
+	/** 0 = maximum intensity projection; 1 = "volumetric" **/
 	void setRenderType(int nRender);
 	
+	/** 0 = maximum intensity projection; 1 = "volumetric" **/
 	int getRenderType ();
 	
-	// voxel interpolation
+	/** 0 = nearest neighbor (cubes); 1 = tri-linear **/
 	void setVoxelRenderInterpolation(int nInterpolation);
 	
+	/** 0 = nearest neighbor (cubes); 1 = tri-linear **/
 	int getVoxelRenderInterpolation();
 	
 }

@@ -327,8 +327,11 @@ public class RealARGBColorGammaConverterSetup implements GammaConverterSetup
 		if (nRender >2 || nRender <0)
 			nRenderType = 0;
 		else
-			nRenderType = nRender;
-		listeners.list.forEach( l -> l.setupParametersChanged( this ) );
+			if(nRenderType != nRender)
+			{
+				nRenderType = nRender;
+				listeners.list.forEach( l -> l.setupParametersChanged( this ) );
+			}
 	}
 
 	@Override
@@ -360,7 +363,8 @@ public class RealARGBColorGammaConverterSetup implements GammaConverterSetup
 	}
 	
 	@Override
-	public void setClipInterval(final RealInterval clipInt) {
+	public void setClipInterval(final RealInterval clipInt) 
+	{
 		this.clipInt = new FinalRealInterval(clipInt);
 		clipActive = true;
 		listeners.list.forEach( l -> l.setupParametersChanged( this ) );
@@ -403,12 +407,17 @@ public class RealARGBColorGammaConverterSetup implements GammaConverterSetup
 	{
 		texLUT = lut_;	
 		bUpdateTexture = false;
+		listeners.list.forEach( l -> l.setupParametersChanged( this ) );
 	}
 
 	@Override
 	public void setVoxelRenderInterpolation( int nInterpolation )
 	{
-		nVoxelInterpolation = nInterpolation;		
+		if(nVoxelInterpolation != nInterpolation)
+		{
+			nVoxelInterpolation = nInterpolation;	
+			listeners.list.forEach( l -> l.setupParametersChanged( this ) );
+		}
 	}
 
 	@Override
