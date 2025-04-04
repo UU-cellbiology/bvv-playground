@@ -35,7 +35,7 @@ float sampleVolume( vec4 wpos, sampler3D volumeCache, vec3 cacheSize, vec3 block
 		if(s.x * s.y * s.z==0.0)
 			return 0.0;
 	}
-	float corr = 1.0;
+	float zerofade = 1.0;
 	vec3 pos = (im * wpos).xyz;
 	vec3 B0 = vec3(0.0,0.0,0.0);
 	vec3 sj = vec3(0.0,0.0,0.0);
@@ -52,10 +52,15 @@ float sampleVolume( vec4 wpos, sampler3D volumeCache, vec3 cacheSize, vec3 block
 
 	}
 	else
-	{		
+	{	
+		//cannot read texture with negative coordinates,
+		//so let's take the value at the border	
 		vec3 over = pos * step(0.0,pos) - pos;
-		corr = 1.0-2.0*max(over.x,max(over.y,over.z));	 
-		pos = over + pos;		
+		pos = over + pos;
+		
+		//fake interpolation to zero		
+		zerofade = (1.0-over.x)*(1.0-over.y)*(1-over.z);		
+		
 		vec3 q = floor( pos / blockSize ) - lutOffset + 0.5;	
 		uvec4 lutv = texture( lutSampler, q / lutSize );
 		B0 = lutv.xyz * paddedBlockSize + padOffset;
@@ -66,7 +71,7 @@ float sampleVolume( vec4 wpos, sampler3D volumeCache, vec3 cacheSize, vec3 block
 	vec3 c0 = B0 + mod( pos, blockSize ) + 0.5 * sj ;
 	                                       // + 0.5 ( sj - 1 )   + 0.5 for tex coord offset
 	
-	return corr*texture( volumeCache, c0 / cacheSize ).r;
+	return zerofade*texture( volumeCache, c0 / cacheSize ).r;
 	
 	
 }
