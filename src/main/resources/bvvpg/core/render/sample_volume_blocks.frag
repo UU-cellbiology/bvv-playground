@@ -25,12 +25,8 @@ uniform vec3 lutOffset;
 
 float sampleVolume( vec4 wpos, sampler3D volumeCache, vec3 cacheSize, vec3 blockSize, vec3 paddedBlockSize, vec3 padOffset )
 {
-	vec3 pos = (im * wpos).xyz;
-	//vec3 factor = step(0.0, (-1.0)*pos);
-	vec3 over = pos * step(0.0,pos) - pos;
-	pos = over + pos;
-	float zerofade = 1.0 - 2.0*max(over.x,max(over.y,over.z));
-	
+
+	//check if in the clipping area
 	if(clipactive>0)
 	{		
 		vec3 posclip = (cliptransform*wpos).xyz;
@@ -38,20 +34,39 @@ float sampleVolume( vec4 wpos, sampler3D volumeCache, vec3 cacheSize, vec3 block
 			
 		if(s.x * s.y * s.z==0.0)
 			return 0.0;
-	} 
-	vec3 q = floor( pos / blockSize ) - lutOffset + 0.5;
-
-	uvec4 lutv = texture( lutSampler, q / lutSize );
-	vec3 B0 = lutv.xyz * paddedBlockSize + padOffset;
-	vec3 sj = blockScales[ lutv.w ];
-	pos = pos*sj;
-	if(voxelInterpolation == 0)
-	{
-		pos = floor(pos + 0.5);
-		zerofade = 1.0;
 	}
+	float corr = 1.0;
+	vec3 pos = (im * wpos).xyz;
+	vec3 B0 = vec3(0.0,0.0,0.0);
+	vec3 sj = vec3(0.0,0.0,0.0);
+	if(voxelInterpolation == 0)
+	{	
+		pos = pos + 0.5;			
+		vec3 q = floor( pos / blockSize ) - lutOffset + 0.5;
+	
+		uvec4 lutv = texture( lutSampler, q / lutSize );
+		B0 = lutv.xyz * paddedBlockSize + padOffset;
+		sj = blockScales[ lutv.w ];
+		pos = pos*sj;
+		pos = floor(pos);
+
+	}
+	else
+	{		
+		vec3 over = pos * step(0.0,pos) - pos;
+		corr = 1.0-2.0*max(over.x,max(over.y,over.z));	 
+		pos = over + pos;		
+		vec3 q = floor( pos / blockSize ) - lutOffset + 0.5;	
+		uvec4 lutv = texture( lutSampler, q / lutSize );
+		B0 = lutv.xyz * paddedBlockSize + padOffset;
+		sj = blockScales[ lutv.w ];
+		pos = pos*sj;		
+	}
+	
 	vec3 c0 = B0 + mod( pos, blockSize ) + 0.5 * sj ;
 	                                       // + 0.5 ( sj - 1 )   + 0.5 for tex coord offset
 	
-	return zerofade*texture( volumeCache, c0 / cacheSize ).r;
+	return corr*texture( volumeCache, c0 / cacheSize ).r;
+	
+	
 }

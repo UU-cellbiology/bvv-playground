@@ -407,7 +407,6 @@ public class RealARGBColorGammaConverterSetup implements GammaConverterSetup
 	{
 		texLUT = lut_;	
 		bUpdateTexture = false;
-		listeners.list.forEach( l -> l.setupParametersChanged( this ) );
 	}
 
 	@Override
