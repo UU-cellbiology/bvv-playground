@@ -25,7 +25,11 @@ uniform vec3 lutOffset;
 
 float sampleVolume( vec4 wpos, sampler3D volumeCache, vec3 cacheSize, vec3 blockSize, vec3 paddedBlockSize, vec3 padOffset )
 {
-	vec3 pos = (im * wpos).xyz + 0.5;
+	vec3 pos = (im * wpos).xyz;
+	//vec3 factor = step(0.0, (-1.0)*pos);
+	vec3 over = pos * step(0.0,pos) - pos;
+	pos = over + pos;
+	float zerofade = 1.0 - 2.0*max(over.x,max(over.y,over.z));
 	
 	if(clipactive>0)
 	{		
@@ -43,10 +47,11 @@ float sampleVolume( vec4 wpos, sampler3D volumeCache, vec3 cacheSize, vec3 block
 	pos = pos*sj;
 	if(voxelInterpolation == 0)
 	{
-		pos = floor(pos);
+		pos = floor(pos + 0.5);
+		zerofade = 1.0;
 	}
-	vec3 c0 = B0 + mod( pos, blockSize ) + 0.5 * sj;
+	vec3 c0 = B0 + mod( pos, blockSize ) + 0.5 * sj ;
 	                                       // + 0.5 ( sj - 1 )   + 0.5 for tex coord offset
 	
-	return texture( volumeCache, c0 / cacheSize ).r;
+	return zerofade*texture( volumeCache, c0 / cacheSize ).r;
 }
