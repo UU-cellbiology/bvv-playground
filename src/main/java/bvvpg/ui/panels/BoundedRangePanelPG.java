@@ -189,6 +189,11 @@ public class BoundedRangePanelPG extends JPanel
 		if ( upperBoundLabel != null )
 			updateBoundLabelFonts();
 	}
+	
+	public void setSliderForeground(final Color fg)
+	{
+		rangeSlider.setForeground( fg );
+	}
 
 	private void updateColors()
 	{
