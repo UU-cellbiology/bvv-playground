@@ -17,6 +17,8 @@ public class SourceSelectionState
 
 	private ArrayList<Listener> listeners =	new ArrayList<>();
 	
+	public SourceTablePG table = null;
+	
 	public static interface Listener 
 	{
 		public void selectionCSChanged(List< ConverterSetup > csList);
@@ -26,6 +28,7 @@ public class SourceSelectionState
 	{
 		this( table::getSelectedConverterSetups);
 		table.getSelectionModel().addListSelectionListener( e -> updateSelection() );
+		this.table = table;
 	}
 	public SourceSelectionState( final SourceGroupTree tree, final ConverterSetupsPG converterSetups)
 	{

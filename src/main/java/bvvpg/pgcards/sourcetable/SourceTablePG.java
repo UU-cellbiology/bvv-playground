@@ -35,6 +35,7 @@ import bdv.viewer.ConverterSetups;
 import bdv.viewer.SourceAndConverter;
 import bdv.viewer.SourceToConverterSetupBimap;
 import bdv.viewer.ViewerState;
+import bvvpg.pgcards.sourcetable.SourceTableModelPG.SourceModel;
 import bvvpg.source.converters.GammaConverterSetup;
 import ij.IJ;
 
@@ -166,6 +167,28 @@ public class SourceTablePG extends JTable
 		for ( final int row : getSelectedRows() )
 			sources.add( model.getValueAt( row ).getSource() );
 		return sources;
+	}
+	
+	public void setSelectedSources(List< SourceAndConverter< ? > > sacList)
+	{
+		ArrayList<Integer> selectedIndices = new ArrayList<>();
+		for(SourceAndConverter< ? > sac:sacList)
+		{		
+				int nIndex = model.model.getSources().indexOf( new SourceModel(sac,state) );
+				selectedIndices.add( new Integer (nIndex ));
+		}
+		for(int i=0;i<selectedIndices.size(); i++)
+		{
+			if(i==0)
+			{
+				this.setRowSelectionInterval( selectedIndices.get( i ).intValue(), selectedIndices.get( i ).intValue() );
+			}
+			else
+			{
+				this.getSelectionModel().addSelectionInterval( selectedIndices.get( i ).intValue(), selectedIndices.get( i ).intValue() );				
+			}
+		}
+		
 	}
 
 	public List< ConverterSetup > getSelectedConverterSetups()
