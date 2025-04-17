@@ -99,6 +99,9 @@ and add the corresponding dependency:
 
 You need to download and ship the latest _bvv-playground-X.X.X.jar_ from [maven](https://maven.scijava.org/#nexus-search;quick~bvv-playground) or [release](https://github.com/UU-cellbiology/bvv-playground/releases). 
 
+## Updates history
+
+It is available through releases description or [as one file](https://github.com/UU-cellbiology/bvv-playground/blob/master/updates_history.md).
 
 ----------
 Developed in <a href='http://cellbiology.science.uu.nl/'>Cell Biology group</a> of Utrecht University.  
