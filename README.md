@@ -8,7 +8,8 @@ This is a fork of [BVV](https://github.com/bigdataviewer/bigvolumeviewer-core) w
 - "volumetric" rendering method ("alpha-blending");
 - nearest-neighbor and trilinear interpolation;
 - lookup tables (LUTs, custom with alpha values and coming from ImageJ);
-- clipping of displayed sources in shaders (optionally using custom transform).
+- clipping of displayed sources in shaders (optionally using custom transform);
+- perspective and orthographic projections.
 
 Currently synced to BVV version 0.3.4 (this [commit](https://github.com/bigdataviewer/bigvolumeviewer-core/tree/2b8367ef592ede840ecba932deb7ff19b1896d6a)).
 
@@ -98,6 +99,9 @@ and add the corresponding dependency:
 
 You need to download and ship the latest _bvv-playground-X.X.X.jar_ from [maven](https://maven.scijava.org/#nexus-search;quick~bvv-playground) or [release](https://github.com/UU-cellbiology/bvv-playground/releases). 
 
+## Updates history
+
+It is available through releases description or [as one file](https://github.com/UU-cellbiology/bvv-playground/blob/master/updates_history.md).
 
 ----------
 Developed in <a href='http://cellbiology.science.uu.nl/'>Cell Biology group</a> of Utrecht University.  

@@ -293,6 +293,7 @@ public class RealARGBColorGammaConverterSetup implements GammaConverterSetup
 		
 		listeners.list.forEach( l -> l.setupParametersChanged( this ) );
 	}
+	
 	@Override
 	public void setLUT(String sLUTName)
 	{
@@ -326,8 +327,11 @@ public class RealARGBColorGammaConverterSetup implements GammaConverterSetup
 		if (nRender >2 || nRender <0)
 			nRenderType = 0;
 		else
-			nRenderType = nRender;
-		listeners.list.forEach( l -> l.setupParametersChanged( this ) );
+			if(nRenderType != nRender)
+			{
+				nRenderType = nRender;
+				listeners.list.forEach( l -> l.setupParametersChanged( this ) );
+			}
 	}
 
 	@Override
@@ -347,32 +351,43 @@ public class RealARGBColorGammaConverterSetup implements GammaConverterSetup
 		
 		return clipActive;
 	}
-
+	
 	@Override
-	public void setClipInterval(RealInterval clipInt) {
+	public void setClipActive(boolean bEnabled)
+	{
+		if(clipActive != bEnabled )
+		{
+			clipActive = bEnabled;
+			listeners.list.forEach( l -> l.setupParametersChanged( this ) );
+		}
+	}
+	
+	@Override
+	public void setClipInterval(final RealInterval clipInt) 
+	{
 		this.clipInt = new FinalRealInterval(clipInt);
 		clipActive = true;
 		listeners.list.forEach( l -> l.setupParametersChanged( this ) );
 	}
 
 	@Override
-	public FinalRealInterval getClipInterval() {
-		if(clipActive)
-			return clipInt;
-		return null;
+	public FinalRealInterval getClipInterval() 
+	{
+		return clipInt;
 	}
 
 	@Override
-	public AffineTransform3D getClipTransform() {
-		
-		return clipTransform;
+	public void getClipTransform(final AffineTransform3D t) 
+	{	
+		t.set( clipTransform );			
+		return;
 	}
 
 	@Override
-	public void setClipTransform(AffineTransform3D t) {
-		
-		clipTransform = t.copy();
-		
+	public void setClipTransform(final AffineTransform3D t) 
+	{
+		clipTransform.set( t );
+		listeners.list.forEach( l -> l.setupParametersChanged( this ) );
 	}
 
 	@Override
@@ -397,7 +412,11 @@ public class RealARGBColorGammaConverterSetup implements GammaConverterSetup
 	@Override
 	public void setVoxelRenderInterpolation( int nInterpolation )
 	{
-		nVoxelInterpolation = nInterpolation;		
+		if(nVoxelInterpolation != nInterpolation)
+		{
+			nVoxelInterpolation = nInterpolation;	
+			listeners.list.forEach( l -> l.setupParametersChanged( this ) );
+		}
 	}
 
 	@Override

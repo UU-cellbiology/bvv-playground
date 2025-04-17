@@ -61,9 +61,9 @@ public class MatrixMath
 	 * @param screenPadding additional padding on all sides of the screen plane
 	 * @param matrix is set to the screenPerspective transformation and returned
 	 */
-	public static Matrix4f screenPerspective( double dCam, final double dClip, final double screenWidth, final double screenHeight, final double screenPadding, Matrix4f matrix )
+	public static Matrix4f screenPerspective( final int nProjectionType, double dCam, final double dClip, final double screenWidth, final double screenHeight, final double screenPadding, Matrix4f matrix )
 	{
-		return screenPerspective( dCam, dClip, dClip, screenWidth, screenHeight, screenPadding, matrix );
+		return screenPerspective(nProjectionType, dCam, dClip, dClip, screenWidth, screenHeight, screenPadding, matrix );
 	}
 
 	/**
@@ -77,7 +77,7 @@ public class MatrixMath
 	 * @param screenPadding additional padding on all sides of the screen plane
 	 * @param matrix is set to the screenPerspective transformation and returned
 	 */
-	public static Matrix4f screenPerspective( double dCam, final double dClipNear, final double dClipFar, final double screenWidth, final double screenHeight, final double screenPadding, Matrix4f matrix )
+	public static Matrix4f screenPerspective(final int nProjectionType, double dCam, final double dClipNear, final double dClipFar, final double screenWidth, final double screenHeight, final double screenPadding, Matrix4f matrix )
 	{
 		double r0 = ( screenWidth + screenPadding ) / 2;
 		double t0 = ( screenHeight + screenPadding ) / 2;
@@ -90,10 +90,20 @@ public class MatrixMath
 		float n = ( float ) ( dCam - dClipNear );
 		float f = ( float ) ( dCam + dClipFar );
 
+		if( nProjectionType == 0)
+		{
+			matrix
+			.setFrustum( l, r, b, t, n, f );
+		}
+		else
+		{	
+			matrix
+			.setOrtho( l, r, b, t, n, f );		
+		}
 		matrix
-				.setFrustum( l, r, b, t, n, f )
-				.scale( 1f, -1f, -1f )
-				.translate( ( float ) ( -( screenWidth - 1 ) / 2 ), ( float ) ( -( screenHeight - 1 ) / 2 ), ( float ) dCam );
+		.scale( 1f, -1f, -1f )
+		.translate( ( float ) ( -( screenWidth - 1 ) / 2 ), ( float ) ( -( screenHeight - 1 ) / 2 ), ( float ) dCam );
+
 		return matrix;
 
 		// frustum by hand...
@@ -157,7 +167,7 @@ public class MatrixMath
 	 * @param matrix
 	 * 		is set to the screenPerspective transformation and returned
 	 */
-	public static Matrix4f perspective( double dCam, final double dClipNear, final double dClipFar, final double screenWidth, final double screenHeight, final double screenPadding, Matrix4f matrix )
+	public static Matrix4f perspective( final int nProjectionType, double dCam, final double dClipNear, final double dClipFar, final double screenWidth, final double screenHeight, final double screenPadding, Matrix4f matrix )
 	{
 		double r0 = ( screenWidth + screenPadding ) / 2;
 		double t0 = ( screenHeight + screenPadding ) / 2;
@@ -169,9 +179,18 @@ public class MatrixMath
 		float l = -r;
 		float n = ( float ) ( dCam - dClipNear );
 		float f = ( float ) ( dCam + dClipFar );
-
+		
+		if( nProjectionType == 0)
+		{
+			matrix
+			.setFrustum( l, r, b, t, n, f );
+		}
+		else
+		{	
+			matrix
+			.setOrtho( l, r, b, t, n, f );		
+		}
 		matrix
-				.setFrustum( l, r, b, t, n, f )
 				.scale( 1f, -1f, -1f );
 		return matrix;
 	}

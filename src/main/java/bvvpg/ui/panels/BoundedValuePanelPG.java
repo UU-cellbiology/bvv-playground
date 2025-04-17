@@ -125,6 +125,7 @@ public class BoundedValuePanelPG extends JPanel {
 		//maxSpinner = new JSpinner( new SpinnerNumberModel( 1.0, 0.0, 1.0, 1.0 ) );
 		//slider = new ValueSlider( 0, SLIDER_LENGTH );
 		slider = new ValueSlider( 0, SLIDER_LENGTH );
+	
 		upperBoundLabel = new JLabel();
 		lowerBoundLabel = new JLabel();
 
@@ -171,6 +172,11 @@ public class BoundedValuePanelPG extends JPanel {
 		}
 		if ( upperBoundLabel != null )
 			updateBoundLabelFonts();
+	}
+	
+	public void setSliderForeground(final Color fg)
+	{
+		slider.setForeground( fg );
 	}
 
 	private void updateColors()

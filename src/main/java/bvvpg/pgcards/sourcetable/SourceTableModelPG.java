@@ -57,7 +57,7 @@ public class SourceTableModelPG extends AbstractTableModel
 
 	private final SourceToConverterSetupBimap converters;
 
-	private StateModel model;
+	public StateModel model;
 
 	public static final int NAME_COLUMN = 0;
 	public static final int IS_CURRENT_COLUMN = 1;

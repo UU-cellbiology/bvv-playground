@@ -65,6 +65,8 @@ import bvvpg.core.render.RenderData;
 import bvvpg.core.render.VolumeRenderer;
 import bvvpg.core.render.VolumeRenderer.RepaintType;
 import bvvpg.core.util.MatrixMath;
+import bvvpg.pgcards.sourcetable.SourceSelectionState;
+import bvvpg.pgcards.sourcetable.SourceSelectionWindowState;
 import bvvpg.source.converters.ConverterSetupsPG;
 
 import com.jogamp.opengl.GL3;
@@ -164,9 +166,19 @@ public class VolumeViewerPanel
 		}
 	}
 	
+	/** activates "rendering mode", 
+	 * changing repaint style update mode **/
 	private boolean bRenderMode = false;
+	
+	/** screen projection method,
+	 * 0 - perspective, 1 - orthographic **/
+	private int nProjectionType = 0;
 
 	private final Repaint repaint = new Repaint();
+	
+	public SourceSelectionState sourceSelection;
+	public SourceSelectionState sourceGroupSelection;
+	public SourceSelectionWindowState sourceSelectionWindowState;
 
 	protected final OffScreenFrameBufferWithDepth sceneBuf;
 
@@ -413,7 +425,32 @@ public class VolumeViewerPanel
 		return bRenderMode;
 	}
 	
-
+	/** screen projection method,
+	 * 0 - perspective, 1 - orthographic **/
+	public int getProjectionType ()
+	{
+		return nProjectionType;
+	}
+	
+	/** screen projection method,
+	 * 0 - perspective, 1 - orthographic **/
+	public void setProjectionType (final int nProjectionType)
+	{
+		int newProj = nProjectionType;
+		if(nProjectionType != 0)
+		{
+			newProj = 1;
+		}
+		else
+		{
+			newProj = 0;
+		}
+		if(newProj != this.nProjectionType)
+		{
+			this.nProjectionType = newProj;
+			requestRepaint();
+		}
+	}
 	/**
 	 * @deprecated Modify {@link #state()} directly
 	 */
@@ -988,7 +1025,7 @@ public class VolumeViewerPanel
 			final AffineTransform3D renderTransformWorldToScreen = state.getViewerTransform();
 
 			final Matrix4f view = MatrixMath.affine( renderTransformWorldToScreen, new Matrix4f() );
-			MatrixMath.screenPerspective( dCam, dClipNear, dClipFar, screenWidth, screenHeight, 0, pv ).mul( view );
+			MatrixMath.screenPerspective( nProjectionType, dCam, dClipNear, dClipFar, screenWidth, screenHeight, 0, pv ).mul( view );
 
 			renderStacks.clear();
 			renderConverters.clear();
@@ -1137,4 +1174,6 @@ public class VolumeViewerPanel
 		}
 		state.kill();
 	}
+	
+	
 }
