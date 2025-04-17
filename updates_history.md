@@ -5,7 +5,7 @@
 - added orthographic projection rendering (>viewer->setProjectionType);
 - remade range and value (regular) sliders, no dependence on jide library;
 - sliders color can be changed, double click expands range slider;
-- clip interval is now in BVV world coordinated;
+- clip interval is now in BVV world coordinates;
 - clip transform is now "inverted" in shaders, i.e. can be treated as normal;
 - volume rendering now happens from -0.5 pixel width till (N-1)+0.5, where N is pixel number;
 - added "fake" linear interpolation for -0.5 till 0.0 rendering range in trilinear interpolation mode;
