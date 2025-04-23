@@ -1,5 +1,5 @@
 /*-
- * #%L
+c * #%L
  * Volume rendering of bdv datasets with gamma and transparency option
  * %%
  * Copyright (C) 2022 - 2025 Cell Biology, Neurobiology and Biophysics Department of Utrecht University.

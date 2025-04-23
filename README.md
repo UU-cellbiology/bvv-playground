@@ -13,6 +13,11 @@ This is a fork of [BVV](https://github.com/bigdataviewer/bigvolumeviewer-core) w
 
 Currently synced to BVV version 0.3.4 (this [commit](https://github.com/bigdataviewer/bigvolumeviewer-core/tree/2b8367ef592ede840ecba932deb7ff19b1896d6a)).
 
+Similar to [BDV](https://github.com/bigdataviewer/bigdataviewer-core)/[BVV](https://github.com/bigdataviewer/bigvolumeviewer-core), this fork is mostly intended to be used as a visualization  
+component in other plugins (like [BigTrace](https://github.com/ekatrukha/BigTrace), [MoBIE](https://github.com/mobie/mobie-viewer-fiji)).  
+ 
+For a stand-alone usage we recommend looking at the [BigVolumeBrowser](https://github.com/ekatrukha/bigvolumebrowser) plugin (in active development).
+
 ## How to install it for users
 
 Download latest zip archive with jar files from <a href="https://github.com/ekatrukha/bvv-playground/releases">releases</a>  
