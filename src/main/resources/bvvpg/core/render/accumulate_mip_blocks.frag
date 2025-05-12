@@ -1,6 +1,6 @@
 if (vis)
 {
-	float x = sampleVolume(wpos, volumeCache, cacheSize, blockSize, paddedBlockSize, cachePadOffset);
+	float x = sampleVolume(wpos);
 
 	vnew = convert(x);	
 	

@@ -42,7 +42,7 @@ import net.imglib2.img.cell.AbstractCellImg;
 import net.imglib2.type.NativeType;
 import net.imglib2.type.PrimitiveType;
 import net.imglib2.util.Fraction;
-
+import static net.imglib2.type.PrimitiveType.BYTE;
 import static net.imglib2.type.PrimitiveType.SHORT;
 
 /**
@@ -114,10 +114,11 @@ public class TileAccess< S >
 			if ( img instanceof VolatileView )
 				img = ( ( VolatileView ) img ).getVolatileViewData().getImg();
 			final boolean cellimg = img instanceof AbstractCellImg;
+			final boolean volatil = type instanceof Volatile;
+			final PrimitiveType primitive = getPrimitiveType( type );
 
-			if ( cacheSpec.format() == Texture.InternalFormat.R16 && cellimg )
+			if ( cellimg && primitive == SHORT && cacheSpec.format() == Texture.InternalFormat.R16 )
 			{
-				final boolean volatil = type instanceof Volatile;
 				return new TileAccess<>(
 						volatil
 								? new GridDataAccessImp.VolatileCells<>( ( AbstractCellImg ) img )
@@ -126,11 +127,22 @@ public class TileAccess< S >
 						cacheSpec
 				);
 			}
+			else if ( cellimg && primitive == BYTE && cacheSpec.format() == Texture.InternalFormat.R8 )
+			{
+				return new TileAccess<>(
+						volatil
+								? new GridDataAccessImp.VolatileCells<>( ( AbstractCellImg ) img )
+								: new GridDataAccessImp.Cells<>( ( AbstractCellImg ) img ),
+						new CopySubArrayImp.ByteToAddress(),
+						cacheSpec
+				);
+			}
 		}
 
 		throw new UnsupportedOperationException( "pixel and/or image type not supported (yet)." );
 	}
 
+	@SuppressWarnings( "rawtypes" )
 	public static boolean isSupportedType( final Object type )
 	{
 		// Currently only [Volatile]UnsignedShortType CellImgs are handled correctly
@@ -138,11 +150,20 @@ public class TileAccess< S >
 		{
 			final PrimitiveType primitive = ( ( NativeType ) type ).getNativeTypeFactory().getPrimitiveType();
 			final Fraction epp = ( ( NativeType ) type ).getEntitiesPerPixel();
-			if ( primitive == SHORT && epp.getNumerator() == epp.getDenominator() )
-				return true;
+			return ( primitive == SHORT || primitive == BYTE ) && epp.getNumerator() == epp.getDenominator();
 		}
 
 		return false;
+	}
+	
+	@SuppressWarnings( "rawtypes" )
+	public static PrimitiveType getPrimitiveType( final Object type )
+	{
+		if ( type instanceof NativeType )
+		{
+			return ( ( NativeType ) type ).getNativeTypeFactory().getPrimitiveType();
+		}
+		throw new IllegalArgumentException();
 	}
 
 	/**
