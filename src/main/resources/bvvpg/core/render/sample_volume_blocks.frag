@@ -55,7 +55,7 @@ float sampleVolume( vec4 wpos )
 		vec3 q = floor( pos / blockSize ) - lutOffset + 0.5;
 	
 		uvec4 lutv = texture( lutSampler, q / lutSize );
-		B0 = lutv.xyz * paddedBlockSize + padOffset;
+		B0 = lutv.xyz * paddedBlockSize + cachePadOffset;
 		sj = blockScales[ lutv.w ];
 		pos = pos*sj;
 		pos = floor(pos);
@@ -73,7 +73,7 @@ float sampleVolume( vec4 wpos )
 		
 		vec3 q = floor( pos / blockSize ) - lutOffset + 0.5;	
 		uvec4 lutv = texture( lutSampler, q / lutSize );
-		B0 = lutv.xyz * paddedBlockSize + padOffset;
+		B0 = lutv.xyz * paddedBlockSize + cachePadOffset;
 		sj = blockScales[ lutv.w ];
 		pos = pos*sj;		
 	}
