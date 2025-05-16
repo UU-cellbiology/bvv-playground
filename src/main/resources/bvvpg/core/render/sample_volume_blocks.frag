@@ -33,6 +33,15 @@ uniform vec3 blockScales[ NUM_BLOCK_SCALES ];
 uniform vec3 lutSize;
 uniform vec3 lutOffset;
 
+vec3 getPosCache(vec3 pos)
+{
+		vec3 q = floor( pos / blockSize ) - lutOffset + 0.5;
+		uvec4 lutv = texture( lutSampler, q / lutSize );
+		B0 = lutv.xyz * paddedBlockSize + cachePadOffset;
+		sj = blockScales[ lutv.w ];
+		return pos*sj;
+}
+
 float sampleVolume( vec4 wpos )
 {
 
@@ -45,19 +54,24 @@ float sampleVolume( vec4 wpos )
 		if(s.x * s.y * s.z==0.0)
 			return 0.0;
 	}
+	
+	
 	float zerofade = 1.0;
 	vec3 pos = (im * wpos).xyz;
 	vec3 B0 = vec3(0.0,0.0,0.0);
 	vec3 sj = vec3(0.0,0.0,0.0);
+	
+	//no interpolation
 	if(voxelInterpolation == 0)
 	{	
-		pos = pos + 0.5;			
+		pos = pos + 0.5;
+					
 		vec3 q = floor( pos / blockSize ) - lutOffset + 0.5;
-	
 		uvec4 lutv = texture( lutSampler, q / lutSize );
 		B0 = lutv.xyz * paddedBlockSize + cachePadOffset;
 		sj = blockScales[ lutv.w ];
 		pos = pos*sj;
+		
 		pos = floor(pos);
 
 	}
@@ -65,12 +79,13 @@ float sampleVolume( vec4 wpos )
 	{	
 		//cannot read texture with negative coordinates,
 		//so let's take the value at the border	
-		vec3 over = pos * step(0.0,pos) - pos;
+		vec3 over = pos * step(0.0, pos) - pos;
 		pos = over + pos;
+		over = clamp(over,0,1);
 		
 		//fake interpolation to zero		
-		zerofade = (1.0-over.x)*(1.0-over.y)*(1-over.z);		
-		
+		zerofade = (1.0-over.x)*(1.0-over.y)*(1.0-over.z);		
+
 		vec3 q = floor( pos / blockSize ) - lutOffset + 0.5;	
 		uvec4 lutv = texture( lutSampler, q / lutSize );
 		B0 = lutv.xyz * paddedBlockSize + cachePadOffset;

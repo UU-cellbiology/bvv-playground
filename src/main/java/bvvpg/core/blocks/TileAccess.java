@@ -33,7 +33,6 @@ import bvvpg.core.backend.Texture;
 import bvvpg.core.cache.CacheSpec;
 import bvvpg.core.cache.UploadBuffer;
 import bvvpg.core.multires.ResolutionLevel3D;
-
 import net.imglib2.RandomAccessible;
 import net.imglib2.Volatile;
 import net.imglib2.cache.UncheckedCache;
@@ -42,6 +41,7 @@ import net.imglib2.img.cell.AbstractCellImg;
 import net.imglib2.type.NativeType;
 import net.imglib2.type.PrimitiveType;
 import net.imglib2.util.Fraction;
+
 import static net.imglib2.type.PrimitiveType.BYTE;
 import static net.imglib2.type.PrimitiveType.SHORT;
 
@@ -155,7 +155,7 @@ public class TileAccess< S >
 
 		return false;
 	}
-	
+
 	@SuppressWarnings( "rawtypes" )
 	public static PrimitiveType getPrimitiveType( final Object type )
 	{

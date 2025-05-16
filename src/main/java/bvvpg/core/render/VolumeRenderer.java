@@ -216,7 +216,7 @@ public class VolumeRenderer
 		// used for the first time.
 		cacheR8 = new TextureCacheAndPboChain( R8, cacheBlockSize, maxCacheSizeInMB );
 		cacheR16 = new TextureCacheAndPboChain( R16, cacheBlockSize, maxCacheSizeInMB );
-
+		
 		final int parallelism = Math.max( 1, Runtime.getRuntime().availableProcessors() / 2 );
 		forkJoinPool = new ForkJoinPool( parallelism );
 
@@ -541,7 +541,7 @@ public class VolumeRenderer
 
 		return complete;
 	}
-	
+
 	private void updateBlocks(
 			final JoglGpuContext context,
 			final List< ? extends MultiResolutionStack3D< ? > > multiResStacks,

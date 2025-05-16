@@ -679,8 +679,7 @@ public class MultiVolumeShaderMip
 
 		public VolumeBlocksSegment( final SegmentedShader prog, final Segment volume)
 		{
-			super( volume );
-			
+			super( volume );			
 
 			uniformVolumeCache = prog.getUniformSampler(volume, "volumeCache" );
 			uniformBlockSize = prog.getUniform3f(volume, "blockSize" );

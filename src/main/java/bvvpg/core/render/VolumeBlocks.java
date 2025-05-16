@@ -28,6 +28,18 @@
  */
 package bvvpg.core.render;
 
+import bvvpg.core.blockmath.FindRequiredBlocks;
+import bvvpg.core.blockmath.MipmapSizes;
+import bvvpg.core.blockmath.RequiredBlock;
+import bvvpg.core.blockmath.RequiredBlocks;
+import bvvpg.core.cache.CacheSpec;
+import bvvpg.core.cache.DefaultFillTask;
+import bvvpg.core.cache.FillTask;
+import bvvpg.core.cache.ImageBlockKey;
+import bvvpg.core.cache.TextureCache;
+import bvvpg.core.cache.UploadBuffer;
+import bvvpg.core.multires.ResolutionLevel3D;
+import bvvpg.core.util.MatrixMath;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -37,21 +49,8 @@ import net.imglib2.util.LinAlgHelpers;
 import org.joml.Matrix4f;
 import org.joml.Matrix4fc;
 import org.joml.Vector3f;
-
-import bvvpg.core.blockmath.FindRequiredBlocks;
-import bvvpg.core.blockmath.MipmapSizes;
-import bvvpg.core.blockmath.RequiredBlock;
-import bvvpg.core.blockmath.RequiredBlocks;
 import bvvpg.core.blocks.TileAccess;
-import bvvpg.core.cache.CacheSpec;
-import bvvpg.core.cache.DefaultFillTask;
-import bvvpg.core.cache.FillTask;
-import bvvpg.core.cache.ImageBlockKey;
-import bvvpg.core.cache.TextureCache;
-import bvvpg.core.cache.UploadBuffer;
 import bvvpg.core.multires.MultiResolutionStack3D;
-import bvvpg.core.multires.ResolutionLevel3D;
-import bvvpg.core.util.MatrixMath;
 
 /**
  * For setting up the volume for one frame, call methods in this order:
@@ -66,7 +65,6 @@ import bvvpg.core.util.MatrixMath;
  */
 public class VolumeBlocks
 {
-
 	private final LookupTextureARGB lut;
 	private final TileAccess.Cache tileAccess;
 	private final MipmapSizes sizes;
@@ -228,7 +226,7 @@ public class VolumeBlocks
 	 * </ul>
 	 *
 	 * @param NUM_BLOCK_SCALES
-	 * @return array for shader
+	 * @return
 	 */
 	public float[][] getLutBlockScales( final int NUM_BLOCK_SCALES )
 	{
@@ -282,6 +280,9 @@ public class VolumeBlocks
 	{
 		return textureCache;
 	}
+
+
+
 
 	/**
 	 * Get visible blocks in grid coordinates of {@code baseLevel} resolution.
