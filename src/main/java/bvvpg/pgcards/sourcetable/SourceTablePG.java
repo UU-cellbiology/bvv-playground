@@ -171,11 +171,17 @@ public class SourceTablePG extends JTable
 	
 	public void setSelectedSources(List< SourceAndConverter< ? > > sacList)
 	{
-		ArrayList<Integer> selectedIndices = new ArrayList<>();
+		if( sacList.size() == 0 )
+		{
+			this.clearSelection();
+		}
+		
+		final ArrayList<Integer> selectedIndices = new ArrayList<>();
+		
 		for(SourceAndConverter< ? > sac:sacList)
 		{		
-				int nIndex = model.model.getSources().indexOf( new SourceModel(sac,state) );
-				selectedIndices.add( new Integer (nIndex ));
+				final int nIndex = model.model.getSources().indexOf( new SourceModel(sac,state) );
+				selectedIndices.add( new Integer ( nIndex ));
 		}
 		for(int i=0;i<selectedIndices.size(); i++)
 		{
@@ -188,6 +194,7 @@ public class SourceTablePG extends JTable
 				this.getSelectionModel().addSelectionInterval( selectedIndices.get( i ).intValue(), selectedIndices.get( i ).intValue() );				
 			}
 		}
+		
 		
 	}
 
