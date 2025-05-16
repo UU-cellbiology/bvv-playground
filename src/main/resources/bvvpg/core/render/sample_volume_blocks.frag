@@ -33,15 +33,6 @@ uniform vec3 blockScales[ NUM_BLOCK_SCALES ];
 uniform vec3 lutSize;
 uniform vec3 lutOffset;
 
-vec3 getPosCache(vec3 pos)
-{
-		vec3 q = floor( pos / blockSize ) - lutOffset + 0.5;
-		uvec4 lutv = texture( lutSampler, q / lutSize );
-		B0 = lutv.xyz * paddedBlockSize + cachePadOffset;
-		sj = blockScales[ lutv.w ];
-		return pos*sj;
-}
-
 float sampleVolume( vec4 wpos )
 {
 
