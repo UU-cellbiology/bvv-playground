@@ -303,10 +303,20 @@ public class TextureCache implements Texture3D
 		final Object dummyImage = new Object();
 		final ImageBlockKey< Object > oobDummyKey = new ImageBlockKey<>( dummyImage, new int[] { 0, 0, 0 } );
 		final int elementsPerTile = ( int ) Intervals.numElements( spec.paddedBlockSize() );
-		tileFillTasks.add( new TileFillTask( new DefaultFillTask( oobDummyKey, buf -> {
-			ByteUtils.setShorts( ( short ) 0, buf.getAddress(), elementsPerTile );
-			return true;
-		} , () -> true ), oobTile ) );
+		if(spec.format() == InternalFormat.R8)
+		{
+			tileFillTasks.add( new TileFillTask( new DefaultFillTask( oobDummyKey, buf -> {
+				ByteUtils.setBytes( ( byte ) 0, buf.getAddress(), elementsPerTile );
+				return true;
+			} , () -> true ), oobTile ) );
+		}
+		if(spec.format() == InternalFormat.R16)
+		{
+			tileFillTasks.add( new TileFillTask( new DefaultFillTask( oobDummyKey, buf -> {
+				ByteUtils.setShorts( ( short ) 0, buf.getAddress(), elementsPerTile );
+				return true;
+			} , () -> true ), oobTile ) );
+		}
 	}
 
 	private List< Tile > assignFillTiles( final int size, final int currentTimestamp )
