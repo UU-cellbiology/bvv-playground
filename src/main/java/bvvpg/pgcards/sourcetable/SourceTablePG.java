@@ -195,7 +195,6 @@ public class SourceTablePG extends JTable
 			}
 		}
 		
-		
 	}
 
 	public List< ConverterSetup > getSelectedConverterSetups()

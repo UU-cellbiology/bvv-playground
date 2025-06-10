@@ -3,8 +3,8 @@
 uniform mat4 im;
 uniform vec3 sourcemin;
 uniform vec3 sourcemax;
-uniform int clipactive;
 uniform int voxelInterpolation;
+uniform int clipactive;
 uniform vec3 clipmin;
 uniform vec3 clipmax;
 uniform mat4 cliptransform;

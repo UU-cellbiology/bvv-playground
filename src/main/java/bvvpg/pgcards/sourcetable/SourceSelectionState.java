@@ -93,6 +93,7 @@ public class SourceSelectionState
 	{
 		this.selectedConverterSetups = selectedConverterSetups;
 	}
+	
 	public synchronized void updateSelection()
 	{
 		for(Listener l : listeners)
