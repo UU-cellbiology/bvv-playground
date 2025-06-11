@@ -264,6 +264,7 @@ public class MultiVolumeShaderMip
 
 		segments.put( SegmentType.SampleMultiresolutionVolume, new SegmentTemplate(
 				"sample_volume_blocks.frag",
+				"volumeCache", "blockSize", "paddedBlockSize", "cachePadOffset", "cacheSize",
 				"im", "sourcemin", "sourcemax","voxelInterpolation", 
 				"clipactive", "clipmin", "clipmax", "cliptransform",
 				"intersectBoundingBox",
@@ -305,20 +306,6 @@ public class MultiVolumeShaderMip
 	public MultiVolumeShaderMip( VolumeShaderSignature signature, final boolean useDepthTexture, final double degrade )
 	{
 		this( signature, useDepthTexture, degrade, getDefaultSegments( useDepthTexture ), null, "sceneDepth" );
-	}
-
-	public void setTextureCache( TextureCache textureCache )
-	{
-		CacheSpec spec = textureCache.spec();
-		final int[] bs = spec.blockSize();
-		final int[] pbs = spec.paddedBlockSize();
-		final int[] bo = spec.padOffset();
-		prog.getUniform3f( "blockSize" ).set( bs[ 0 ], bs[ 1 ], bs[ 2 ] );
-		prog.getUniform3f( "paddedBlockSize" ).set( pbs[ 0 ], pbs[ 1 ], pbs[ 2 ] );
-		prog.getUniform3f( "cachePadOffset" ).set( bo[ 0 ], bo[ 1 ], bo[ 2 ] );
-
-		prog.getUniformSampler( "volumeCache" ).set( textureCache );
-		prog.getUniform3f( "cacheSize" ).set( textureCache.texWidth(), textureCache.texHeight(), textureCache.texDepth() );
 	}
 
 	public void setDepthTexture( Texture2D depth )
@@ -677,6 +664,11 @@ public class MultiVolumeShaderMip
 
 	static class VolumeBlocksSegment extends VolumeSegment
 	{
+		private final UniformSampler uniformVolumeCache;
+		private final Uniform3f uniformBlockSize;
+		private final Uniform3f uniformPaddedBlockSize;
+		private final Uniform3f uniformCachePadOffset;
+		private final Uniform3f uniformCacheSize;
 		private final Uniform3fv uniformBlockScales;
 		private final UniformSampler uniformLutSampler;
 		private final Uniform3f uniformLutSize;
@@ -685,9 +677,16 @@ public class MultiVolumeShaderMip
 		private final Uniform3f uniformSourcemin;
 		private final Uniform3f uniformSourcemax;
 
-		public VolumeBlocksSegment( final SegmentedShader prog, final Segment volume )
+		public VolumeBlocksSegment( final SegmentedShader prog, final Segment volume)
 		{
-			super( volume );
+			super( volume );			
+
+			uniformVolumeCache = prog.getUniformSampler(volume, "volumeCache" );
+			uniformBlockSize = prog.getUniform3f(volume, "blockSize" );
+			uniformPaddedBlockSize = prog.getUniform3f(volume, "paddedBlockSize" );
+			uniformCachePadOffset = prog.getUniform3f(volume, "cachePadOffset" );
+			uniformCacheSize = prog.getUniform3f(volume, "cacheSize" );
+			
 			uniformBlockScales = prog.getUniform3fv( volume, "blockScales" );
 			uniformLutSampler = prog.getUniformSampler( volume, "lutSampler" );
 			uniformLutSize = prog.getUniform3f( volume, "lutSize" );
@@ -700,6 +699,17 @@ public class MultiVolumeShaderMip
 
 		public void setData( VolumeBlocks blocks )
 		{
+			final TextureCache cache = blocks.getTextureCache();
+			final CacheSpec spec = cache.spec();
+			final int[] bs = spec.blockSize();
+			final int[] pbs = spec.paddedBlockSize();
+			final int[] bo = spec.padOffset();
+			uniformVolumeCache.set( cache );
+			uniformBlockSize.set( bs[ 0 ], bs[ 1 ], bs[ 2 ] );
+			uniformPaddedBlockSize.set( pbs[ 0 ], pbs[ 1 ], pbs[ 2 ] );
+			uniformCachePadOffset.set( bo[ 0 ], bo[ 1 ], bo[ 2 ] );
+			uniformCacheSize.set( cache.texWidth(), cache.texHeight(), cache.texDepth() );
+
 			uniformBlockScales.set( blocks.getLutBlockScales( NUM_BLOCK_SCALES ) );
 			final LookupTextureARGB lut = blocks.getLookupTexture();
 			uniformLutSampler.set( lut );

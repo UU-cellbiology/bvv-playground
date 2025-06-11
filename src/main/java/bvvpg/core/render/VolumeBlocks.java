@@ -28,6 +28,18 @@
  */
 package bvvpg.core.render;
 
+import bvvpg.core.blockmath.FindRequiredBlocks;
+import bvvpg.core.blockmath.MipmapSizes;
+import bvvpg.core.blockmath.RequiredBlock;
+import bvvpg.core.blockmath.RequiredBlocks;
+import bvvpg.core.cache.CacheSpec;
+import bvvpg.core.cache.DefaultFillTask;
+import bvvpg.core.cache.FillTask;
+import bvvpg.core.cache.ImageBlockKey;
+import bvvpg.core.cache.TextureCache;
+import bvvpg.core.cache.UploadBuffer;
+import bvvpg.core.multires.ResolutionLevel3D;
+import bvvpg.core.util.MatrixMath;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -37,26 +49,13 @@ import net.imglib2.util.LinAlgHelpers;
 import org.joml.Matrix4f;
 import org.joml.Matrix4fc;
 import org.joml.Vector3f;
-
-import bvvpg.core.blockmath.FindRequiredBlocks;
-import bvvpg.core.blockmath.MipmapSizes;
-import bvvpg.core.blockmath.RequiredBlock;
-import bvvpg.core.blockmath.RequiredBlocks;
 import bvvpg.core.blocks.TileAccess;
-import bvvpg.core.cache.CacheSpec;
-import bvvpg.core.cache.DefaultFillTask;
-import bvvpg.core.cache.FillTask;
-import bvvpg.core.cache.ImageBlockKey;
-import bvvpg.core.cache.TextureCache;
-import bvvpg.core.cache.UploadBuffer;
 import bvvpg.core.multires.MultiResolutionStack3D;
-import bvvpg.core.multires.ResolutionLevel3D;
-import bvvpg.core.util.MatrixMath;
 
 /**
  * For setting up the volume for one frame, call methods in this order:
  * <ol>
- *     <li>{@link #init(MultiResolutionStack3D, int, Matrix4fc)}</li>
+ *     <li>{@link #init(MultiResolutionStack3D, TextureCache, int, Matrix4fc)}</li>
  *     <li>{@link #getFillTasks()}</li>
  *     <li>{@link #makeLut(int)}</li>
  * </ol>
@@ -66,22 +65,20 @@ import bvvpg.core.util.MatrixMath;
  */
 public class VolumeBlocks
 {
-	private final TextureCache textureCache;
-	private final CacheSpec cacheSpec;
 	private final LookupTextureARGB lut;
 	private final TileAccess.Cache tileAccess;
 	private final MipmapSizes sizes;
 
-	public VolumeBlocks( final TextureCache textureCache )
+	public VolumeBlocks()
 	{
-		this.textureCache = textureCache;
-		this.cacheSpec = textureCache.spec();
 		this.lut = new LookupTextureARGB();
 		this.tileAccess = new TileAccess.Cache();
 		this.sizes = new MipmapSizes();
 	}
 
 	private MultiResolutionStack3D< ? > multiResolutionStack;
+	private TextureCache textureCache;
+	private CacheSpec cacheSpec;
 
 	/** {@code projection * view * model} matrix */
 	final Matrix4f pvm = new Matrix4f();
@@ -104,10 +101,13 @@ public class VolumeBlocks
 	 */
 	public void init(
 			final MultiResolutionStack3D< ? > multiResolutionStack,
+			final TextureCache textureCache,
 			final int viewportWidth,
 			final Matrix4fc pv)
 	{
 		this.multiResolutionStack = multiResolutionStack;
+		this.textureCache = textureCache;
+		this.cacheSpec = textureCache.spec();
 
 		final Matrix4f model = MatrixMath.affine( multiResolutionStack.getSourceTransform(), new Matrix4f() );
 		pvm.set( pv ).mul( model );
@@ -119,7 +119,7 @@ public class VolumeBlocks
 	 * Get the base resolution level for rendering the volume.
 	 * Every block in the volumes LUT is at this level or higher (coarser).
 	 * <p>
-	 * This is chosen automatically, when calling {@link #init(MultiResolutionStack3D, int, Matrix4fc)}.
+	 * This is chosen automatically, when calling {@link #init(MultiResolutionStack3D, TextureCache, int, Matrix4fc)}.
 	 * It can be manually adjusted using {@link #setBaseLevel(int)}.
 	 */
 	public int getBaseLevel()
@@ -226,7 +226,7 @@ public class VolumeBlocks
 	 * </ul>
 	 *
 	 * @param NUM_BLOCK_SCALES
-	 * @return array for shader
+	 * @return
 	 */
 	public float[][] getLutBlockScales( final int NUM_BLOCK_SCALES )
 	{
@@ -276,6 +276,10 @@ public class VolumeBlocks
 		return lut;
 	}
 
+	public TextureCache getTextureCache()
+	{
+		return textureCache;
+	}
 
 
 

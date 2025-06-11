@@ -3,8 +3,8 @@
 uniform mat4 im;
 uniform vec3 sourcemin;
 uniform vec3 sourcemax;
-uniform int clipactive;
 uniform int voxelInterpolation;
+uniform int clipactive;
 uniform vec3 clipmin;
 uniform vec3 clipmax;
 uniform mat4 cliptransform;
@@ -18,12 +18,22 @@ void intersectBoundingBox( vec4 wfront, vec4 wback, out float tnear, out float t
 }
 
 
+uniform sampler3D volumeCache;
+
+// -- comes from CacheSpec -----
+uniform vec3 blockSize;
+uniform vec3 paddedBlockSize;
+uniform vec3 cachePadOffset;
+
+// -- comes from TextureCache --
+uniform vec3 cacheSize;// TODO: get from texture!?
+
 uniform usampler3D lutSampler;
 uniform vec3 blockScales[ NUM_BLOCK_SCALES ];
 uniform vec3 lutSize;
 uniform vec3 lutOffset;
 
-float sampleVolume( vec4 wpos, sampler3D volumeCache, vec3 cacheSize, vec3 blockSize, vec3 paddedBlockSize, vec3 padOffset )
+float sampleVolume( vec4 wpos )
 {
 
 	//check if in the clipping area
@@ -35,19 +45,24 @@ float sampleVolume( vec4 wpos, sampler3D volumeCache, vec3 cacheSize, vec3 block
 		if(s.x * s.y * s.z==0.0)
 			return 0.0;
 	}
+	
+	
 	float zerofade = 1.0;
 	vec3 pos = (im * wpos).xyz;
 	vec3 B0 = vec3(0.0,0.0,0.0);
 	vec3 sj = vec3(0.0,0.0,0.0);
+	
+	//no interpolation
 	if(voxelInterpolation == 0)
 	{	
-		pos = pos + 0.5;			
+		pos = pos + 0.5;
+					
 		vec3 q = floor( pos / blockSize ) - lutOffset + 0.5;
-	
 		uvec4 lutv = texture( lutSampler, q / lutSize );
-		B0 = lutv.xyz * paddedBlockSize + padOffset;
+		B0 = lutv.xyz * paddedBlockSize + cachePadOffset;
 		sj = blockScales[ lutv.w ];
 		pos = pos*sj;
+		
 		pos = floor(pos);
 
 	}
@@ -55,15 +70,16 @@ float sampleVolume( vec4 wpos, sampler3D volumeCache, vec3 cacheSize, vec3 block
 	{	
 		//cannot read texture with negative coordinates,
 		//so let's take the value at the border	
-		vec3 over = pos * step(0.0,pos) - pos;
+		vec3 over = pos * step(0.0, pos) - pos;
 		pos = over + pos;
+		over = clamp(over,0,1);
 		
 		//fake interpolation to zero		
-		zerofade = (1.0-over.x)*(1.0-over.y)*(1-over.z);		
-		
+		zerofade = (1.0-over.x)*(1.0-over.y)*(1.0-over.z);		
+
 		vec3 q = floor( pos / blockSize ) - lutOffset + 0.5;	
 		uvec4 lutv = texture( lutSampler, q / lutSize );
-		B0 = lutv.xyz * paddedBlockSize + padOffset;
+		B0 = lutv.xyz * paddedBlockSize + cachePadOffset;
 		sj = blockScales[ lutv.w ];
 		pos = pos*sj;		
 	}

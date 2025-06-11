@@ -83,10 +83,7 @@ public class BvvFunctions
 
 	public static Bvv show( final BvvOptions options )
 	{
-		final Bvv bvv = options.values.addTo();
-		final BvvHandle handle = ( bvv == null )
-				? new BvvHandleFrame( options )
-				: bvv.getBvvHandle();
+		final BvvHandle handle = getHandle( options );
 		handle.createViewer( Collections.emptyList(), Collections.emptyList(), 1 );
 		return handle;
 	}
@@ -97,10 +94,7 @@ public class BvvFunctions
 			final String name,
 			final BvvOptions options )
 	{
-		final Bvv bvv = options.values.addTo();
-		final BvvHandle handle = ( bvv == null )
-				? new BvvHandleFrame( options )
-				: bvv.getBvvHandle();
+		final BvvHandle handle = getHandle( options );
 		final AxisOrder axisOrder = AxisOrder.getAxisOrder( options.values.axisOrder(), img, false );
 		final AffineTransform3D sourceTransform = options.values.getSourceTransform();
 		final T type;
@@ -141,13 +135,47 @@ public class BvvFunctions
 			final int numTimePoints,
 			final BvvOptions options )
 	{
-		final Bvv bvv = options.values.addTo();
-		final BvvHandle handle = ( bvv == null )
-				? new BvvHandleFrame( options )
-				: bvv.getBvvHandle();
+		final BvvHandle handle = getHandle( options );
 		@SuppressWarnings( { "unchecked", "rawtypes" } )
 		final BvvStackSource< T > stackSource = addSource( handle, ( Source ) source, numTimePoints );
 		return stackSource;
+	}
+	
+	public static < T > BvvStackSource< T > show(
+			final SourceAndConverter< T > source )
+	{
+		return show( source, Bvv.options() );
+	}
+
+	public static < T > BvvStackSource< T > show(
+			final SourceAndConverter< T > source,
+			final BvvOptions options )
+	{
+		return show( source, 1, options );
+	}
+	
+
+	public static < T > BvvStackSource< T > show(
+			final SourceAndConverter< T > source,
+			final int numTimePoints )
+	{
+		return show( source, numTimePoints, Bvv.options() );
+	}
+	
+	public static < T > BvvStackSource< T > show(
+			final SourceAndConverter< T > soc,
+			final int numTimepoints,
+			final BvvOptions options )
+	{
+		final BvvHandle handle = getHandle( options );
+		final T type = soc.getSpimSource().getType();
+		final int setupId = handle.getUnusedSetupId();
+		final List< ConverterSetup > converterSetups = Collections.singletonList( BigDataViewer.createConverterSetup( soc, setupId ) );
+		final List< SourceAndConverter< T > > sources = Collections.singletonList( soc );
+		handle.add( converterSetups, sources, numTimepoints );
+		final BvvStackSource< T > bdvSource = new BvvStackSource<>( handle, numTimepoints, type, converterSetups, sources );
+		handle.addBvvSource( bdvSource );
+		return bdvSource;
 	}
 
 	public static List< BvvStackSource< ? > > show(
@@ -160,11 +188,7 @@ public class BvvFunctions
 			final AbstractSpimData< ? > spimData,
 			final BvvOptions options )
 	{
-		final Bvv bvv = options.values.addTo();
-		final BvvHandle handle = ( bvv == null )
-				? new BvvHandleFrame( options )
-				: bvv.getBvvHandle();
-
+		final BvvHandle handle = getHandle( options );
 		final AbstractSequenceDescription< ?, ?, ? > seq = spimData.getSequenceDescription();
 		final int numTimepoints = seq.getTimePoints().size();
 		final VolatileGlobalCellCache cache = ( VolatileGlobalCellCache ) ( ( ViewerImgLoader ) seq.getImgLoader() ).getCacheControl();
@@ -194,6 +218,18 @@ public class BvvFunctions
 	public static synchronized int getUnusedSetupId( final SetupAssignments setupAssignments )
 	{
 		return SetupAssignments.getUnusedSetupId( setupAssignments );
+	}
+	
+	/**
+	 * Get existing {@code BvvHandle} from {@code options} or create a new
+	 * {@code BvvHandleFrame}.
+	 */
+	private static BvvHandle getHandle( final BvvOptions options )
+	{
+		final Bvv bvv = options.values.addTo();
+		return ( bvv == null )
+				? new BvvHandleFrame( options )
+				: bvv.getBvvHandle();
 	}
 
 	/**

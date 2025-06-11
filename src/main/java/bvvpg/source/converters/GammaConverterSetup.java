@@ -33,30 +33,23 @@ import bvvpg.core.render.LutCSTexturePG;
 
 import java.awt.image.IndexColorModel;
 
-import net.imglib2.FinalRealInterval;
-import net.imglib2.RealInterval;
-import net.imglib2.realtransform.AffineTransform3D;
+public interface GammaConverterSetup extends ConverterSetup, Clippable3D 
+{
 
-public interface GammaConverterSetup extends ConverterSetup {
-
-	// gamma of LUT
 	void setDisplayGamma( double gamma );
 	
 	double getDisplayGamma();
 	
-	// alpha value and its own gamma 
 	void setAlphaRange( double min, double max );
 	
 	double getAlphaRangeMin();
 	
 	double getAlphaRangeMax();
-	
-	
+		
 	void setAlphaGamma( double gamma );
 	
 	double getAlphaGamma();
 	
-	// lookup tables
 	String getLUTName();
 	
 	void setLUT(final IndexColorModel icm_, String sLUTName);
@@ -71,20 +64,7 @@ public interface GammaConverterSetup extends ConverterSetup {
 	
 	void setLUTTexture(LutCSTexturePG lut_);	
 	
-	public int getLUTSize();
-	
-	/** whether the source's clipping is active **/
-	boolean clipActive();
-	
-	void setClipInterval(final RealInterval clipInt);
-	
-	void setClipActive(boolean bEnabled);
-	
-	FinalRealInterval getClipInterval();
-	
-	void getClipTransform(final AffineTransform3D t);
-	
-	void setClipTransform(final AffineTransform3D t);	
+	public int getLUTSize();	
 	
 	/** 0 = maximum intensity projection; 1 = "volumetric" **/
 	void setRenderType(int nRender);

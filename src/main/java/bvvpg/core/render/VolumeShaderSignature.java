@@ -95,7 +95,7 @@ public final class VolumeShaderSignature
 		return volumeSignatures;
 	}
 
-	public final int numVolumes()
+	public int numVolumes()
 	{
 		return volumeSignatures.size();
 	}

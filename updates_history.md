@@ -1,5 +1,9 @@
 # Updates history
 
+## 0.4.1
+
+- added loading of 8-bit images;
+
 ## 0.4.0
 
 - added orthographic projection rendering (>viewer->setProjectionType);
