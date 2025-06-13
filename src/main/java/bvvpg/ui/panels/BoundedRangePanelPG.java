@@ -406,11 +406,13 @@ public class BoundedRangePanelPG extends JPanel
 		minSpinnerModel.setMinimum( minBound );
 		minSpinnerModel.setMaximum( maxBound );
 		minSpinnerModel.setValue( range.getMin() );
+		minSpinnerModel.setStepSize( Math.abs( maxBound  - minBound)/100. );
 
 		final SpinnerNumberModel maxSpinnerModel = ( SpinnerNumberModel ) maxSpinner.getModel();
 		maxSpinnerModel.setMinimum( minBound );
 		maxSpinnerModel.setMaximum( maxBound );
 		maxSpinnerModel.setValue( range.getMax() );
+		maxSpinnerModel.setStepSize( Math.abs( maxBound  - minBound)/100. );
 
 		rangeSlider.setRange( valueToPos( range.getMin() ), valueToPos( range.getMax() ) );
 		///rangeSlider.setLowValue(valueToPos( range.getMin() ));

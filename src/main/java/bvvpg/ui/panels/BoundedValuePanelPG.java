@@ -372,6 +372,7 @@ public class BoundedValuePanelPG extends JPanel {
 		spinnerModel.setMinimum( minBound );
 		spinnerModel.setMaximum( maxBound );
 		spinnerModel.setValue( model.getCurrentValue() );
+		spinnerModel.setStepSize( Math.abs( maxBound  - minBound)/100.);
 		slider.setValue(valueToPos(model.getCurrentValue()));
 		//rangeSlider.setRange( valueToPos( range.getMin() ), valueToPos( range.getMax() ) );
 
