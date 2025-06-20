@@ -68,6 +68,7 @@ public class DefaultSimpleStackManager implements SimpleStackManager
 		currentTimestamp = 0;
 	}
 
+	@SuppressWarnings( "unchecked" )
 	@Override
 	public synchronized SimpleVolume getSimpleVolume( final GpuContext context, final SimpleStack3D< ? > stack )
 	{
