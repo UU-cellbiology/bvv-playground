@@ -5,6 +5,7 @@ uniform mat4 ipv;
 uniform float fwnw;
 uniform float nw;
 
+const vec3 lightColor = vec3(1.0, 1.0, 1.0);
 // intersect ray with a box
 // http://www.siggraph.org/education/materials/HyperGraph/raytrace/rtinter3.htm
 void intersectBox( vec3 r_o, vec3 r_d, vec3 boxmin, vec3 boxmax, out float tnear, out float tfar )
@@ -23,10 +24,25 @@ void intersectBox( vec3 r_o, vec3 r_d, vec3 boxmin, vec3 boxmax, out float tnear
 	tfar = min( min( tmax.x, tmax.y ), min( tmax.x, tmax.z ) );
 }
 
+// Phase function: Henyey-Greenstein (anisotropy g)
+float phaseHG(vec3 lightDir, vec3 viewDir, float g) {
+    float cosTheta = dot(lightDir, viewDir);
+    float denom = 1.0 + g*g - 2.0*g*cosTheta;
+    return (1.0 - g*g) / (4.0 * 3.14159265 * pow(denom, 1.5));
+}
+
+
+
 // ---------------------
 // $insert{SampleVolume}
 // $insert{Convert}
 // ---------------------
+
+
+vec3 diffuse(vec3 norm,  vec3 lightDir)
+{	
+	return max(dot(norm, lightDir), 0.0) * lightColor;
+}
 
 void main()
 {
@@ -65,6 +81,9 @@ void main()
 	if (tnear < tfar)
 	{
 		vec4 fb = wback - wfront;
+		vec3 rayDir = normalize(fb.xyz);
+		
+		
 		int numSteps =
 			(fwnw > 0.00001)
 			? int (log((tfar * fwnw + nw) / (tnear * fwnw + nw)) / log (1 + fwnw))
