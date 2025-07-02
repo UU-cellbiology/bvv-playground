@@ -1113,9 +1113,10 @@ public class VolumeViewerPanel
 			
 			finalBuf.bind(gl);
 			gl.glDisable( GL_DEPTH_TEST );
+			//draw scene + volumes on top, only color
 			offscreen.drawQuad( gl );
 			
-			//write depth to the rendering buffer
+			//write depth component of the scene to the final buffer
 			gl.glEnable(GL_DEPTH_TEST);
 			gl.glDepthMask(true);			
 			sceneBuf.drawQuadDepth( gl );
@@ -1125,6 +1126,7 @@ public class VolumeViewerPanel
 				renderSceneTransparent.render( gl, renderData );
 			
 			finalBuf.unbind(gl, false);
+			//clear previous frame
 			gl.glClear(GL_DEPTH_BUFFER_BIT);
 			finalBuf.drawQuad( gl );
 			
