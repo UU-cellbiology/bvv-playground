@@ -108,6 +108,7 @@ import static bvvpg.core.render.VolumeRenderer.RepaintType.SCENE;
 import static com.jogamp.opengl.GL.GL_DEPTH_TEST;
 import static com.jogamp.opengl.GL.GL_LESS;
 import static com.jogamp.opengl.GL.GL_RGB8;
+import static com.jogamp.opengl.GL.GL_DEPTH_BUFFER_BIT;
 
 public class VolumeViewerPanel
 		extends AbstractViewerPanel
@@ -124,8 +125,15 @@ public class VolumeViewerPanel
 	{
 		this.renderScene = renderScene;
 	}
+	
+	public void setRenderSceneTransparent( final RenderScene renderSceneTransparent )
+	{
+		this.renderSceneTransparent = renderSceneTransparent;
+	}
 
 	private RenderScene renderScene;
+	
+	private RenderScene renderSceneTransparent;
 
 	private class Repaint
 	{
@@ -183,6 +191,8 @@ public class VolumeViewerPanel
 	protected final OffScreenFrameBufferWithDepth sceneBuf;
 
 	protected final OffScreenFrameBuffer offscreen;
+	
+	protected final OffScreenFrameBufferWithDepth finalBuf;
 
 	// TODO: should be settable
 	private final long[] iobudget = new long[] { 100l * 1000000l,  10l * 1000000l };
@@ -339,8 +349,12 @@ public class VolumeViewerPanel
 
 		final int renderWidth = options.getRenderWidth();
 		final int renderHeight = options.getRenderHeight();
-		sceneBuf = new OffScreenFrameBufferWithDepth( renderWidth, renderHeight, GL_RGB8 );
-		offscreen = new OffScreenFrameBuffer( renderWidth, renderHeight, GL_RGB8, false, useGLJPanel );
+		sceneBuf = new OffScreenFrameBufferWithDepth( renderWidth, renderHeight, GL_RGB8, false );
+		//offscreen = new OffScreenFrameBuffer( renderWidth, renderHeight, GL_RGB8, false, useGLJPanel );
+		offscreen = new OffScreenFrameBuffer( renderWidth, renderHeight, GL_RGB8, false, false );
+
+		finalBuf = new OffScreenFrameBufferWithDepth( renderWidth, renderHeight, GL_RGB8, useGLJPanel );
+
 		maxRenderMillis = options.getMaxRenderMillis();
 
 		renderer = new VolumeRenderer(
@@ -1095,6 +1109,25 @@ public class VolumeViewerPanel
 			gl.glDisable( GL_DEPTH_TEST );
 			sceneBuf.drawQuad( gl );
 			final RepaintType rerender = renderer.draw( gl, type, sceneBuf, renderStacks, renderConverters, pv, maxRenderMillis, maxAllowedStepInVoxels );
+			offscreen.unbind( gl, false );
+			
+			finalBuf.bind(gl);
+			gl.glDisable( GL_DEPTH_TEST );
+			offscreen.drawQuad( gl );
+			
+			//write depth to the rendering buffer
+			gl.glEnable(GL_DEPTH_TEST);
+			gl.glDepthMask(true);			
+			sceneBuf.drawQuadDepth( gl );
+			
+			//render transparent pass
+			if ( renderSceneTransparent != null )
+				renderSceneTransparent.render( gl, renderData );
+			
+			finalBuf.unbind(gl, false);
+			gl.glClear(GL_DEPTH_BUFFER_BIT);
+			finalBuf.drawQuad( gl );
+			
 			if( bRenderMode )
 			{
 				repaint.set( rerender );
@@ -1103,8 +1136,6 @@ public class VolumeViewerPanel
 			{
 				repaint.request( rerender );
 			}
-			offscreen.unbind( gl, false );
-			offscreen.drawQuad( gl );
 		}
 
 		@Override

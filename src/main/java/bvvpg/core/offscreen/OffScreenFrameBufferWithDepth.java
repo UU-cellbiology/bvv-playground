@@ -78,6 +78,10 @@ public class OffScreenFrameBufferWithDepth
 	private int vaoQuad;
 
 	private final DefaultShader progQuad;
+	
+	private final DefaultShader progQuadDepth;
+	
+	private final boolean flipY;
 
 	private int framebuffer;
 
@@ -124,9 +128,9 @@ public class OffScreenFrameBufferWithDepth
 	 * @param fbWidth width of offscreen framebuffer
 	 * @param fbHeight height of offscreen framebuffer
 	 */
-	public OffScreenFrameBufferWithDepth( final int fbWidth, final int fbHeight )
+	public OffScreenFrameBufferWithDepth( final int fbWidth, final int fbHeight, final boolean flipY )
 	{
-		this( fbWidth, fbHeight, GL_RGB32F );
+		this( fbWidth, fbHeight, GL_RGB32F, flipY );
 	}
 
 	/**
@@ -134,15 +138,20 @@ public class OffScreenFrameBufferWithDepth
 	 * @param fbHeight height of offscreen framebuffer
 	 * @param internalFormat internal texture format
 	 */
-	public OffScreenFrameBufferWithDepth( final int fbWidth, final int fbHeight, final int internalFormat )
+	public OffScreenFrameBufferWithDepth( final int fbWidth, final int fbHeight, final int internalFormat, final boolean flipY )
 	{
 		this.fbWidth = fbWidth;
 		this.fbHeight = fbHeight;
 		this.internalFormat = internalFormat;
+		this.flipY = flipY;
 
 		final Segment quadvp = new SegmentTemplate( OffScreenFrameBufferWithDepth.class, "osfbquad.vp" ).instantiate();
 		final Segment quadfp = new SegmentTemplate( OffScreenFrameBufferWithDepth.class, "osfbquad.fp" ).instantiate();
 		progQuad = new DefaultShader( quadvp.getCode(), quadfp.getCode() );
+		
+		final Segment quadvpd = new SegmentTemplate( OffScreenFrameBufferWithDepth.class, "osfbquad_depth.vp" ).instantiate();
+		final Segment quadfpd = new SegmentTemplate( OffScreenFrameBufferWithDepth.class, "osfbquad_depth.fp" ).instantiate();
+		progQuadDepth = new DefaultShader( quadvpd.getCode(), quadfpd.getCode() );
 
 		depthTexture = new DepthTexture( fbWidth, fbHeight );
 	}
@@ -195,12 +204,20 @@ public class OffScreenFrameBufferWithDepth
 				-1, -1, 0,     0, 0,   // bottom left
 				-1,  1, 0,     0, 1    // top left
 		};
+		
+		final float verticesQuadFlipY[] = {
+				//    pos      texture
+				 1,  1, 0,     1, 0,   // top right
+				 1, -1, 0,     1, 1,   // bottom right
+				-1, -1, 0,     0, 1,   // bottom left
+				-1,  1, 0,     0, 0    // top left
+		};
 
 		final int[] tmp = new int[ 1 ];
 		gl.glGenBuffers( 1, tmp, 0 );
 		final int vboQuad = tmp[ 0 ];
 		gl.glBindBuffer( GL_ARRAY_BUFFER, vboQuad );
-		gl.glBufferData( GL_ARRAY_BUFFER, verticesQuad.length * Float.BYTES, FloatBuffer.wrap( verticesQuad ), GL.GL_STATIC_DRAW );
+		gl.glBufferData( GL_ARRAY_BUFFER, verticesQuad.length * Float.BYTES, FloatBuffer.wrap( flipY ? verticesQuadFlipY : verticesQuad ), GL.GL_STATIC_DRAW );
 		gl.glBindBuffer( GL_ARRAY_BUFFER, 0 );
 
 		final int indices[] = {
@@ -329,6 +346,23 @@ public class OffScreenFrameBufferWithDepth
 		gl.glBindTexture( GL_TEXTURE_2D, texColorBuffer );
 		gl.glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, minFilter );
 		gl.glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, magFilter );
+		gl.glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE );
+		gl.glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE );
+		gl.glBindVertexArray( vaoQuad );
+		gl.glDrawElements( GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0 );
+		gl.glBindVertexArray( 0 );
+		gl.glBindTexture( GL_TEXTURE_2D, 0 );
+	}
+	
+	public void drawQuadDepth( GL3 gl )
+	{
+		initQuad( gl );
+
+		progQuadDepth.use( JoglGpuContext.get( gl ) );
+		gl.glActiveTexture( GL_TEXTURE0 );
+		gl.glBindTexture( GL_TEXTURE_2D, texDepthBuffer );
+		gl.glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
+		gl.glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
 		gl.glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE );
 		gl.glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE );
 		gl.glBindVertexArray( vaoQuad );
