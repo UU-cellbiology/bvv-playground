@@ -467,9 +467,15 @@ public class MultiVolumeShaderMip
 		c.div( c.w() );
 		adx.div( adx.w() );
 		cdx.div( cdx.w() );
+		
+		//final Vector4f testa = pv.transform( a );
+		//final Vector4f testc = pv.transform( c );
 
-		final double sNear = Math.max( adx.sub( a ).length(), minWorldVoxelSize );
-		final double sFar = Math.max( cdx.sub( c ).length(), minWorldVoxelSize );
+		final double sNear = minWorldVoxelSize ;
+		final double sFar = minWorldVoxelSize ;
+
+//		final double sNear = Math.max( adx.sub( a ).length(), minWorldVoxelSize );
+//		final double sFar = Math.max( cdx.sub( c ).length(), minWorldVoxelSize );
 		final double ac = c.sub( a ).length();
 		final double scale = 1.0 / ac;
 		final double nw = sNear * scale;

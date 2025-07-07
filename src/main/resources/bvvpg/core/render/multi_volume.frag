@@ -39,8 +39,10 @@ void main()
 
 	// calculate eye ray in world space
 	vec4 wfront = ipv * front;
+	float wF = wfront.w;
 	wfront *= 1 / wfront.w;
 	vec4 wback = ipv * back;
+	float wB = wback.w;
 	wback *= 1 / wback.w;
 	
 	mat4 pv = inverse(ipv);
@@ -67,15 +69,17 @@ void main()
 	if (tnear < tfar)
 	{
 		vec4 fb = wback - wfront;
-		int numSteps =
-			(fwnw > 0.00001)
-			? int (log((tfar * fwnw + nw) / (tnear * fwnw + nw)) / log (1 + fwnw))
-			: int (trunc((tfar - tnear) / nw + 1));
+	//	int numSteps =
+	//		(fwnw > 0.00001)
+	//		? int (log((tfar * fwnw + nw) / (tnear * fwnw + nw)) / log (1 + fwnw))
+	//		: int (trunc((tfar - tnear) / nw + 1));
+	
+		int numSteps = int (trunc((tfar - tnear) / nw + 1));
 
 		float step = tnear;
 		vec4 v = vec4(0);
 		vec4 vnew = vec4(0);
-		for (int i = 0; i < numSteps; ++i, step += nw + step * fwnw)
+		for (int i = 0; i < numSteps; ++i, step += nw )//+ step * fwnw)
 		{
 			vec4 wpos = mix(wfront, wback, step);
 
@@ -89,16 +93,16 @@ void main()
 				v = max(v, convert(x));
 			}
 			*/
-			if(v.a>0.95)
+			if(v.a>0.9)
 			{
 				v.a = 1.0;
 				i = numSteps;
 				//gl_FragDepth = gl_FragCoord.z;
-				vec4 outv = vec4(wpos.xyz, 1.0);
+				vec4 outv = wpos*mix(wF,wB,step);
 				vec4 ndc = pv* outv;
 				//float a = (fwnw+2*nw)/fwnw;
 				//float b = 2*nw*(fwnw+nw)/fwnw;
-				gl_FragDepth = ndc.w*ndc.z;
+				gl_FragDepth =  (ndc.z*ndc.w+1.0)*0.5 ;
 				//gl_FragDepth = wpos.z*fwnw+nw;
 				//gl_FragDepth = ndc.w*2.0-1.0;
 				//gl_FragDepth = (wpos.z-wfront.z)/(wback.z-wfront.z);
