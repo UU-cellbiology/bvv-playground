@@ -103,9 +103,9 @@ void main()
 				//float a = (fwnw+2*nw)/fwnw;
 				//float b = 2*nw*(fwnw+nw)/fwnw;
 				gl_FragDepth =  (ndc.z*ndc.w+1.0)*0.5 ;
-				//gl_FragDepth = wpos.z*fwnw+nw;
-				//gl_FragDepth = ndc.w*2.0-1.0;
-				//gl_FragDepth = (wpos.z-wfront.z)/(wback.z-wfront.z);
+				//gl_FragDepth = (tzd(wpos.z)*mix(wF,wB,step)+1.0)*0.5;
+				v.xyz = vec3(1.0,0.0,0.0);
+
 			}
 		}
 		FragColor = v;
