@@ -42,6 +42,8 @@ void main()
 	wfront *= 1 / wfront.w;
 	vec4 wback = ipv * back;
 	wback *= 1 / wback.w;
+	
+	mat4 pv = inverse(ipv);
 
 	// -- bounding box intersection for all volumes ----------
 	float tnear = 1, tfar = 0, tmax = getMaxDepth(uv);
@@ -61,7 +63,7 @@ void main()
 
 	// -------------------------------------------------------
 
-
+	gl_FragDepth = getMaxDepthNDC( uv );
 	if (tnear < tfar)
 	{
 		vec4 fb = wback - wfront;
@@ -87,10 +89,19 @@ void main()
 				v = max(v, convert(x));
 			}
 			*/
-			if(v.a>0.99)
+			if(v.a>0.95)
 			{
 				v.a = 1.0;
 				i = numSteps;
+				//gl_FragDepth = gl_FragCoord.z;
+				vec4 outv = vec4(wpos.xyz, 1.0);
+				vec4 ndc = pv* outv;
+				//float a = (fwnw+2*nw)/fwnw;
+				//float b = 2*nw*(fwnw+nw)/fwnw;
+				gl_FragDepth = ndc.w*ndc.z;
+				//gl_FragDepth = wpos.z*fwnw+nw;
+				//gl_FragDepth = ndc.w*2.0-1.0;
+				//gl_FragDepth = (wpos.z-wfront.z)/(wback.z-wfront.z);
 			}
 		}
 		FragColor = v;

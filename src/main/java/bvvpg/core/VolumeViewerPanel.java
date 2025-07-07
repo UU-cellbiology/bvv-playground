@@ -190,7 +190,7 @@ public class VolumeViewerPanel
 
 	protected final OffScreenFrameBufferWithDepth sceneBuf;
 
-	protected final OffScreenFrameBuffer offscreen;
+	protected final OffScreenFrameBufferWithDepth offscreen;
 	
 	protected final OffScreenFrameBufferWithDepth finalBuf;
 
@@ -351,7 +351,7 @@ public class VolumeViewerPanel
 		final int renderHeight = options.getRenderHeight();
 		sceneBuf = new OffScreenFrameBufferWithDepth( renderWidth, renderHeight, GL_RGB8, false );
 		//offscreen = new OffScreenFrameBuffer( renderWidth, renderHeight, GL_RGB8, false, useGLJPanel );
-		offscreen = new OffScreenFrameBuffer( renderWidth, renderHeight, GL_RGB8, false, false );
+		offscreen = new OffScreenFrameBufferWithDepth( renderWidth, renderHeight, GL_RGB8,  false );
 
 		finalBuf = new OffScreenFrameBufferWithDepth( renderWidth, renderHeight, GL_RGB8, useGLJPanel );
 
@@ -1105,7 +1105,7 @@ public class VolumeViewerPanel
 			}
 
 //			offscreen.flipY = true;
-			offscreen.bind( gl, false );
+			offscreen.bind( gl, true );
 			gl.glDisable( GL_DEPTH_TEST );
 			sceneBuf.drawQuad( gl );
 			final RepaintType rerender = renderer.draw( gl, type, sceneBuf, renderStacks, renderConverters, pv, maxRenderMillis, maxAllowedStepInVoxels );
@@ -1118,9 +1118,13 @@ public class VolumeViewerPanel
 			
 			//write depth component of the scene to the final buffer
 			gl.glEnable(GL_DEPTH_TEST);
-			gl.glDepthMask(true);			
+			gl.glDepthMask(true);	
+			//in case no volume
 			sceneBuf.drawQuadDepth( gl );
-			
+			gl.glDepthFunc( GL_LESS );
+			offscreen.drawQuadDepth( gl );
+			//gl.glDepthFunc( GL_LESS );
+			//offscreen;
 			//render transparent pass
 			if ( renderSceneTransparent != null )
 				renderSceneTransparent.render( gl, renderData );
