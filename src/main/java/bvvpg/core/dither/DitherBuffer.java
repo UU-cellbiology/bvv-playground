@@ -31,7 +31,6 @@ package bvvpg.core.dither;
 import com.jogamp.opengl.GL3;
 
 import bvvpg.core.backend.jogl.JoglGpuContext;
-import bvvpg.core.offscreen.OffScreenFrameBuffer;
 import bvvpg.core.offscreen.OffScreenFrameBufferWithDepth;
 import bvvpg.core.shadergen.DefaultShader;
 import bvvpg.core.shadergen.generate.Segment;
@@ -47,11 +46,14 @@ import static com.jogamp.opengl.GL.GL_CLAMP_TO_EDGE;
 import static com.jogamp.opengl.GL.GL_NEAREST;
 import static com.jogamp.opengl.GL.GL_RGBA8;
 import static com.jogamp.opengl.GL.GL_TEXTURE0;
+import static com.jogamp.opengl.GL.GL_TEXTURE1;
 import static com.jogamp.opengl.GL.GL_TEXTURE_2D;
 import static com.jogamp.opengl.GL.GL_TEXTURE_MAG_FILTER;
 import static com.jogamp.opengl.GL.GL_TEXTURE_MIN_FILTER;
 import static com.jogamp.opengl.GL.GL_TEXTURE_WRAP_S;
 import static com.jogamp.opengl.GL.GL_TEXTURE_WRAP_T;
+
+import com.jogamp.opengl.GL;
 
 public class DitherBuffer
 {
@@ -192,6 +194,14 @@ public class DitherBuffer
 		gl.glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE );
 		gl.glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE );
 		progDither.getUniform1i( "tex" ).set( 0 );
+		
+		gl.glActiveTexture( GL_TEXTURE1 );
+		gl.glBindTexture( GL_TEXTURE_2D, dither.getTexDepthBuffer() );
+		gl.glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST );
+		gl.glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST );
+		gl.glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE );
+		gl.glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE );
+		progDither.getUniform1i( "texDepth" ).set( 1 );
 
 		progDither.use( context );
 		progDither.getUniform2f( "spw" ).set( spw, spw );
@@ -213,13 +223,23 @@ public class DitherBuffer
 			quad.draw( gl );
 		}
 		stitch.unbind( gl, false );
-
+		
+		gl.glActiveTexture( GL_TEXTURE0 );
 		gl.glBindTexture( GL_TEXTURE_2D, stitch.getTexColorBuffer() );
 		gl.glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST );
 		gl.glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST );
 		gl.glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE );
 		gl.glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE );
 		progStitch.getUniform1i( "tex" ).set( 0 );
+		
+		gl.glActiveTexture( GL_TEXTURE1 );
+		gl.glBindTexture( GL_TEXTURE_2D, stitch.getTexDepthBuffer() );
+		gl.glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST );
+		gl.glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST );
+		gl.glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE );
+		gl.glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE );
+		progStitch.getUniform1i( "texDepth" ).set( 1 );
+		
 		progStitch.getUniform2f( "viewportScale" ).set(
 				( float ) paddedWidth / destWidth,
 				( float ) paddedHeight / destHeight );

@@ -271,6 +271,11 @@ public class OffScreenFrameBufferWithDepth
 	{
 		return texColorBuffer;
 	}
+	
+	public int getTexDepthBuffer()
+	{
+		return texDepthBuffer;
+	}
 
 	/**
 	 * Bind this framebuffer and clear it.
