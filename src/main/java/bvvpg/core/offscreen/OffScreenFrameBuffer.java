@@ -289,7 +289,7 @@ public class OffScreenFrameBuffer
 	 * @param c channel (rgb)
 	 * @param x
 	 * @param y
-	 * @return
+	 * @return color value from the texture
 	 */
 	public float get( int c, int x, int y )
 	{

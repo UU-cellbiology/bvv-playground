@@ -1,6 +1,7 @@
 out vec4 FragColor;
 
 uniform sampler2D tex;
+uniform sampler2D texDepth;
 uniform vec2 viewportScale;
 uniform vec2 spw;
 uniform vec2 tls;
@@ -23,4 +24,5 @@ void main()
 	vec2 o = trunc( mod( xg + 0.1, spw ) );
 	vec2 q = ( xg - o ) / spw + o * tls + 0.5;
 	FragColor = texture( tex, q / textureSize( tex, 0 ) );
+	gl_FragDepth = texture( texDepth, q / textureSize( texDepth, 0 ) ).x ;
 }

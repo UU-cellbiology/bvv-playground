@@ -123,10 +123,23 @@ public class OffScreenFrameBufferWithDepth
 
 	private int restoreFramebuffer;
 
+	
 	/**
 	 * Use {@code GL_RGB32F} as internalFormat.
 	 * @param fbWidth width of offscreen framebuffer
 	 * @param fbHeight height of offscreen framebuffer
+	 * @param internalFormat internal texture format
+	 */
+	public OffScreenFrameBufferWithDepth( final int fbWidth, final int fbHeight, final int internalFormat )
+	{
+		this( fbWidth, fbHeight, internalFormat, false );
+	}
+	
+	/**
+	 * Use {@code GL_RGB32F} as internalFormat.
+	 * @param fbWidth width of offscreen framebuffer
+	 * @param fbHeight height of offscreen framebuffer
+	 * @param flipY whether to flip the Y axis when {@link #drawQuad drawing the texture}
 	 */
 	public OffScreenFrameBufferWithDepth( final int fbWidth, final int fbHeight, final boolean flipY )
 	{
@@ -137,6 +150,7 @@ public class OffScreenFrameBufferWithDepth
 	 * @param fbWidth width of offscreen framebuffer
 	 * @param fbHeight height of offscreen framebuffer
 	 * @param internalFormat internal texture format
+	 * @param flipY whether to flip the Y axis when {@link #drawQuad drawing the texture}
 	 */
 	public OffScreenFrameBufferWithDepth( final int fbWidth, final int fbHeight, final int internalFormat, final boolean flipY )
 	{
@@ -256,6 +270,16 @@ public class OffScreenFrameBufferWithDepth
 		depthImg = ArrayImgs.floats( depth, fbWidth, fbHeight );
 	}
 
+	public int getTexColorBuffer()
+	{
+		return texColorBuffer;
+	}
+
+	public int getTexDepthBuffer()
+	{
+		return texDepthBuffer;
+	}
+	
 	/**
 	 * Bind this framebuffer and clear it.
 	 * Call before rendering.
@@ -289,7 +313,7 @@ public class OffScreenFrameBufferWithDepth
 	 * @param c channel (rgb)
 	 * @param x
 	 * @param y
-	 * @return
+	 * @return color value from the texture
 	 */
 	public float get( int c, int x, int y )
 	{

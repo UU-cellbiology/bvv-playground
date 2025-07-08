@@ -56,6 +56,7 @@ public class DitherPattern
 		sb.append( "out vec4 FragColor;\n" );
 		sb.append( "\n" );
 		sb.append( "uniform sampler2D tex;\n" );
+		sb.append( "uniform sampler2D texDepth;\n" );
 		sb.append( "uniform vec2 spw;\n" );
 		sb.append( "uniform vec2 dsp;\n" );
 		sb.append( "\n" );
@@ -67,13 +68,22 @@ public class DitherPattern
 		sb.append( "\tvec2 xg = gl_FragCoord.xy + dsp;\n" );
 		sb.append( "\n" );
 		sb.append( "\tvec2 texsize = textureSize( tex, 0 );\n" );
+		sb.append( "\tvec2 texDepthsize = textureSize( texDepth, 0 );\n" );
 
 		for ( int i = 0; i < numSamples; ++i )
+		{
 			sb.append( String.format( "\tvec4 v%1$d = texture( tex, ( xg + spo[ %1$d ] ) / texsize );\n", i ) );
+			sb.append( String.format( "\tfloat d%1$d = texture( texDepth, ( xg + spo[ %1$d ] ) / texDepthsize ).x;\n", i ) );
+		}
 
 		sb.append( "\tFragColor = K[ 0 ] * v0" );
 		for ( int i = 1; i < numSamples; ++i )
 			sb.append( String.format( " + K[ %1$d ] * v%1$d", i ) );
+		sb.append( ";\n" );
+		
+		sb.append( "\tgl_FragDepth = K[ 0 ] * d0" );
+		for ( int i = 1; i < numSamples; ++i )
+			sb.append( String.format( " + K[ %1$d ] * d%1$d", i ) );
 		sb.append( ";\n" );
 
 		sb.append( "}\n" );

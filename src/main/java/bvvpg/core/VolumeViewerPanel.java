@@ -190,7 +190,7 @@ public class VolumeViewerPanel
 
 	protected final OffScreenFrameBufferWithDepth sceneBuf;
 
-	protected final OffScreenFrameBuffer offscreen;
+	protected final OffScreenFrameBufferWithDepth offscreen;
 	
 	protected final OffScreenFrameBufferWithDepth finalBuf;
 
@@ -349,9 +349,9 @@ public class VolumeViewerPanel
 
 		final int renderWidth = options.getRenderWidth();
 		final int renderHeight = options.getRenderHeight();
-		sceneBuf = new OffScreenFrameBufferWithDepth( renderWidth, renderHeight, GL_RGB8, false );
-		//offscreen = new OffScreenFrameBuffer( renderWidth, renderHeight, GL_RGB8, false, useGLJPanel );
-		offscreen = new OffScreenFrameBuffer( renderWidth, renderHeight, GL_RGB8, false, false );
+		sceneBuf = new OffScreenFrameBufferWithDepth( renderWidth, renderHeight, GL_RGB8 );
+
+		offscreen = new OffScreenFrameBufferWithDepth( renderWidth, renderHeight, GL_RGB8 );
 
 		finalBuf = new OffScreenFrameBufferWithDepth( renderWidth, renderHeight, GL_RGB8, useGLJPanel );
 
@@ -1105,7 +1105,7 @@ public class VolumeViewerPanel
 			}
 
 //			offscreen.flipY = true;
-			offscreen.bind( gl, false );
+			offscreen.bind( gl, true );
 			gl.glDisable( GL_DEPTH_TEST );
 			sceneBuf.drawQuad( gl );
 			final RepaintType rerender = renderer.draw( gl, type, sceneBuf, renderStacks, renderConverters, pv, maxRenderMillis, maxAllowedStepInVoxels );
@@ -1116,12 +1116,16 @@ public class VolumeViewerPanel
 			//draw scene + volumes on top, only color
 			offscreen.drawQuad( gl );
 			
-			//write depth component of the scene to the final buffer
+			//draw depth component of the scene to the final buffer
+			//(in case there is no volume)
 			gl.glEnable(GL_DEPTH_TEST);
-			gl.glDepthMask(true);			
+			gl.glDepthMask(true);
 			sceneBuf.drawQuadDepth( gl );
+			//draw depth from "volumetric" rendering, if present
+			gl.glDepthFunc( GL_LESS );
+			offscreen.drawQuadDepth( gl );
 			
-			//render transparent pass
+			//render pass for transparent objects of the scene
 			if ( renderSceneTransparent != null )
 				renderSceneTransparent.render( gl, renderData );
 			
