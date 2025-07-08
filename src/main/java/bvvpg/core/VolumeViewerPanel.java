@@ -1122,9 +1122,9 @@ public class VolumeViewerPanel
 //			offscreen.flipY = true;
 			offscreen.bind( gl, true );
 			gl.glDisable( GL_DEPTH_TEST );
+
 			sceneBuf.drawQuad( gl );
 			final RepaintType rerender = renderer.draw( gl, type, sceneBuf, renderStacks, renderConverters, pv, maxRenderMillis, maxAllowedStepInVoxels );
-			
 			if(nDepthScreenshot>0)
 			{
 				offscreen.unbind( gl, true);

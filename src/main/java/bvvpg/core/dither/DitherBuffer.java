@@ -32,6 +32,7 @@ import com.jogamp.opengl.GL3;
 
 import bvvpg.core.backend.jogl.JoglGpuContext;
 import bvvpg.core.offscreen.OffScreenFrameBuffer;
+import bvvpg.core.offscreen.OffScreenFrameBufferWithDepth;
 import bvvpg.core.shadergen.DefaultShader;
 import bvvpg.core.shadergen.generate.Segment;
 import bvvpg.core.shadergen.generate.SegmentTemplate;
@@ -68,8 +69,8 @@ public class DitherBuffer
 	private final DefaultShader progDither;
 	private final DefaultShader progStitch;
 
-	private final OffScreenFrameBuffer dither;
-	private final OffScreenFrameBuffer stitch;
+	private final OffScreenFrameBufferWithDepth dither;
+	private final OffScreenFrameBufferWithDepth stitch;
 
 	private final int we;
 
@@ -127,8 +128,8 @@ public class DitherBuffer
 		final Segment stichFp = new SegmentTemplate( DitherBuffer.class, "stitch.fp" ).instantiate();
 		progStitch = new DefaultShader( stitchVp.getCode(), stichFp.getCode() );
 
-		dither = new OffScreenFrameBuffer( paddedWidth, paddedHeight, GL_RGBA8 );
-		stitch = new OffScreenFrameBuffer( paddedWidth, paddedHeight, GL_RGBA8 );
+		dither = new OffScreenFrameBufferWithDepth( paddedWidth, paddedHeight, GL_RGBA8 );
+		stitch = new OffScreenFrameBufferWithDepth( paddedWidth, paddedHeight, GL_RGBA8 );
 	}
 
 	public int numSteps()
@@ -239,13 +240,13 @@ public class DitherBuffer
 	}
 
 	// for debug
-	public OffScreenFrameBuffer getDitherBuffer()
+	public OffScreenFrameBufferWithDepth getDitherBuffer()
 	{
 		return dither;
 	}
 
 	// for debug
-	public OffScreenFrameBuffer getStitchBuffer()
+	public OffScreenFrameBufferWithDepth getStitchBuffer()
 	{
 		return stitch;
 	}

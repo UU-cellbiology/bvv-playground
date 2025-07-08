@@ -129,6 +129,16 @@ public class OffScreenFrameBufferWithDepth
 	 * @param fbWidth width of offscreen framebuffer
 	 * @param fbHeight height of offscreen framebuffer
 	 */
+	public OffScreenFrameBufferWithDepth( final int fbWidth, final int fbHeight, final int internalFormat)
+	{
+		this(fbWidth, fbHeight, internalFormat, false);
+	}
+	/**
+	 * Use {@code GL_RGB32F} as internalFormat.
+	 * @param fbWidth width of offscreen framebuffer
+	 * @param fbHeight height of offscreen framebuffer
+	 * @param flipY whether to flip the Y axis when {@link #drawQuad drawing the texture}
+	 */
 	public OffScreenFrameBufferWithDepth( final int fbWidth, final int fbHeight, final boolean flipY )
 	{
 		this( fbWidth, fbHeight, GL_RGB32F, flipY );
@@ -255,6 +265,11 @@ public class OffScreenFrameBufferWithDepth
 
 		depth = new float[ fbWidth * fbHeight ];
 		depthImg = ArrayImgs.floats( depth, fbWidth, fbHeight );
+	}
+	
+	public int getTexColorBuffer()
+	{
+		return texColorBuffer;
 	}
 
 	/**

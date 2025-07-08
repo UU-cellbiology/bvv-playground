@@ -39,13 +39,9 @@ void main()
 
 	// calculate eye ray in world space
 	vec4 wfront = ipv * front;
-	float wF = wfront.w;
 	wfront *= 1 / wfront.w;
 	vec4 wback = ipv * back;
-	float wB = wback.w;
 	wback *= 1 / wback.w;
-	
-	mat4 pv = inverse(ipv);
 
 	// -- bounding box intersection for all volumes ----------
 	float tnear = 1, tfar = 0, tmax = getMaxDepth(uv);
@@ -65,7 +61,7 @@ void main()
 
 	// -------------------------------------------------------
 
-	gl_FragDepth = 1.0;//getMaxDepthNDC( uv );
+	gl_FragDepth = getMaxDepthNDC( uv );
 	if (tnear < tfar)
 	{
 		vec4 fb = wback - wfront;
@@ -93,17 +89,12 @@ void main()
 				v = max(v, convert(x));
 			}
 			*/
-			if(v.a>0.9)
+			if(v.a>0.99)
 			{
 				v.a = 1.0;
 				i = numSteps;
-				//gl_FragDepth = wpos.z;
-				
-				vec4 outv = wpos*mix(wF,wB,step);
-				vec4 ndc = pv* outv;
-				gl_FragDepth =  (ndc.z*ndc.w+1.0)*0.5 ;
-				//gl_FragDepth = 0.5;
 
+				gl_FragDepth = tzd(step);
 			}
 		}
 		FragColor = v;
