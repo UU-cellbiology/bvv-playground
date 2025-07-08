@@ -31,7 +31,7 @@ package bvvpg.core.dither;
 import com.jogamp.opengl.GL3;
 
 import bvvpg.core.backend.jogl.JoglGpuContext;
-import bvvpg.core.offscreen.OffScreenFrameBuffer;
+import bvvpg.core.offscreen.OffScreenFrameBufferWithDepth;
 import bvvpg.core.shadergen.DefaultShader;
 import bvvpg.core.shadergen.generate.Segment;
 import bvvpg.core.shadergen.generate.SegmentTemplate;
@@ -46,6 +46,7 @@ import static com.jogamp.opengl.GL.GL_CLAMP_TO_EDGE;
 import static com.jogamp.opengl.GL.GL_NEAREST;
 import static com.jogamp.opengl.GL.GL_RGBA8;
 import static com.jogamp.opengl.GL.GL_TEXTURE0;
+import static com.jogamp.opengl.GL.GL_TEXTURE1;
 import static com.jogamp.opengl.GL.GL_TEXTURE_2D;
 import static com.jogamp.opengl.GL.GL_TEXTURE_MAG_FILTER;
 import static com.jogamp.opengl.GL.GL_TEXTURE_MIN_FILTER;
@@ -68,8 +69,8 @@ public class DitherBuffer
 	private final DefaultShader progDither;
 	private final DefaultShader progStitch;
 
-	private final OffScreenFrameBuffer dither;
-	private final OffScreenFrameBuffer stitch;
+	private final OffScreenFrameBufferWithDepth dither;
+	private final OffScreenFrameBufferWithDepth stitch;
 
 	private final int we;
 
@@ -127,8 +128,8 @@ public class DitherBuffer
 		final Segment stichFp = new SegmentTemplate( DitherBuffer.class, "stitch.fp" ).instantiate();
 		progStitch = new DefaultShader( stitchVp.getCode(), stichFp.getCode() );
 
-		dither = new OffScreenFrameBuffer( paddedWidth, paddedHeight, GL_RGBA8 );
-		stitch = new OffScreenFrameBuffer( paddedWidth, paddedHeight, GL_RGBA8 );
+		dither = new OffScreenFrameBufferWithDepth( paddedWidth, paddedHeight, GL_RGBA8 );
+		stitch = new OffScreenFrameBufferWithDepth( paddedWidth, paddedHeight, GL_RGBA8 );
 	}
 
 	public int numSteps()
@@ -191,6 +192,14 @@ public class DitherBuffer
 		gl.glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE );
 		gl.glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE );
 		progDither.getUniform1i( "tex" ).set( 0 );
+		
+		gl.glActiveTexture( GL_TEXTURE1 );
+		gl.glBindTexture( GL_TEXTURE_2D, dither.getTexDepthBuffer() );
+		gl.glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST );
+		gl.glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST );
+		gl.glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE );
+		gl.glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE );
+		progDither.getUniform1i( "texDepth" ).set( 1 );
 
 		progDither.use( context );
 		progDither.getUniform2f( "spw" ).set( spw, spw );
@@ -212,13 +221,23 @@ public class DitherBuffer
 			quad.draw( gl );
 		}
 		stitch.unbind( gl, false );
-
+		
+		gl.glActiveTexture( GL_TEXTURE0 );
 		gl.glBindTexture( GL_TEXTURE_2D, stitch.getTexColorBuffer() );
 		gl.glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST );
 		gl.glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST );
 		gl.glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE );
 		gl.glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE );
 		progStitch.getUniform1i( "tex" ).set( 0 );
+		
+		gl.glActiveTexture( GL_TEXTURE1 );
+		gl.glBindTexture( GL_TEXTURE_2D, stitch.getTexDepthBuffer() );
+		gl.glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST );
+		gl.glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST );
+		gl.glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE );
+		gl.glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE );
+		progStitch.getUniform1i( "texDepth" ).set( 1 );
+		
 		progStitch.getUniform2f( "viewportScale" ).set(
 				( float ) paddedWidth / destWidth,
 				( float ) paddedHeight / destHeight );
@@ -233,19 +252,19 @@ public class DitherBuffer
 		gl.glBindTexture( GL_TEXTURE_2D, 0 );
 	}
 
-	private double deltaSp( final int sps, final int spo, final int se )
+	private double deltaSp( final int sps_, final int spo, final int se )
 	{
-		return ( spo + 0.5 ) / sps - 0.5 - spo * se;
+		return ( spo + 0.5 ) / sps_ - 0.5 - spo * se;
 	}
 
 	// for debug
-	public OffScreenFrameBuffer getDitherBuffer()
+	public OffScreenFrameBufferWithDepth getDitherBuffer()
 	{
 		return dither;
 	}
 
 	// for debug
-	public OffScreenFrameBuffer getStitchBuffer()
+	public OffScreenFrameBufferWithDepth getStitchBuffer()
 	{
 		return stitch;
 	}

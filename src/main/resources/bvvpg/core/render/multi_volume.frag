@@ -61,7 +61,9 @@ void main()
 
 	// -------------------------------------------------------
 
-
+	
+	gl_FragDepth = getMaxDepthNDC( uv );
+	
 	if (tnear < tfar)
 	{
 		vec4 fb = wback - wfront;
@@ -91,6 +93,7 @@ void main()
 			{
 				v.a = 1.0;
 				i = numSteps;
+				gl_FragDepth = tzd(step);
 			}
 		}
 		FragColor = v;
