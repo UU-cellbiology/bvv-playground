@@ -42,6 +42,7 @@ import java.nio.IntBuffer;
 import net.imglib2.RandomAccess;
 import net.imglib2.img.Img;
 import net.imglib2.img.array.ArrayImgs;
+import net.imglib2.img.display.imagej.ImageJFunctions;
 import net.imglib2.type.numeric.real.FloatType;
 
 import static com.jogamp.opengl.GL.GL_ARRAY_BUFFER;
@@ -326,7 +327,11 @@ public class OffScreenFrameBufferWithDepth
 		imgValid = false;
 
 		if ( getTexture )
+		{
 			getTexture( gl );
+			
+			ImageJFunctions.show(depthImg);
+		}
 	}
 
 	/**

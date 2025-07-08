@@ -65,7 +65,7 @@ void main()
 
 	// -------------------------------------------------------
 
-	gl_FragDepth = getMaxDepthNDC( uv );
+	gl_FragDepth = 1.0;//getMaxDepthNDC( uv );
 	if (tnear < tfar)
 	{
 		vec4 fb = wback - wfront;
@@ -97,14 +97,12 @@ void main()
 			{
 				v.a = 1.0;
 				i = numSteps;
-				//gl_FragDepth = gl_FragCoord.z;
+				//gl_FragDepth = wpos.z;
+				
 				vec4 outv = wpos*mix(wF,wB,step);
 				vec4 ndc = pv* outv;
-				//float a = (fwnw+2*nw)/fwnw;
-				//float b = 2*nw*(fwnw+nw)/fwnw;
 				gl_FragDepth =  (ndc.z*ndc.w+1.0)*0.5 ;
-				//gl_FragDepth = (tzd(wpos.z)*mix(wF,wB,step)+1.0)*0.5;
-				v.xyz = vec3(1.0,0.0,0.0);
+				//gl_FragDepth = 0.5;
 
 			}
 		}

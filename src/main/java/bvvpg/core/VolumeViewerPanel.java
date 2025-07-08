@@ -178,6 +178,8 @@ public class VolumeViewerPanel
 	 * changing repaint style update mode **/
 	private boolean bRenderMode = false;
 	
+	private int nDepthScreenshot = 0;
+	
 	/** screen projection method,
 	 * 0 - perspective, 1 - orthographic **/
 	private int nProjectionType = 0;
@@ -432,6 +434,11 @@ public class VolumeViewerPanel
 	public void setRenderMode (boolean bRenderMode_)
 	{
 		bRenderMode = bRenderMode_;
+	}
+	
+	public void showDepth ()
+	{
+		nDepthScreenshot = 2;
 	}
 	
 	public boolean getRenderMode ()
@@ -1088,14 +1095,22 @@ public class VolumeViewerPanel
 				renderTransformListeners.list.forEach( l -> l.transformChanged( renderData.getRenderTransformWorldToScreen() ) );
 			}
 
-			if ( type == FULL || type == SCENE )
+			//if ( type == FULL || type == SCENE )
 			{
 				sceneBuf.bind( gl );
 				gl.glEnable( GL_DEPTH_TEST );
 				gl.glDepthFunc( GL_LESS );
 				if ( renderScene != null )
 					renderScene.render( gl, renderData );
-				sceneBuf.unbind( gl, false );
+				if(nDepthScreenshot>0)
+				{
+					sceneBuf.unbind( gl, true );
+					nDepthScreenshot--;
+				}
+				else
+				{
+					sceneBuf.unbind( gl, false );
+				}
 			}
 
 			if ( type == FULL || type == LOAD )
@@ -1109,8 +1124,16 @@ public class VolumeViewerPanel
 			gl.glDisable( GL_DEPTH_TEST );
 			sceneBuf.drawQuad( gl );
 			final RepaintType rerender = renderer.draw( gl, type, sceneBuf, renderStacks, renderConverters, pv, maxRenderMillis, maxAllowedStepInVoxels );
-			offscreen.unbind( gl, false );
 			
+			if(nDepthScreenshot>0)
+			{
+				offscreen.unbind( gl, true);
+				nDepthScreenshot--;
+			}
+			else
+			{
+				offscreen.unbind( gl, false );
+			}
 			finalBuf.bind(gl);
 			gl.glDisable( GL_DEPTH_TEST );
 			//draw scene + volumes on top, only color
