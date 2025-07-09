@@ -1,8 +1,11 @@
 # Updates history
 
-## 0.4.1
+## 0.5.0
 
 - added loading of 8-bit images;
+- added separate rendering of opaque and transparent objects of the scene;
+- added depth writing for "volumetric" rendering, allowing occlusion of transparent objects;
+- fixed "fake" interpolation;
 
 ## 0.4.0
 
