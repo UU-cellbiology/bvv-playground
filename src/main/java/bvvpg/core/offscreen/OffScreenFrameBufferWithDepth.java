@@ -79,6 +79,8 @@ public class OffScreenFrameBufferWithDepth
 
 	private final DefaultShader progQuad;
 	
+	private final DefaultShader progQuadAlpha;
+	
 	private final DefaultShader progQuadDepth;
 	
 	private final boolean flipY;
@@ -162,6 +164,9 @@ public class OffScreenFrameBufferWithDepth
 		final Segment quadvp = new SegmentTemplate( OffScreenFrameBufferWithDepth.class, "osfbquad.vp" ).instantiate();
 		final Segment quadfp = new SegmentTemplate( OffScreenFrameBufferWithDepth.class, "osfbquad.fp" ).instantiate();
 		progQuad = new DefaultShader( quadvp.getCode(), quadfp.getCode() );
+
+		final Segment quadfpa = new SegmentTemplate( OffScreenFrameBufferWithDepth.class, "osfbquad_alpha.fp" ).instantiate();
+		progQuadAlpha = new DefaultShader( quadvp.getCode(), quadfpa.getCode() );
 		
 		final Segment quadvpd = new SegmentTemplate( OffScreenFrameBufferWithDepth.class, "osfbquad_depth.vp" ).instantiate();
 		final Segment quadfpd = new SegmentTemplate( OffScreenFrameBufferWithDepth.class, "osfbquad_depth.fp" ).instantiate();
@@ -370,6 +375,23 @@ public class OffScreenFrameBufferWithDepth
 		gl.glBindTexture( GL_TEXTURE_2D, texColorBuffer );
 		gl.glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, minFilter );
 		gl.glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, magFilter );
+		gl.glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE );
+		gl.glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE );
+		gl.glBindVertexArray( vaoQuad );
+		gl.glDrawElements( GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0 );
+		gl.glBindVertexArray( 0 );
+		gl.glBindTexture( GL_TEXTURE_2D, 0 );
+	}
+	
+	public void drawQuadAlpha( GL3 gl )
+	{
+		initQuad( gl );
+
+		progQuadAlpha.use( JoglGpuContext.get( gl ) );
+		gl.glActiveTexture( GL_TEXTURE0 );
+		gl.glBindTexture( GL_TEXTURE_2D, texColorBuffer );
+		gl.glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
+		gl.glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
 		gl.glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE );
 		gl.glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE );
 		gl.glBindVertexArray( vaoQuad );

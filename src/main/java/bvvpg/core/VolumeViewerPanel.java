@@ -108,6 +108,10 @@ import static bvvpg.core.render.VolumeRenderer.RepaintType.SCENE;
 import static com.jogamp.opengl.GL.GL_DEPTH_TEST;
 import static com.jogamp.opengl.GL.GL_LESS;
 import static com.jogamp.opengl.GL.GL_RGB8;
+import static com.jogamp.opengl.GL.GL_RGBA8;
+
+import com.jogamp.opengl.GL;
+
 import static com.jogamp.opengl.GL.GL_DEPTH_BUFFER_BIT;
 
 public class VolumeViewerPanel
@@ -189,6 +193,8 @@ public class VolumeViewerPanel
 	public SourceSelectionWindowState sourceSelectionWindowState;
 
 	protected final OffScreenFrameBufferWithDepth sceneBuf;
+	
+	protected final OffScreenFrameBufferWithDepth sceneBufTransparent;
 
 	protected final OffScreenFrameBufferWithDepth offscreen;
 	
@@ -349,11 +355,13 @@ public class VolumeViewerPanel
 
 		final int renderWidth = options.getRenderWidth();
 		final int renderHeight = options.getRenderHeight();
-		sceneBuf = new OffScreenFrameBufferWithDepth( renderWidth, renderHeight, GL_RGB8 );
+		sceneBuf = new OffScreenFrameBufferWithDepth( renderWidth, renderHeight, GL_RGBA8 );
+		
+		sceneBufTransparent = new OffScreenFrameBufferWithDepth( renderWidth, renderHeight, GL_RGBA8, useGLJPanel);
 
 		offscreen = new OffScreenFrameBufferWithDepth( renderWidth, renderHeight, GL_RGB8 );
 
-		finalBuf = new OffScreenFrameBufferWithDepth( renderWidth, renderHeight, GL_RGB8, useGLJPanel );
+		finalBuf = new OffScreenFrameBufferWithDepth( renderWidth, renderHeight, GL_RGBA8, useGLJPanel );
 
 		maxRenderMillis = options.getMaxRenderMillis();
 
@@ -1116,6 +1124,10 @@ public class VolumeViewerPanel
 			//draw scene + volumes on top, only color
 			offscreen.drawQuad( gl );
 			
+			finalBuf.unbind(gl, false);
+			
+			sceneBufTransparent.bind( gl );
+
 			//draw depth component of the scene to the final buffer
 			//(in case there is no volume)
 			gl.glEnable(GL_DEPTH_TEST);
@@ -1128,11 +1140,14 @@ public class VolumeViewerPanel
 			//render pass for transparent objects of the scene
 			if ( renderSceneTransparent != null )
 				renderSceneTransparent.render( gl, renderData );
+			sceneBufTransparent.unbind(gl, false);
 			
-			finalBuf.unbind(gl, false);
 			//clear previous frame
-			gl.glClear(GL_DEPTH_BUFFER_BIT);
+			gl.glClear(GL.GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+			gl.glDisable( GL_DEPTH_TEST );
 			finalBuf.drawQuad( gl );
+//			sceneBufTransparent.drawQuad( gl );
+			sceneBufTransparent.drawQuadAlpha( gl );
 			
 			if( bRenderMode )
 			{
