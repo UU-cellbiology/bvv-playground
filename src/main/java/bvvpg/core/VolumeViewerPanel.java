@@ -59,7 +59,6 @@ import bdv.viewer.state.ViewerState;
 import bdv.viewer.state.XmlIoViewerState;
 import bvvpg.core.multires.SourceStacks;
 import bvvpg.core.multires.Stack3D;
-import bvvpg.core.offscreen.OffScreenFrameBuffer;
 import bvvpg.core.offscreen.OffScreenFrameBufferWithDepth;
 import bvvpg.core.render.RenderData;
 import bvvpg.core.render.VolumeRenderer;
@@ -109,10 +108,6 @@ import static com.jogamp.opengl.GL.GL_DEPTH_TEST;
 import static com.jogamp.opengl.GL.GL_LESS;
 import static com.jogamp.opengl.GL.GL_RGB8;
 import static com.jogamp.opengl.GL.GL_RGBA8;
-
-import com.jogamp.opengl.GL;
-
-import static com.jogamp.opengl.GL.GL_DEPTH_BUFFER_BIT;
 
 public class VolumeViewerPanel
 		extends AbstractViewerPanel
@@ -192,12 +187,9 @@ public class VolumeViewerPanel
 	public SourceSelectionState sourceGroupSelection;
 	public SourceSelectionWindowState sourceSelectionWindowState;
 
-	protected final OffScreenFrameBufferWithDepth sceneBuf;
-	
+	protected final OffScreenFrameBufferWithDepth sceneBuf;	
 	protected final OffScreenFrameBufferWithDepth sceneBufTransparent;
-
-	protected final OffScreenFrameBufferWithDepth offscreen;
-	
+	protected final OffScreenFrameBufferWithDepth offscreen;	
 	protected final OffScreenFrameBufferWithDepth finalBuf;
 
 	// TODO: should be settable
@@ -355,6 +347,7 @@ public class VolumeViewerPanel
 
 		final int renderWidth = options.getRenderWidth();
 		final int renderHeight = options.getRenderHeight();
+		
 		sceneBuf = new OffScreenFrameBufferWithDepth( renderWidth, renderHeight, GL_RGBA8 );
 		
 		sceneBufTransparent = new OffScreenFrameBufferWithDepth( renderWidth, renderHeight, GL_RGBA8, useGLJPanel);
@@ -1142,11 +1135,9 @@ public class VolumeViewerPanel
 				renderSceneTransparent.render( gl, renderData );
 			sceneBufTransparent.unbind(gl, false);
 			
-			//clear previous frame
-			gl.glClear(GL.GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+			//render final quads
 			gl.glDisable( GL_DEPTH_TEST );
 			finalBuf.drawQuad( gl );
-//			sceneBufTransparent.drawQuad( gl );
 			sceneBufTransparent.drawQuadAlpha( gl );
 			
 			if( bRenderMode )
