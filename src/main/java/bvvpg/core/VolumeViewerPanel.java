@@ -348,7 +348,7 @@ public class VolumeViewerPanel
 		final int renderWidth = options.getRenderWidth();
 		final int renderHeight = options.getRenderHeight();
 		
-		sceneBuf = new OffScreenFrameBufferWithDepth( renderWidth, renderHeight, GL_RGBA8 );
+		sceneBuf = new OffScreenFrameBufferWithDepth( renderWidth, renderHeight, GL_RGB8 );
 		
 		sceneBufTransparent = new OffScreenFrameBufferWithDepth( renderWidth, renderHeight, GL_RGBA8, useGLJPanel);
 
