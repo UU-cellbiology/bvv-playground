@@ -107,7 +107,7 @@ import static bvvpg.core.render.VolumeRenderer.RepaintType.SCENE;
 import static com.jogamp.opengl.GL.GL_DEPTH_TEST;
 import static com.jogamp.opengl.GL.GL_LESS;
 import static com.jogamp.opengl.GL.GL_RGB8;
-import static com.jogamp.opengl.GL.GL_RGBA8;
+
 
 public class VolumeViewerPanel
 		extends AbstractViewerPanel
@@ -119,20 +119,24 @@ public class VolumeViewerPanel
 	{
 		void render( final GL3 gl, RenderData data );
 	}
+	public interface RenderSceneTransparent
+	{
+		void render( final GL3 gl, RenderData data, final OffScreenFrameBufferWithDepth sceneVolBuffer );
+	}
 
 	public void setRenderScene( final RenderScene renderScene )
 	{
 		this.renderScene = renderScene;
 	}
 	
-	public void setRenderSceneTransparent( final RenderScene renderSceneTransparent )
+	public void setRenderSceneTransparent( final RenderSceneTransparent renderSceneTransparent )
 	{
 		this.renderSceneTransparent = renderSceneTransparent;
 	}
 
 	private RenderScene renderScene;
 	
-	private RenderScene renderSceneTransparent;
+	private RenderSceneTransparent renderSceneTransparent;
 
 	private class Repaint
 	{
@@ -188,7 +192,6 @@ public class VolumeViewerPanel
 	public SourceSelectionWindowState sourceSelectionWindowState;
 
 	protected final OffScreenFrameBufferWithDepth sceneBuf;	
-	protected final OffScreenFrameBufferWithDepth sceneBufTransparent;
 	protected final OffScreenFrameBufferWithDepth offscreen;	
 	protected final OffScreenFrameBufferWithDepth finalBuf;
 
@@ -350,11 +353,9 @@ public class VolumeViewerPanel
 		
 		sceneBuf = new OffScreenFrameBufferWithDepth( renderWidth, renderHeight, GL_RGB8 );
 		
-		sceneBufTransparent = new OffScreenFrameBufferWithDepth( renderWidth, renderHeight, GL_RGBA8, useGLJPanel);
-
 		offscreen = new OffScreenFrameBufferWithDepth( renderWidth, renderHeight, GL_RGB8 );
 
-		finalBuf = new OffScreenFrameBufferWithDepth( renderWidth, renderHeight, GL_RGBA8, useGLJPanel );
+		finalBuf = new OffScreenFrameBufferWithDepth( renderWidth, renderHeight, GL_RGB8, useGLJPanel );
 
 		maxRenderMillis = options.getMaxRenderMillis();
 
@@ -1112,33 +1113,34 @@ public class VolumeViewerPanel
 			final RepaintType rerender = renderer.draw( gl, type, sceneBuf, renderStacks, renderConverters, pv, maxRenderMillis, maxAllowedStepInVoxels );
 			offscreen.unbind( gl, false );
 			
+			//assemble everything so far
 			finalBuf.bind(gl);
 			gl.glDisable( GL_DEPTH_TEST );
 			//draw scene + volumes on top, only color
 			offscreen.drawQuad( gl );
 			
-			finalBuf.unbind(gl, false);
-			
-			sceneBufTransparent.bind( gl );
-
-			//draw depth component of the scene to the final buffer
-			//(in case there is no volume)
+			//draw depth info
 			gl.glEnable(GL_DEPTH_TEST);
 			gl.glDepthMask(true);
-			sceneBuf.drawQuadDepth( gl );
-			//draw depth from "volumetric" rendering, if present
 			gl.glDepthFunc( GL_LESS );
-			offscreen.drawQuadDepth( gl );
-			
+			//from scene (in case volumes are absent)
+			sceneBuf.drawQuadDepth( gl );
+			//draw depth from "volumetric" rendering, if present			
+			offscreen.drawQuadDepth( gl );		
+
+			//read the depth to the texture
+			finalBuf.unbind(gl, false);
+			finalBuf.bind(gl, false);
+
 			//render pass for transparent objects of the scene
+			//we pass finalBuf so it can be used for depth test
 			if ( renderSceneTransparent != null )
-				renderSceneTransparent.render( gl, renderData );
-			sceneBufTransparent.unbind(gl, false);
+				renderSceneTransparent.render( gl, renderData, finalBuf );
 			
+			finalBuf.unbind(gl, false);
 			//render final quads
-			gl.glDisable( GL_DEPTH_TEST );
+			gl.glDisable( GL_DEPTH_TEST );			
 			finalBuf.drawQuad( gl );
-			sceneBufTransparent.drawQuadAlpha( gl );
 			
 			if( bRenderMode )
 			{
