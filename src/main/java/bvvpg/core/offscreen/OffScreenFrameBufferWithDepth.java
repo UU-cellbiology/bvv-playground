@@ -168,7 +168,7 @@ public class OffScreenFrameBufferWithDepth
 		final Segment quadfpa = new SegmentTemplate( OffScreenFrameBufferWithDepth.class, "osfbquad_alpha.fp" ).instantiate();
 		progQuadAlpha = new DefaultShader( quadvp.getCode(), quadfpa.getCode() );
 		
-		final Segment quadvpd = new SegmentTemplate( OffScreenFrameBufferWithDepth.class, "osfbquad.vp" ).instantiate();
+		final Segment quadvpd = new SegmentTemplate( OffScreenFrameBufferWithDepth.class, "osfbquad_depth.vp" ).instantiate();
 		final Segment quadfpd = new SegmentTemplate( OffScreenFrameBufferWithDepth.class, "osfbquad_depth.fp" ).instantiate();
 		progQuadDepth = new DefaultShader( quadvpd.getCode(), quadfpd.getCode() );
 
@@ -259,13 +259,6 @@ public class OffScreenFrameBufferWithDepth
 		gl.glEnableVertexAttribArray( 1 );
 		gl.glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, eboQuad );
 		gl.glBindVertexArray( 0 );
-	}
-	
-	public void bSetFlipY(boolean bFlipY)
-	{
-		//probably it can be done in shaders, but is good for now
-		flipY = bFlipY;
-		quadInitialized = false;	
 	}
 
 	private void initImgs()
@@ -406,12 +399,15 @@ public class OffScreenFrameBufferWithDepth
 		gl.glBindVertexArray( 0 );
 		gl.glBindTexture( GL_TEXTURE_2D, 0 );
 	}
-	
-	public void drawQuadDepth( GL3 gl )
+
+	/** draws only current stored depth component, optionally flipping it **/
+	public void drawQuadDepth( GL3 gl, boolean bFlipY )
 	{
 		initQuad( gl );
-
-		progQuadDepth.use( JoglGpuContext.get( gl ) );
+		JoglGpuContext context = JoglGpuContext.get( gl );
+		progQuadDepth.getUniform1i( "nFlip" ).set( bFlipY?1:0 );
+		progQuadDepth.setUniforms( context );
+		progQuadDepth.use( context );
 		gl.glActiveTexture( GL_TEXTURE0 );
 		gl.glBindTexture( GL_TEXTURE_2D, texDepthBuffer );
 		gl.glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
