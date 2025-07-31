@@ -41,8 +41,7 @@ float sampleVolume( vec4 wpos )
 	{		
 		vec3 posclip = (cliptransform*wpos).xyz;
 		vec3 s = step(clipmin, posclip) - step(clipmax, posclip);
-			
-		if(s.x * s.y * s.z==0.0)
+		if(s.x * s.y * s.z == clipactive-1)
 			return 0.0;
 	}
 	

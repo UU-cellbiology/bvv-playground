@@ -62,7 +62,7 @@ public class RealARGBColorGammaConverterSetup implements GammaConverterSetup
 	
 	private int sizeLUT = 0;
 	
-	private boolean clipActive = false;
+	private int clipState = 0;
 	
 	private FinalRealInterval clipInt = null;
 	
@@ -347,17 +347,17 @@ public class RealARGBColorGammaConverterSetup implements GammaConverterSetup
 	}
 
 	@Override
-	public boolean clipActive() {
+	public int getClipState() {
 		
-		return clipActive;
+		return clipState;
 	}
 	
 	@Override
-	public void setClipActive(boolean bEnabled)
+	public void setClipState(final int clipType)
 	{
-		if(clipActive != bEnabled )
+		if(clipState != clipType )
 		{
-			clipActive = bEnabled;
+			clipState = clipType;
 			listeners.list.forEach( l -> l.setupParametersChanged( this ) );
 		}
 	}
@@ -366,7 +366,6 @@ public class RealARGBColorGammaConverterSetup implements GammaConverterSetup
 	public void setClipInterval(final RealInterval clipInt) 
 	{
 		this.clipInt = new FinalRealInterval(clipInt);
-		clipActive = true;
 		listeners.list.forEach( l -> l.setupParametersChanged( this ) );
 	}
 

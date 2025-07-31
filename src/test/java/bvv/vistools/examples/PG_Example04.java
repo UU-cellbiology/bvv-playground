@@ -97,7 +97,8 @@ public class PG_Example04 {
 		newMin[nAxes] = newMin[nAxes]+0.5*(newMax[nAxes]-newMin[nAxes]);		
 		source.setClipInterval(new FinalRealInterval(newMin,newMax));
 		
-		
+		source.setClipState( 1 );
+
 	}
 	
 	/** function assigns new LLS7 transform to bt.afDataTransform (using provided voxel size of original data) 

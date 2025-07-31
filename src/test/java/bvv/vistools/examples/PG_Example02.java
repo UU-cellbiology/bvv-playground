@@ -72,6 +72,7 @@ public class PG_Example02
 		//regular interpolation (left half)
 		final BvvSource source = BvvFunctions.show( sphereRai, "sphere_left" );
 		source.setClipInterval( new FinalInterval(new long[] {0,0,0}, new long[] {nRadius,2*nRadius+2,2*nRadius+2}) );
+		source.setClipState( 1 );
 		source.setDisplayRangeBounds( 0, 255 );
 		source.setRenderType( 1 );
 		source.setAlphaRangeBounds( 0, 255 );
@@ -81,6 +82,7 @@ public class PG_Example02
 		//no interpolation (right half)
 		final BvvSource source2 = BvvFunctions.show( sphereRai, "sphere_right" ,Bvv.options().addTo( source ));
 		source2.setClipInterval( new FinalInterval(new long[] {nRadius,0,0}, new long[] {2*nRadius+2,2*nRadius+2,2*nRadius+2}) );
+		source2.setClipState( 1 );
 		source2.setDisplayRangeBounds( 0, 255 );
 		source2.setRenderType( 1 );
 		source2.setAlphaRangeBounds( 0, 255 );

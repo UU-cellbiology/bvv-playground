@@ -200,6 +200,7 @@ public class ColorPanelPG extends JPanel
 		this.icmName = icmName_;
 		colorButton.setIcon( new ColorIconPG( null, icm, 30, 30, 10, 10, true ) );
 	}
+	
 	public synchronized void setICMbyName(String icmName)
 	{
 		setICM(LutLoader.getLut(icmName), icmName);
