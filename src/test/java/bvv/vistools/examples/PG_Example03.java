@@ -79,7 +79,8 @@ public class PG_Example03 {
 		double [] newMax2 =  img.maxAsDoubleArray();
 		newMin2[nAxes] = newMin2[nAxes]+0.5*(newMax2[nAxes]-newMin2[nAxes]);
 		source.setClipInterval(new FinalRealInterval(newMin2,newMax2));
-
+		source.setClipState( 1 );
+		
 		//clip source 2 in 'clip' coordinates		
 		source2.setClipTransform(deskew);
 			
@@ -91,6 +92,7 @@ public class PG_Example03 {
 	
 		newMin[nAxes] = newMin[nAxes]+0.5*(newMax[nAxes]-newMin[nAxes]);		
 		source2.setClipInterval(new FinalRealInterval(newMin,newMax));
+		source2.setClipState( 1 );
 		
 
 	}

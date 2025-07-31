@@ -122,7 +122,8 @@ public class PG_Example01 {
 		//clip half of the volume along Z axis in the shaders	
 		minI[2]=0.5*maxI[2];		
 		source.setClipInterval(new FinalRealInterval(minI,maxI));		
-		
+		//turn on clipping
+		source.setClipState( 1 );
 	}
 	
 }

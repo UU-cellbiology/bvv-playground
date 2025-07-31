@@ -89,6 +89,9 @@ public abstract class BvvSource implements Bvv
 	/** tries to load a LUT with this name from available ImageJ/Fiji LUTs **/
 	public abstract void setLUT(String sLUTName);
 	
+	/** set clip state 0 - no clipping, 1 - clipping inside, 2 - clipping outside **/
+	public abstract void setClipState(final int nClipType);
+	
 	/** provided 3D interval, volumetric data outside of it will be clipped. setClipTransform can be applied **/
 	public abstract void setClipInterval(RealInterval clipInt);
 	

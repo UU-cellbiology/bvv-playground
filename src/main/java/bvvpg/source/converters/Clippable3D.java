@@ -5,10 +5,11 @@ import net.imglib2.realtransform.AffineTransform3D;
 
 public interface Clippable3D
 {
-	/** whether the source's clipping is active **/
-	boolean clipActive();
-
-	void setClipActive(boolean bEnabled);
+	/** current clip state 0 - no clipping, 1 - clipping inside, 2 - clipping outside **/
+	int getClipState();
+	
+	/** set clip state 0 - no clipping, 1 - clipping inside, 2 - clipping outside **/
+	void setClipState(final int clipType);
 
 	/** clip interval without application of clip transform **/
 	void setClipInterval(final RealInterval clipInt);
