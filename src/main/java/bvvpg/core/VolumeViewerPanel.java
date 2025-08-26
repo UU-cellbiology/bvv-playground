@@ -59,6 +59,7 @@ import bdv.viewer.state.ViewerState;
 import bdv.viewer.state.XmlIoViewerState;
 import bvvpg.core.multires.SourceStacks;
 import bvvpg.core.multires.Stack3D;
+import bvvpg.core.offscreen.OSFBDofF;
 import bvvpg.core.offscreen.OffScreenFrameBufferWithDepth;
 import bvvpg.core.render.RenderData;
 import bvvpg.core.render.VolumeRenderer;
@@ -193,7 +194,7 @@ public class VolumeViewerPanel
 
 	protected final OffScreenFrameBufferWithDepth sceneBuf;	
 	protected final OffScreenFrameBufferWithDepth offscreen;	
-	protected final OffScreenFrameBufferWithDepth finalBuf;
+	protected final OSFBDofF finalBuf;
 
 	// TODO: should be settable
 	private final long[] iobudget = new long[] { 100l * 1000000l,  10l * 1000000l };
@@ -355,7 +356,7 @@ public class VolumeViewerPanel
 		
 		offscreen = new OffScreenFrameBufferWithDepth( renderWidth, renderHeight, GL_RGB8 );
 
-		finalBuf = new OffScreenFrameBufferWithDepth( renderWidth, renderHeight, GL_RGB8, useGLJPanel );
+		finalBuf = new OSFBDofF( renderWidth, renderHeight, GL_RGB8, useGLJPanel );
 
 		maxRenderMillis = options.getMaxRenderMillis();
 
@@ -1140,7 +1141,8 @@ public class VolumeViewerPanel
 			finalBuf.unbind(gl, false);
 			//render final quads
 			gl.glDisable( GL_DEPTH_TEST );			
-			finalBuf.drawQuad( gl );
+			//finalBuf.drawQuad( gl );
+			finalBuf.drawQuadBlurred( gl );
 			
 			if( bRenderMode )
 			{

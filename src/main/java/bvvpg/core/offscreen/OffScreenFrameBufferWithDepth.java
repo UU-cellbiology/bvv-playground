@@ -75,7 +75,7 @@ import static com.jogamp.opengl.GL2ES2.GL_DEPTH_COMPONENT;
  */
 public class OffScreenFrameBufferWithDepth
 {
-	private int vaoQuad;
+	int vaoQuad;
 
 	private final DefaultShader progQuad;
 	
@@ -83,13 +83,13 @@ public class OffScreenFrameBufferWithDepth
 	
 	private final DefaultShader progQuadDepth;
 	
-	private boolean flipY;
+	boolean flipY;
 
 	private int framebuffer;
 
-	private int texColorBuffer;
+	int texColorBuffer;
 
-	private int texDepthBuffer;
+	int texDepthBuffer;
 
 	private final Texture2D depthTexture;
 
@@ -210,7 +210,7 @@ public class OffScreenFrameBufferWithDepth
 		JoglGpuContext.get( gl ).registerTexture( depthTexture, texDepthBuffer );
 	}
 
-	private void initQuad( GL3 gl )
+	void initQuad( GL3 gl )
 	{
 		if ( quadInitialized )
 			return;
