@@ -144,6 +144,8 @@ public class VolumeViewerPanel
 	private float fFocalRange = 0.2f;
 	
 	private float fBlurRadius = 20.f;
+	
+	private boolean bDepthOfField = false;
 
 	private class Repaint
 	{
@@ -475,6 +477,12 @@ public class VolumeViewerPanel
 		}
 	}
 	
+	
+	public void enableDOF(boolean bEnable)
+	{
+		bDepthOfField = bEnable;
+		requestRepaint();
+	}
 	public void setFocalDepth(final float focalDepth_)
 	{
 		fFocalDepth = focalDepth_;
@@ -1166,7 +1174,7 @@ public class VolumeViewerPanel
 			//render final quads
 			gl.glDisable( GL_DEPTH_TEST );			
 			//finalBuf.drawQuad( gl );
-			if(renderer.progvol!=null)
+			if(renderer.progvol!=null && bDepthOfField)
 			{
 			
 				finalBuf.drawQuadBlurred( gl, renderer.progvol.xf, fFocalDepth, fFocalRange, fBlurRadius);

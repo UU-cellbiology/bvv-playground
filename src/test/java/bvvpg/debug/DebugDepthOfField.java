@@ -3,8 +3,11 @@ package bvvpg.debug;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.util.List;
 
+import javax.swing.JCheckBox;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
@@ -67,9 +70,19 @@ public class DebugDepthOfField
 			i++;
 		}
 		
-		JFrame frame = new JFrame("FoD");
+		JFrame frame = new JFrame("Depth of Field");
 		frame.setAlwaysOnTop( true );
-		frame.getContentPane().setPreferredSize( new Dimension(450,120) );
+		frame.getContentPane().setPreferredSize( new Dimension(450,140) );
+		
+		final JCheckBox cbEnable = new JCheckBox("Enable DoF");
+		cbEnable.addItemListener( new ItemListener() 
+		{
+			@Override
+			public void itemStateChanged( ItemEvent e )
+			{
+				panelBVV.enableDOF( cbEnable.isSelected());	
+			}
+		});
 		BoundedValueDouble modelDepth = new BoundedValueDouble( 0.0, 1.0, 0.5 );
 		BoundedValuePanelPG depthPanel = new BoundedValuePanelPG(modelDepth);
 		depthPanel.setConsistent( true );
@@ -130,6 +143,9 @@ public class DebugDepthOfField
 		gbc.weightx = 0.1;
 		gbc.gridx = 0;
 		gbc.gridy = 0;
+		
+		allPanels.add( cbEnable,gbc);
+		gbc.gridy++;
 		allPanels.add( depthPanel,gbc);
 		
 		gbc.gridy++;

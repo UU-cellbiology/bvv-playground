@@ -108,7 +108,7 @@ public class OSFBDofF extends OffScreenFrameBufferWithDepth
 		gl.glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, magFilter );
 		gl.glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE );
 		gl.glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE );
-		progQuadBlur.getUniform1f( "radius" ).set( fBlurRadius );
+		progQuadBlur.getUniform1f( "r" ).set( fBlurRadius );
 		progQuadBlur.getUniform1i( "nFlip" ).set( 1 );
 		progQuadBlur.getUniform1i( "tex" ).set( 0 );
 		progQuadBlur.setUniforms( context );
