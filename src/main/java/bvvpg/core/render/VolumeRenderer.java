@@ -134,7 +134,7 @@ public class VolumeRenderer
 	 * Currently used volume shader program.
 	 * This is used when redrawing without changing {@code RenderState}.
 	 */
-	private MultiVolumeShaderMip progvol;
+	public MultiVolumeShaderMip progvol;
 
 	// ... dithering ...
 

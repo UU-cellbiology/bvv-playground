@@ -1,6 +1,7 @@
 package bvvpg.core.offscreen;
 
 import static com.jogamp.opengl.GL.GL_CLAMP_TO_EDGE;
+import static com.jogamp.opengl.GL.GL_DEPTH_TEST;
 import static com.jogamp.opengl.GL.GL_LINEAR;
 import static com.jogamp.opengl.GL.GL_TEXTURE0;
 import static com.jogamp.opengl.GL.GL_TEXTURE1;
@@ -32,14 +33,13 @@ public class OSFBDofF extends OffScreenFrameBufferWithDepth
 	public OSFBDofF( int fbWidth, int fbHeight, boolean flipY )
 	{
 		this( fbWidth, fbHeight, GL_RGB32F, flipY );
-		// TODO Auto-generated constructor stub
 	}
 	public OSFBDofF( final int fbWidth, final int fbHeight, final int internalFormat, final boolean flipY )
 	{
 		super(fbWidth, fbHeight, internalFormat, flipY);
-		final Segment quadvp = new SegmentTemplate( OffScreenFrameBufferWithDepth.class, "osfbquadblur.vp" ).instantiate();
-		final Segment quadfp = new SegmentTemplate( OffScreenFrameBufferWithDepth.class, "osfbquadblur.fp" ).instantiate();
-		progQuadBlur = new DefaultShader( quadvp.getCode(), quadfp.getCode() );
+		final Segment quadvpblur = new SegmentTemplate( OffScreenFrameBufferWithDepth.class, "osfbquadblur.vp" ).instantiate();
+		final Segment quadfpblur = new SegmentTemplate( OffScreenFrameBufferWithDepth.class, "osfbquadblur.fp" ).instantiate();
+		progQuadBlur = new DefaultShader( quadvpblur.getCode(), quadfpblur.getCode() );
 		
 		final Segment quadvpdof = new SegmentTemplate( OffScreenFrameBufferWithDepth.class, "osfbquaddof.vp" ).instantiate();
 		final Segment quadfpdof = new SegmentTemplate( OffScreenFrameBufferWithDepth.class, "osfbquaddof.fp" ).instantiate();
@@ -48,15 +48,15 @@ public class OSFBDofF extends OffScreenFrameBufferWithDepth
 		blurBuf = new OffScreenFrameBuffer(fbWidth,fbHeight,GL_RGB8, false, true);
 	}
 	
-	public void drawQuadBlurred( GL3 gl )
+	public void drawQuadBlurred( GL3 gl, final float xf, final float focalDepth, final float focalRange, final float fBlurRadius)
 	{
 		blurBuf.bind( gl );
-		drawQuadBlurred( gl, GL_LINEAR, GL_LINEAR );
+		drawQuadBlurred( gl, GL_LINEAR, GL_LINEAR, fBlurRadius );
 		blurBuf.unbind( gl );
-		drawQuadDoF( gl, GL_LINEAR, GL_LINEAR );
+		drawQuadDoF( gl, GL_LINEAR, GL_LINEAR, xf, focalDepth, focalRange);
 	}
 	
-	public void drawQuadDoF( GL3 gl, int minFilter, int magFilter )
+	public void drawQuadDoF( GL3 gl, int minFilter, int magFilter, final float xf, final float focalDepth, final float focalRange)
 	{
 		initQuad( gl );
 
@@ -85,6 +85,10 @@ public class OSFBDofF extends OffScreenFrameBufferWithDepth
 		gl.glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE );
 		progDoF.getUniform1i("depthTex").set( 2 );
 		
+		progDoF.getUniform1f("xf").set( xf );
+		progDoF.getUniform1f("focalDepth").set( focalDepth );
+		progDoF.getUniform1f("focalRange").set( focalRange );
+		
 		progDoF.use( context );
 		progDoF.setUniforms( context );
 		gl.glBindVertexArray( vaoQuad );
@@ -93,7 +97,7 @@ public class OSFBDofF extends OffScreenFrameBufferWithDepth
 		gl.glBindTexture( GL_TEXTURE_2D, 0 );
 	}
 	
-	public void drawQuadBlurred( GL3 gl, int minFilter, int magFilter )
+	public void drawQuadBlurred( GL3 gl, int minFilter, int magFilter, final float fBlurRadius )
 	{
 		initQuad( gl );
 		final JoglGpuContext context = JoglGpuContext.get( gl );
@@ -104,7 +108,9 @@ public class OSFBDofF extends OffScreenFrameBufferWithDepth
 		gl.glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, magFilter );
 		gl.glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE );
 		gl.glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE );
+		progQuadBlur.getUniform1f( "radius" ).set( fBlurRadius );
 		progQuadBlur.getUniform1i( "nFlip" ).set( 1 );
+		progQuadBlur.getUniform1i( "tex" ).set( 0 );
 		progQuadBlur.setUniforms( context );
 	
 		progQuadBlur.use( context );

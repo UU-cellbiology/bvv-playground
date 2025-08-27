@@ -91,6 +91,8 @@ public class MultiVolumeShaderMip
 
 	private int viewportWidth;
 	private String sceneDepthTextureName;
+	
+	public float xf = 0.0f;
 
 	/**
 	 * Functional interface to be able to use and integrate custom segments. Basically takes a three-parameter
@@ -481,6 +483,7 @@ public class MultiVolumeShaderMip
 		uniformNw.set( ( float ) nw );
 		uniformFwnw.set( ( float ) ( fw - nw ) );
 		uniformXf.set( ( float ) f );
+		xf = (float)f;
 	}
 
 	public void setViewportWidth( int width )

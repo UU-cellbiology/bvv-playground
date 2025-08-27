@@ -138,6 +138,12 @@ public class VolumeViewerPanel
 	private RenderScene renderScene;
 	
 	private RenderSceneTransparent renderSceneTransparent;
+	
+	private float fFocalDepth = 0.5f;
+	
+	private float fFocalRange = 0.2f;
+	
+	private float fBlurRadius = 20.f;
 
 	private class Repaint
 	{
@@ -467,6 +473,24 @@ public class VolumeViewerPanel
 			this.nProjectionType = newProj;
 			requestRepaint();
 		}
+	}
+	
+	public void setFocalDepth(final float focalDepth_)
+	{
+		fFocalDepth = focalDepth_;
+		requestRepaint();
+	}
+	
+	public void setFocalRange(final float focalRange_)
+	{
+		fFocalRange = focalRange_;
+		requestRepaint();
+	}
+	
+	public void setBlurRadius(final float blurRadius_)
+	{
+		fBlurRadius = blurRadius_;
+		requestRepaint();
 	}
 	/**
 	 * @deprecated Modify {@link #state()} directly
@@ -1142,7 +1166,15 @@ public class VolumeViewerPanel
 			//render final quads
 			gl.glDisable( GL_DEPTH_TEST );			
 			//finalBuf.drawQuad( gl );
-			finalBuf.drawQuadBlurred( gl );
+			if(renderer.progvol!=null)
+			{
+			
+				finalBuf.drawQuadBlurred( gl, renderer.progvol.xf, fFocalDepth, fFocalRange, fBlurRadius);
+			}
+			else
+			{
+				finalBuf.drawQuad( gl );
+			}
 			
 			if( bRenderMode )
 			{
