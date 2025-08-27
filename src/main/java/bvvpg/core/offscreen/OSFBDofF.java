@@ -27,6 +27,7 @@ public class OSFBDofF extends OffScreenFrameBufferWithDepth
 {
 	private final DefaultShader progQuadBlur;
 	private final DefaultShader progDoF;
+	private final DefaultShader progQuadDepth;
 	
 	private final OffScreenFrameBuffer blurBuf;
 
@@ -44,6 +45,10 @@ public class OSFBDofF extends OffScreenFrameBufferWithDepth
 		final Segment quadvpdof = new SegmentTemplate( OffScreenFrameBufferWithDepth.class, "osfbquaddof.vp" ).instantiate();
 		final Segment quadfpdof = new SegmentTemplate( OffScreenFrameBufferWithDepth.class, "osfbquaddof.fp" ).instantiate();
 		progDoF = new DefaultShader( quadvpdof.getCode(), quadfpdof.getCode() );
+
+		final Segment quadvpdt = new SegmentTemplate( OffScreenFrameBufferWithDepth.class, "osfbquad_depth_test.vp" ).instantiate();
+		final Segment quadfpdt = new SegmentTemplate( OffScreenFrameBufferWithDepth.class, "osfbquad_depth_test.fp" ).instantiate();
+		progQuadDepth = new DefaultShader( quadvpdt.getCode(), quadfpdt.getCode() );
 		
 		blurBuf = new OffScreenFrameBuffer(fbWidth,fbHeight,GL_RGB8, false, true);
 	}
@@ -54,6 +59,29 @@ public class OSFBDofF extends OffScreenFrameBufferWithDepth
 		drawQuadBlurred( gl, GL_LINEAR, GL_LINEAR, fBlurRadius );
 		blurBuf.unbind( gl );
 		drawQuadDoF( gl, GL_LINEAR, GL_LINEAR, xf, focalDepth, focalRange);
+	}
+	
+	public void drawQuadDepthTest( GL3 gl, final float xf)
+	{
+		drawQuadDepthTest( gl, GL_LINEAR, GL_LINEAR, xf );
+	}
+	public void drawQuadDepthTest( GL3 gl, int minFilter, int magFilter, final float xf)
+	{
+		initQuad( gl );
+		JoglGpuContext context = JoglGpuContext.get( gl );
+		progQuadDepth.getUniform1i( "nFlip" ).set( 0);
+		progQuadDepth.setUniforms( context );
+		progQuadDepth.use( context );
+		gl.glActiveTexture( GL_TEXTURE0 );
+		gl.glBindTexture( GL_TEXTURE_2D, texDepthBuffer );
+		gl.glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
+		gl.glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
+		gl.glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE );
+		gl.glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE );
+		gl.glBindVertexArray( vaoQuad );
+		gl.glDrawElements( GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0 );
+		gl.glBindVertexArray( 0 );
+		gl.glBindTexture( GL_TEXTURE_2D, 0 );
 	}
 	
 	public void drawQuadDoF( GL3 gl, int minFilter, int magFilter, final float xf, final float focalDepth, final float focalRange)

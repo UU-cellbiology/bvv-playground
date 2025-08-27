@@ -1174,9 +1174,9 @@ public class VolumeViewerPanel
 			//render final quads
 			gl.glDisable( GL_DEPTH_TEST );			
 			//finalBuf.drawQuad( gl );
-			if(renderer.progvol!=null && bDepthOfField)
-			{
-			
+			if(renderer.progvol != null && bDepthOfField)
+			{	
+				//finalBuf.drawQuadDepthTest( gl, renderer.progvol.xf );
 				finalBuf.drawQuadBlurred( gl, renderer.progvol.xf, fFocalDepth, fFocalRange, fBlurRadius);
 			}
 			else
