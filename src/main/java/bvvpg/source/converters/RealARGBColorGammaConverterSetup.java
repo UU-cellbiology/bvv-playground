@@ -303,7 +303,7 @@ public class RealARGBColorGammaConverterSetup implements GammaConverterSetup
 			System.err.println("Cannot load ImageJ LUT with the name \""+sLUTName+ "\". Wrong name/not installed?");
 			return;
 		}
-		setLUT(icm_lut ,sLUTName);
+		setLUT(icm_lut, sLUTName);
 	}
 	
 	@Override

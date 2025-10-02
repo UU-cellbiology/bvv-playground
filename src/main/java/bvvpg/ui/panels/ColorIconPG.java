@@ -63,6 +63,8 @@ public class ColorIconPG implements Icon
 	private final int oy;
 	
 	private IndexColorModel icm;
+	
+	public boolean bInvertedICM = false;
 
 	public ColorIconPG( final Color color, final IndexColorModel icm)
 	{
@@ -131,28 +133,30 @@ public class ColorIconPG implements Icon
 			{
 
 				int l = icm.getMapSize()-1;
-				if(l>0)
+				if(l > 0)
 				{
+					int nValMaxW = width;
+					int nValMaxH = height;
+					
 					if ( drawAsCircle )
 					{
-						for(int r = size;r>0; r--)
-						{
-							int ind = Math.round( r*l /size);
-							final Color cLUT = new Color(icm.getRed( ind ) ,icm.getGreen( ind ) ,icm.getBlue( ind ) );
-							g2d.setColor( cLUT );
-							g2d.fillRect( x, y, r, size );
-						}
+						nValMaxW = size;
+						nValMaxH = size;
 					}
-					else
+
+					for(int r = nValMaxW; r > 0; r--)
 					{
-						for(int r = width;r>0; r--)
+						int ind = Math.round( (r*(float)l / nValMaxW));
+						if(bInvertedICM)
 						{
-							int ind = Math.round( r*l /width);
-							final Color cLUT = new Color(icm.getRed( ind ) ,icm.getGreen( ind ) ,icm.getBlue( ind ) );
-							g2d.setColor( cLUT );
-							g2d.fillRect( x, y, r, height);
-						}	
+							ind = l-ind;
+						}
+						final Color cLUT = new Color(icm.getRed( ind ) ,icm.getGreen( ind ) ,icm.getBlue( ind ) );
+						g2d.setColor( cLUT );
+						g2d.fillRect( x, y, r, nValMaxH);
 					}
+					
+
 				}
 				else
 				{
