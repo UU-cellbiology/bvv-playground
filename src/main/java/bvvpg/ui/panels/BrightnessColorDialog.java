@@ -183,10 +183,10 @@ public class BrightnessColorDialog extends DelayedPackDialogPG
 			removeAll();
 			panels.clear();
 			GridBagConstraints ct = new GridBagConstraints();
-			ct.gridx=0;
-			ct.gridy=0;
-			ct.insets= new Insets(2,2,2,2);
-			ct.weightx =0.1;
+			ct.gridx = 0;
+			ct.gridy = 0;
+			ct.insets = new Insets(2,2,2,2);
+			ct.weightx = 0.1;
 			ct.fill = GridBagConstraints.HORIZONTAL;
 			ct.anchor = GridBagConstraints.NORTH;
 			final List< SourceModel > sources = model.getSources();
@@ -216,7 +216,7 @@ public class BrightnessColorDialog extends DelayedPackDialogPG
 				panel.update();
 			}
 			invalidate();
-			panelSize.height=totHeight;
+			panelSize.height = totHeight;
 			this.setPreferredSize( panelSize );
 			final Window frame = SwingUtilities.getWindowAncestor( this );
 			if ( frame != null )
