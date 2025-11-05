@@ -174,6 +174,8 @@ public class BoundedValuePanelPG extends JPanel {
 			updateBoundLabelFonts();
 	}
 	
+	
+	
 	public void setSliderForeground(final Color fg)
 	{
 		slider.setForeground( fg );
@@ -189,6 +191,13 @@ public class BoundedValuePanelPG extends JPanel {
 	{
 		this.isConsistent = isConsistent;
 		setBackground( isConsistent ? consistentBg : inConsistentBg );
+	}
+	
+	@Override
+	public void setToolTipText(String text)
+	{
+		this.slider.setToolTipText( text );
+		this.spinner.setToolTipText( text );
 	}
 
 	@Override

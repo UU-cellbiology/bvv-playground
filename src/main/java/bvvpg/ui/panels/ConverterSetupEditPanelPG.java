@@ -104,13 +104,13 @@ public class ConverterSetupEditPanelPG extends JPanel
 		this.listeners = new Listeners.SynchronizedList<>();
 		colorPanel = new ColorPanelPG();
 		rangePanel = new BoundedRangePanelPG();
-		Misc.setToolTipRecursively( rangePanel, "Color/LUT range" );
+		rangePanel.setToolTipText( "Color/LUT range" );
 		gammaPanel = new BoundedValuePanelPG( new BoundedValueDouble(0.01,5.0,1.0));
-		Misc.setToolTipRecursively( gammaPanel, "Color/LUT gamma" );
+		gammaPanel.setToolTipText( "Color/LUT gamma" );
 		rangeAlphaPanel = new BoundedRangePanelPG();
-		Misc.setToolTipRecursively( rangeAlphaPanel, "Opacity range" );
+		rangeAlphaPanel.setToolTipText( "Opacity range"  );
 		gammaAlphaPanel = new BoundedValuePanelPG( new BoundedValueDouble(0.01,5.0,1.0));
-		Misc.setToolTipRecursively( this.gammaAlphaPanel, "Opacity gamma" );
+		gammaAlphaPanel.setToolTipText( "Opacity gamma"  );
 		cbSync = new JCheckBox();
 		cbSync.setSelected(true);
 		cbSync.setToolTipText( "Change in LUT\nchanges opacity" );

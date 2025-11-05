@@ -206,6 +206,14 @@ public class BoundedRangePanelPG extends JPanel
 		this.isConsistent = isConsistent;
 		setBackground( isConsistent ? consistentBg : inConsistentBg );
 	}
+	
+	@Override
+	public void setToolTipText(String text)
+	{
+		this.rangeSlider.setToolTipText( text );
+		this.minSpinner.setToolTipText( text );
+		this.maxSpinner.setToolTipText( text );		
+	}
 
 	@Override
 	public void setBackground( final Color bg )
