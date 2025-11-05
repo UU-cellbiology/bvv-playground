@@ -9,9 +9,10 @@ This is a fork of [BVV](https://github.com/bigdataviewer/bigvolumeviewer-core) w
 - nearest-neighbor and trilinear interpolation;
 - lookup tables (LUTs, custom with alpha values and coming from ImageJ);
 - clipping of displayed sources in shaders (optionally using custom transform);
-- perspective and orthographic projections.
+- perspective and orthographic projections;
+- [weighted OIT](https://jcgt.org/published/0002/02/09/) rendering for transparent objects.
 
-Currently synced to BVV version 0.3.4 (this [commit](https://github.com/bigdataviewer/bigvolumeviewer-core/tree/2b8367ef592ede840ecba932deb7ff19b1896d6a)).
+Currently synced to BVV version 0.4.1 (this [commit](https://github.com/bigdataviewer/bigvolumeviewer-core/commit/7ca399a73c84b37461ca5e9f5b6c547d62867bae)).
 
 Similar to [BDV](https://github.com/bigdataviewer/bigdataviewer-core)/[BVV](https://github.com/bigdataviewer/bigvolumeviewer-core), this fork is mostly intended to be used as a visualization  
 component in other plugins (like [BigTrace](https://github.com/ekatrukha/BigTrace), [MoBIE](https://github.com/mobie/mobie-viewer-fiji)).  
