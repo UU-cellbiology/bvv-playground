@@ -6,6 +6,7 @@
 - added separate rendering of opaque and transparent objects of the scene;
 - added depth writing for "volumetric" rendering, allowing occlusion of transparent objects;
 - fixed "fake" interpolation;
+- added tooltips to converter setup panels;
 
 ## 0.4.0
 
