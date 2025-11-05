@@ -101,6 +101,8 @@ public class ColorPanelPG extends JPanel
 		colorButton.setMinimumSize( new Dimension( 46, 42 ) );
 		colorButton.setPreferredSize( new Dimension( 46, 42 ) );
 		
+		colorButton.setToolTipText( "Color/LUT" );
+		
 		colorButton.addMouseListener( new MouseAdapter()
 		{ 
 			@Override

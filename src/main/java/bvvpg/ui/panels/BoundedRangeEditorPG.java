@@ -159,6 +159,7 @@ public class BoundedRangeEditorPG {
 	{
 		this.singleCS = new ArrayList<>();
 		this.selectedConverterSetups = selectedConverterSetups;
+		
 		this.rangePanel = rangePanel;
 		this.gammaPanel = gammaPanel;
 		this.rangeAlphaPanel = rangeAlphaPanel;

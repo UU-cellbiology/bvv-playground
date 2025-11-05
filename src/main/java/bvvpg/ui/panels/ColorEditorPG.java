@@ -66,7 +66,7 @@ public class ColorEditorPG {
 	{
 		this( () -> null, converterSetups, colorPanel );
 
-		if(singleCS!=null)
+		if(singleCS != null)
 		{
 			singleCS.setupChangeListeners().add( converterSetup ->
 			{

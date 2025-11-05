@@ -104,11 +104,16 @@ public class ConverterSetupEditPanelPG extends JPanel
 		this.listeners = new Listeners.SynchronizedList<>();
 		colorPanel = new ColorPanelPG();
 		rangePanel = new BoundedRangePanelPG();
+		Misc.setToolTipRecursively( rangePanel, "Color/LUT range" );
 		gammaPanel = new BoundedValuePanelPG( new BoundedValueDouble(0.01,5.0,1.0));
+		Misc.setToolTipRecursively( gammaPanel, "Color/LUT gamma" );
 		rangeAlphaPanel = new BoundedRangePanelPG();
+		Misc.setToolTipRecursively( rangeAlphaPanel, "Opacity range" );
 		gammaAlphaPanel = new BoundedValuePanelPG( new BoundedValueDouble(0.01,5.0,1.0));
+		Misc.setToolTipRecursively( this.gammaAlphaPanel, "Opacity gamma" );
 		cbSync = new JCheckBox();
 		cbSync.setSelected(true);
+		cbSync.setToolTipText( "Change in LUT\nchanges opacity" );
 
 		//( ( MigLayout ) rangePanel.getLayout() ).setLayoutConstraints( "fillx, filly, hidemode 3" );
 		//( ( MigLayout ) gammaPanel.getLayout() ).setLayoutConstraints( "ins 5 5 5 10, fillx, filly, hidemode 3" );
@@ -120,7 +125,7 @@ public class ConverterSetupEditPanelPG extends JPanel
 		( ( MigLayout ) gammaAlphaPanel.getLayout() ).setLayoutConstraints(sLayoutConstraints );
 
 
-		add(colorPanel);
+		add( colorPanel );
 		add( rangePanel, "growx, span, wrap" );
 		
 		extendedPanel = new JPanel();
@@ -146,21 +151,24 @@ public class ConverterSetupEditPanelPG extends JPanel
 		expandButton.setFocusable( false );
 		expandButton.setBorderPainted( false );
 		expandButton.setOpaque( true );
+		expandButton.setToolTipText( "Show gamma/opacity panels" );
 		expandButton.addActionListener( new ActionListener() 
 				{
 
 					@Override
 					public void actionPerformed( ActionEvent e )
 					{
-
 						bExpanded = !bExpanded;	
-						if(bExpanded)	
+						
+						if( bExpanded )	
 						{
 							expandButton.setIcon( collapseIcon );
+							expandButton.setToolTipText( "Hide gamma/opacity panels" );
 						}
 						else
 						{
 							expandButton.setIcon( expandIcon );
+							expandButton.setToolTipText( "Show gamma/opacity panels" );
 						}
 						extendedPanel.setVisible( bExpanded  );
 						expandButton.setSelected( false );
