@@ -10,7 +10,7 @@ This is a fork of [BVV](https://github.com/bigdataviewer/bigvolumeviewer-core) w
 - lookup tables (LUTs, custom with alpha values and coming from ImageJ);
 - clipping of displayed sources in shaders (optionally using custom transform);
 - perspective and orthographic projections;
-- [weighted OIT](https://jcgt.org/published/0002/02/09/) rendering for transparent objects.
+- separate rendering for opaque and transparent objects (allows [weighted OIT](https://jcgt.org/published/0002/02/09/)).
 
 Currently synced to BVV version 0.4.1 (this [commit](https://github.com/bigdataviewer/bigvolumeviewer-core/commit/7ca399a73c84b37461ca5e9f5b6c547d62867bae)).
 
