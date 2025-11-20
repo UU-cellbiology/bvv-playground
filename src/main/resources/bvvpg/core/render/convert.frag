@@ -10,7 +10,7 @@ vec4 convert(float v)
 {
 	vec4 finC = vec4(0);
 	
-	if(sizeLUT >0)
+	if(sizeLUT > 0)
 	{
 		vec3 q = vec3(0);
 
@@ -36,7 +36,13 @@ vec4 convert(float v)
 		finC.b = pow(clamp(offset.b + scale.b * v,0.0,1.0),gamma);
 		finC.a = pow(clamp(offset.a + scale.a * v,0.0,1.0),alphagamma);			
 	}
-	
+	if(renderType == 2)
+	{
+		if(finC.a<0.99)
+		{
+			finC = vec4(0);
+		}
+	}
 	return finC;
 }
 		

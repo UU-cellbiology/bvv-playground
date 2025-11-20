@@ -35,3 +35,27 @@ float sampleVolume( vec4 wpos )
 	}
 	return texture( volume, pos / textureSize( volume, 0 ) ).r;
 }
+
+vec3 gradientVolume( vec4 wpos )
+{
+	vec3 pos = (im * wpos).xyz + 0.5;
+	
+	vec3 ox = vec3(1.0,0,0);
+	vec3 oy = vec3(0,1.0,0);
+	vec3 oz = vec3(0,0,1.0);
+	float fx1 = texture( volume, (pos + ox) / textureSize( volume, 0 ) ).r;
+	float fx0 = texture( volume, (pos - ox) / textureSize( volume, 0 ) ).r;
+	float fy1 = texture( volume, (pos + oy) / textureSize( volume, 0 ) ).r;
+	float fy0 = texture( volume, (pos - oy) / textureSize( volume, 0 ) ).r;
+	float fz1 = texture( volume, (pos + oz) / textureSize( volume, 0 ) ).r;
+	float fz0 = texture( volume, (pos - oz) / textureSize( volume, 0 ) ).r;
+		
+	// divide by 2*voxelSize to approximate derivative in physical units
+	float dx = (fx1 - fx0) * 0.5;
+	float dy = (fy1 - fy0) * 0.5;
+	float dz = (fz1 - fz0) * 0.5;
+
+	return normalize(vec3(dx, dy, dz));
+	
+	
+}

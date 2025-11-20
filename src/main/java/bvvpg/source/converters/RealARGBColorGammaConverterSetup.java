@@ -324,7 +324,7 @@ public class RealARGBColorGammaConverterSetup implements GammaConverterSetup
 	@Override
 	public void setRenderType(int nRender) 
 	{
-		if (nRender >2 || nRender <0)
+		if (nRender > 3 || nRender < 0)
 			nRenderType = 0;
 		else
 			if(nRenderType != nRender)
