@@ -4,6 +4,7 @@
 ## 0.5.1
 
 - added isosurface rendering of volumes;
+- updated to scijava POM 42.0.0;
 
 ## 0.5.0
 
