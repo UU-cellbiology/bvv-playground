@@ -10,7 +10,7 @@ if (vis)
 	//volumetric or surface
 	else
 	{
-		if(lightType > 0)
+		if(lightType * vnew.a > 0)
 		{
 			//get gradient
 			vec3 n = gradientVolume(wpos, gradientHalfStep);

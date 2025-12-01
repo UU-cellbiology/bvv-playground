@@ -3,7 +3,7 @@ uniform vec4 scale;
 uniform float gamma;
 uniform float alphagamma;
 uniform int renderType;
-uniform int lightType;
+uniform float lightType;
 uniform int sizeLUT;
 uniform sampler3D lut;
 

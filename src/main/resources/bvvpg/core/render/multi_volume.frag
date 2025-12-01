@@ -4,7 +4,7 @@ uniform vec2 dsp;
 uniform mat4 ipv;
 uniform float fwnw;
 uniform float nw;
-const vec3 lightDir = normalize(vec3(0.0, -0.2, -1.0));
+const vec3 lightDir = normalize(vec3(0, -0.2, -1));
 const float gradientHalfStep = 3.0;
 
 // intersect ray with a box

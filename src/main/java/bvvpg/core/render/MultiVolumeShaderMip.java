@@ -527,7 +527,7 @@ public class MultiVolumeShaderMip
 		private final Uniform1f uniformGammaAlpha;
 		private final Uniform1i uniformSizeLUT;
 		private final Uniform1i uniformRenderType;
-		private final Uniform1i uniformLightType;
+		private final Uniform1f uniformLightType;
 		private final UniformSampler uniformLUT;
 		private final Uniform1i uniformClipActive;
 		private final Uniform1i uniformVoxelInterpolation;
@@ -545,7 +545,7 @@ public class MultiVolumeShaderMip
 			uniformGamma = prog.getUniform1f( segmentConv,"gamma" );
 			uniformGammaAlpha = prog.getUniform1f( segmentConv,"alphagamma" );
 			uniformRenderType = prog.getUniform1i( segmentConv,"renderType" );
-			uniformLightType = prog.getUniform1i( segmentConv,"lightType" );
+			uniformLightType = prog.getUniform1f( segmentConv,"lightType" );
 			uniformVoxelInterpolation = prog.getUniform1i( segmentVol,"voxelInterpolation" );
 			uniformSizeLUT = prog.getUniform1i( segmentConv,"sizeLUT" );
 			uniformLUT = prog.getUniformSampler(segmentConv, "lut");
