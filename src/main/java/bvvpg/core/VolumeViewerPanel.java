@@ -1110,7 +1110,7 @@ public class VolumeViewerPanel
 			offscreen.bind( gl, true );
 			gl.glDisable( GL_DEPTH_TEST );
 			sceneBuf.drawQuad( gl );
-			final RepaintType rerender = renderer.draw( gl, type, sceneBuf, renderStacks, renderConverters, pv, maxRenderMillis, maxAllowedStepInVoxels );
+			final RepaintType rerender = renderer.draw( gl, type, sceneBuf, renderStacks, renderConverters, renderData, maxRenderMillis, maxAllowedStepInVoxels );
 			offscreen.unbind( gl, false );
 			
 			//assemble everything so far

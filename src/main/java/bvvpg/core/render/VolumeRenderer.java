@@ -272,7 +272,7 @@ public class VolumeRenderer
 			final OffScreenFrameBufferWithDepth sceneBuf,
 			final List< Stack3D< ? > > renderStacks,
 			final List< ConverterSetup > renderConverters,
-			final Matrix4f pv,
+			final RenderData renderData,
 			final int maxRenderMillis,
 			final double maxAllowedStepInVoxels )
 	{
@@ -351,7 +351,7 @@ public class VolumeRenderer
 					throw new IllegalArgumentException();
 			}
 			needAtLeastNumBlockVolumes( multiResStacks.size() );
-			updateBlocks( context, multiResStacks, pv );
+			updateBlocks( context, multiResStacks, renderData.getPv() );
 
 			double minWorldVoxelSize = Double.POSITIVE_INFINITY;
 			progvol = progvols.computeIfAbsent( new VolumeShaderSignature( volumeSignatures ), this::createMultiVolumeShader );
@@ -367,20 +367,20 @@ public class VolumeRenderer
 					if ( volumeSignatures.get( i ).getSourceStackType() == MULTIRESOLUTION )
 					{
 						final VolumeBlocks volume = volumes.get( mri++ );
-						progvol.setVolume( i, volume );
+						progvol.setVolume( i, volume, renderData );
 						minWorldVoxelSize = Math.min( minWorldVoxelSize, volume.getBaseLevelVoxelSizeInWorldCoordinates() );
 					}
 					else
 					{
 						final SimpleStack3D< ? > simpleStack3D = ( SimpleStack3D< ? > ) renderStacks.get( i );
 						final SimpleVolume volume = simpleStackManager.getSimpleVolume( context, simpleStack3D );
-						progvol.setVolume( i, volume );
+						progvol.setVolume( i, volume, renderData );
 						minWorldVoxelSize = Math.min( minWorldVoxelSize, volume.getVoxelSizeInWorldCoordinates() );
 					}
 				}
 				progvol.setDepthTexture( sceneBuf.getDepthTexture() );
 				progvol.setViewportWidth( renderWidth );
-				progvol.setProjectionViewMatrix( pv, maxAllowedStepInVoxels * minWorldVoxelSize );
+				progvol.setProjectionViewMatrix( renderData.getPv(), maxAllowedStepInVoxels * minWorldVoxelSize );
 			}
 
 			simpleStackManager.freeUnusedSimpleVolumes( context );

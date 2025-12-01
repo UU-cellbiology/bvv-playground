@@ -1,0 +1,121 @@
+package bvvpg.debug;
+
+import java.awt.image.IndexColorModel;
+
+import net.imglib2.FinalRealInterval;
+import net.imglib2.img.Img;
+import net.imglib2.img.display.imagej.ImageJFunctions;
+import net.imglib2.type.numeric.integer.UnsignedShortType;
+
+import bvvpg.vistools.BvvFunctions;
+import bvvpg.vistools.BvvOptions;
+import bvvpg.vistools.BvvSource;
+import ij.IJ;
+import ij.ImagePlus;
+
+public class DebugSurfaceRenderSegmentations
+{
+	/**
+	 * Show 16-bit volume, change display range, change gamma,
+	 * rendering type, alpha value, apply LUT and clip volume in half
+	 */
+	public static void main( final String[] args )
+	{
+		
+		//regular tif init
+		/**/
+		//final ImagePlus imp = IJ.openImage( "https://imagej.nih.gov/ij/images/t1-head.zip" );
+		final ImagePlus imp2 = IJ.openImage( "/home/eugene/Desktop/projects/BigTrace/BigTrace_data/t1-head.tif" );
+		final ImagePlus imp = IJ.openImage( "/home/eugene/Desktop/projects/BVB/wiki/data/lm-cells-1-crop.tif" );
+
+		final Img< UnsignedShortType > img = ImageJFunctions.wrapShort( imp );
+		final Img< UnsignedShortType > img2 = ImageJFunctions.wrapShort( imp2 );
+
+		final BvvSource source = BvvFunctions.show( img, "t1-head" );
+
+		BvvFunctions.show( img2, "ggg", BvvOptions.options().addTo( source ) );
+		/**/
+
+		//BDV XML init (multiscale cached)
+		/*
+		final String xmlFilename = "/home/eugene/Desktop/projects/BigTrace/BigTrace_data/t1-head.xml";
+		SpimDataMinimal spimData = null;
+		try {
+			spimData = new XmlIoSpimDataMinimal().load( xmlFilename );
+		} catch (SpimDataException e) {
+			e.printStackTrace();
+		}		
+		final List< BvvStackSource< ? > > sources = BvvFunctions.show( spimData );
+		final BvvSource source = sources.get(0);
+		double [] minI = spimData.getSequenceDescription().getImgLoader().getSetupImgLoader(0).getImage(0).minAsDoubleArray();
+		double [] maxI = spimData.getSequenceDescription().getImgLoader().getSetupImgLoader(0).getImage(0).maxAsDoubleArray();
+		
+		//scale clipping interval
+		VoxelDimensions voxSize = spimData.getSequenceDescription().getViewSetupsOrdered().get( 0 ).getVoxelSize();
+		for(int d=0; d<3; d++)
+		{
+			minI[d] *= voxSize.dimension( d );
+			maxI[d] *= voxSize.dimension( d );
+
+		}
+		*/
+	
+		source.setDisplayRangeBounds( 0, 200 );
+		source.setDisplayRange(0, 655);
+		source.setDisplayGamma(0.5);
+		source.setVoxelRenderInterpolation( 0 );
+		
+		//set volumetric rendering (1), instead of max intensity max intensity (0)
+		source.setRenderType(2);
+		
+		//DisplayRange maps colors (or LUT values) to intensity values
+		source.setDisplayRange(0, 123);
+		//it is also possible to change gamma value
+		//source.setDisplayGamma(0.9);
+		
+		//alpha channel to intensity mapping can be changed independently
+		source.setAlphaRange(0, 1);
+		//it is also possible to change alpha-channel gamma value
+		//source.setAlphaGamma(0.9);
+		source.setLightingType( 2 );
+		//assign a "Fire" lookup table to this source
+		//source.setLUT("Fire");
+		source.setLUT("3-3-2 RGB");
+		//source.setLUT(  getLargeICMwithWaveAlphas(256), null );
+		
+		//or one can assign custom IndexColorModel + name as string
+		//in this illustration we going to get IndexColorModel from IJ 
+		//(but it could be made somewhere else)
+		//final IndexColorModel icm_lut = LutLoader.getLut("Spectrum");
+		//source.setLUT( icm_lut, "SpectrumLUT" );
+
+		
+
+	}
+	
+	public static IndexColorModel getLargeICMwithWaveAlphas(int nTotLength)
+	{
+		
+		final byte [][] colors = new byte [4][nTotLength];
+		colors[0][0] = ( byte ) 0;
+		colors[1][0] = ( byte )  0 ;
+		colors[2][0] = ( byte ) 255 ;
+		colors[3][0] = ( byte ) 255 ;
+		
+		for(int i=1;i<nTotLength;i++)
+		{
+			int nStep = (int) Math.round( 255.0*i/(nTotLength));
+			colors[0][i] = ( byte ) nStep ;
+			colors[1][i] = ( byte )  (255-nStep ) ;
+			colors[2][i] = ( byte ) 0 ;
+			colors[3][i] = ( byte ) Math.round(255*0.5*(Math.cos(20.0*Math.PI*i/nTotLength )+1)) ;
+
+		}
+		colors[0][nTotLength-1] = ( byte ) 255;
+		colors[1][nTotLength-1] = ( byte )  255 ;
+		colors[2][nTotLength-1] = ( byte ) 255 ;
+		colors[3][nTotLength-1] = ( byte ) 255 ;
+
+		return new IndexColorModel(16,nTotLength,colors[0],colors[1],colors[2],colors[3]);
+	}
+}

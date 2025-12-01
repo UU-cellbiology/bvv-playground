@@ -42,6 +42,7 @@ import bvvpg.core.shadergen.Uniform2f;
 import bvvpg.core.shadergen.Uniform3f;
 import bvvpg.core.shadergen.Uniform3fv;
 import bvvpg.core.shadergen.Uniform4f;
+import bvvpg.core.shadergen.UniformMatrix3f;
 import bvvpg.core.shadergen.UniformMatrix4f;
 import bvvpg.core.shadergen.UniformSampler;
 import bvvpg.core.shadergen.generate.Segment;
@@ -58,6 +59,8 @@ import java.util.Map;
 
 import net.imglib2.realtransform.AffineTransform3D;
 import net.imglib2.type.numeric.ARGBType;
+
+import org.joml.Matrix3f;
 import org.joml.Matrix4f;
 import org.joml.Matrix4fc;
 import org.joml.Vector2f;
@@ -208,7 +211,9 @@ public class MultiVolumeShaderMip
 			fp.bind( "vis", i, accumulate );
 			accumulate.bind( "sampleVolume", sampleVolume );
 			accumulate.bind( "convert", convert );
+			accumulate.bind( "gradientVolume", sampleVolume );
 			accumulate.bind( "renderType", convert );
+			accumulate.bind( "lightType", convert );
 
 			sampleVolumeSegs[ i ] = sampleVolume;
 			convertSegs[ i ] = convert;
@@ -265,25 +270,29 @@ public class MultiVolumeShaderMip
 		segments.put( SegmentType.SampleMultiresolutionVolume, new SegmentTemplate(
 				"sample_volume_blocks.frag",
 				"volumeCache", "blockSize", "paddedBlockSize", "cachePadOffset", "cacheSize",
-				"im", "sourcemin", "sourcemax","voxelInterpolation", 
+				"im", "itvm", "sourcemin", "sourcemax","voxelInterpolation", 
 				"clipactive", "clipmin", "clipmax", "cliptransform",
 				"intersectBoundingBox",
-				"lutSampler", "blockScales", "lutSize", "lutOffset", "sampleVolume" ) );
+				"lutSampler", "blockScales", "lutSize", "lutOffset", "sampleVolume",
+				"sampleRaw", "gradientVolume" ) );
 		segments.put( SegmentType.SampleVolume, new SegmentTemplate(
 				"sample_volume_simple.frag",
-				"im", "sourcemax", "voxelInterpolation",
+				"im", "itvm", "sourcemax", "voxelInterpolation",
 				"clipactive", "clipmin", "clipmax", "cliptransform",
 				"intersectBoundingBox",
-				"volume", "sampleVolume" ) );
+				"volume", "sampleVolume",
+				"sampleRaw", "gradientVolume" ) );
 		segments.put( SegmentType.SampleRGBAVolume, new SegmentTemplate(
 				"sample_volume_simple_rgba.frag",
 				"im", "sourcemax", "voxelInterpolation",
 				"clipactive", "clipmin", "clipmax", "cliptransform",
 				"intersectBoundingBox",
-				"volume", "sampleVolume" ) );
+				"volume", "sampleVolume" ) ); 				
 		segments.put( SegmentType.Convert, new SegmentTemplate(
 				"convert.frag",
-				"convert", "offset", "scale", "gamma", "alphagamma","renderType","sizeLUT","lut" ) );
+				"convert", "offset", "scale", "gamma", "alphagamma",
+				"renderType", "lightType",
+				"sizeLUT","lut" ) );
 		segments.put( SegmentType.ConvertRGBA, new SegmentTemplate(
 				"convert_rgba.frag",
 				"convert", "offset", "scale", "gamma", "alphagamma", "renderType", "sizeLUT","lut" ) );
@@ -294,11 +303,13 @@ public class MultiVolumeShaderMip
 				"multi_volume.frag",
 				"intersectBoundingBox", "vis", "SampleVolume", "Convert", "Accumulate" ) );
 		segments.put( SegmentType.AccumulatorMultiresolution, new SegmentTemplate(
-				"accumulate_mip_blocks.frag",
-				"vis", "sampleVolume", "convert", "renderType" ) );
+				"accumulate_blocks.frag",
+				"vis", "sampleVolume", "convert", "gradientVolume",
+				"renderType", "lightType" ) );
 		segments.put( SegmentType.Accumulator, new SegmentTemplate(
-				"accumulate_mip_simple.frag",
-				"vis", "sampleVolume", "convert", "renderType" ) );
+				"accumulate_simple.frag",
+				"vis", "sampleVolume", "convert", "gradientVolume", 
+				"renderType", "lightType" ) );
 
 		return segments;
 	}
@@ -413,22 +424,22 @@ public class MultiVolumeShaderMip
 		setUniform( index, name, elementSize, value );
 	}
 
-	public void setVolume( int index, VolumeBlocks volume )
+	public void setVolume( int index, VolumeBlocks volume, final RenderData renderData )
 	{
 		final VolumeShaderSignature.VolumeSignature vs = signature.getVolumeSignatures().get( index );
 		if ( vs.getSourceStackType() != SourceStacks.SourceStackType.MULTIRESOLUTION )
 			throw new IllegalArgumentException();
 
-		( ( VolumeBlocksSegment ) volumeSegments[ index ] ).setData( volume );
+		( ( VolumeBlocksSegment ) volumeSegments[ index ] ).setData( volume, renderData );
 	}
 
-	public void setVolume( int index, SimpleVolume volume )
+	public void setVolume( int index, SimpleVolume volume, final RenderData renderData )
 	{
 		final VolumeShaderSignature.VolumeSignature vs = signature.getVolumeSignatures().get( index );
 		if ( vs.getSourceStackType() != SourceStacks.SourceStackType.SIMPLE )
 			throw new IllegalArgumentException();
 
-		( ( VolumeSimpleSegment ) volumeSegments[ index ] ).setData( volume );
+		( ( VolumeSimpleSegment ) volumeSegments[ index ] ).setData( volume, renderData );
 	}
 
 
@@ -516,6 +527,7 @@ public class MultiVolumeShaderMip
 		private final Uniform1f uniformGammaAlpha;
 		private final Uniform1i uniformSizeLUT;
 		private final Uniform1i uniformRenderType;
+		private final Uniform1i uniformLightType;
 		private final UniformSampler uniformLUT;
 		private final Uniform1i uniformClipActive;
 		private final Uniform1i uniformVoxelInterpolation;
@@ -533,6 +545,7 @@ public class MultiVolumeShaderMip
 			uniformGamma = prog.getUniform1f( segmentConv,"gamma" );
 			uniformGammaAlpha = prog.getUniform1f( segmentConv,"alphagamma" );
 			uniformRenderType = prog.getUniform1i( segmentConv,"renderType" );
+			uniformLightType = prog.getUniform1i( segmentConv,"lightType" );
 			uniformVoxelInterpolation = prog.getUniform1i( segmentVol,"voxelInterpolation" );
 			uniformSizeLUT = prog.getUniform1i( segmentConv,"sizeLUT" );
 			uniformLUT = prog.getUniformSampler(segmentConv, "lut");
@@ -566,6 +579,7 @@ public class MultiVolumeShaderMip
 			uniformGamma.set(1.0f);
 			uniformGammaAlpha.set(1.0f);
 			uniformRenderType.set(0);
+			uniformLightType.set(0);
 			uniformClipActive.set(0);
 			uniformVoxelInterpolation.set( 0 );
 
@@ -575,6 +589,7 @@ public class MultiVolumeShaderMip
 				uniformGamma.set(1.0f/(float)gconverter.getDisplayGamma());
 				uniformGammaAlpha.set(1.0f/(float)gconverter.getAlphaGamma());
 				uniformRenderType.set(gconverter.getRenderType());
+				uniformLightType.set(gconverter.getLightingType());
 				uniformVoxelInterpolation.set(gconverter.getVoxelRenderInterpolation());
 				fminA = gconverter.getAlphaRangeMin() / rangeScale;
 				fmaxA = gconverter.getAlphaRangeMax() / rangeScale;
@@ -674,6 +689,7 @@ public class MultiVolumeShaderMip
 		private final Uniform3f uniformLutSize;
 		private final Uniform3f uniformLutOffset;
 		private final UniformMatrix4f uniformIm;
+		private final UniformMatrix3f uniformItvm;
 		private final Uniform3f uniformSourcemin;
 		private final Uniform3f uniformSourcemax;
 
@@ -692,12 +708,13 @@ public class MultiVolumeShaderMip
 			uniformLutSize = prog.getUniform3f( volume, "lutSize" );
 			uniformLutOffset = prog.getUniform3f( volume, "lutOffset" );
 			uniformIm = prog.getUniformMatrix4f( volume, "im" );
+			uniformItvm = prog.getUniformMatrix3f( volume, "itvm" );
 			uniformSourcemin = prog.getUniform3f( volume, "sourcemin" );
 			uniformSourcemax = prog.getUniform3f( volume, "sourcemax" );
 
 		}
 
-		public void setData( VolumeBlocks blocks )
+		public void setData( VolumeBlocks blocks, final RenderData renderData )
 		{
 			final TextureCache cache = blocks.getTextureCache();
 			final CacheSpec spec = cache.spec();
@@ -716,6 +733,9 @@ public class MultiVolumeShaderMip
 			uniformLutSize.set( lut.getSize3f() );
 			uniformLutOffset.set( lut.getOffset3f() );
 			uniformIm.set( blocks.getIms() );
+			final Matrix4f vtm = renderData.getCamview().mul( blocks.getIms(), new Matrix4f() );
+			final Matrix4f itvm = vtm.invert( new Matrix4f() ).transpose();
+			uniformItvm.set( itvm.get3x3( new Matrix3f() ) );
 			uniformSourcemin.set( blocks.getSourceLevelMin() );
 			uniformSourcemax.set( blocks.getSourceLevelMax() );
 		}
@@ -725,6 +745,7 @@ public class MultiVolumeShaderMip
 	{
 		private final UniformSampler uniformVolumeSampler;
 		private final UniformMatrix4f uniformIm;
+		private final UniformMatrix3f uniformItvm;
 		private final Uniform3f uniformSourcemax;
 
 		public VolumeSimpleSegment( final SegmentedShader prog, final Segment volume )
@@ -732,13 +753,17 @@ public class MultiVolumeShaderMip
 			super( volume );
 			uniformVolumeSampler = prog.getUniformSampler( volume, "volume" );
 			uniformIm = prog.getUniformMatrix4f( volume, "im" );
+			uniformItvm = prog.getUniformMatrix3f( volume, "itvm" );
 			uniformSourcemax = prog.getUniform3f( volume, "sourcemax" );
 		}
 
-		public void setData( SimpleVolume volume )
+		public void setData( SimpleVolume volume, final RenderData renderData )
 		{
 			uniformVolumeSampler.set( volume.getVolumeTexture() );
 			uniformIm.set( volume.getIms() );
+			final Matrix4f vtm = renderData.getCamview().mul( volume.getIms(), new Matrix4f() );
+			final Matrix4f itvm = vtm.invert( new Matrix4f() ).transpose();
+			uniformItvm.set( itvm.get3x3( new Matrix3f() ) );
 			uniformSourcemax.set( volume.getSourceMax() );
 		}
 	}

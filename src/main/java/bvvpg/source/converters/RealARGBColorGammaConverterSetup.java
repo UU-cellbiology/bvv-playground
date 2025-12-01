@@ -54,8 +54,11 @@ public class RealARGBColorGammaConverterSetup implements GammaConverterSetup
 	
 	private LutCSTexturePG texLUT = new LutCSTexturePG();
 	
-	/** 0 = maximum intensity projection; 1 = "volumetric" **/
+	/** 0 = maximum intensity projection; 1 = volumetric; 2 = surface **/
 	private int nRenderType = 0; 
+	
+	/** 0 = plain; 1 = shaded; 2 = shiny **/
+	private int nLightType = 0; 
 	
 	/** 0 = nearest neighbor (cubes); 1 = tri-linear **/
 	private int nVoxelInterpolation = 1;
@@ -324,7 +327,7 @@ public class RealARGBColorGammaConverterSetup implements GammaConverterSetup
 	@Override
 	public void setRenderType(int nRender) 
 	{
-		if (nRender >2 || nRender <0)
+		if (nRender > 3 || nRender < 0)
 			nRenderType = 0;
 		else
 			if(nRenderType != nRender)
@@ -338,6 +341,25 @@ public class RealARGBColorGammaConverterSetup implements GammaConverterSetup
 	public int getRenderType() 
 	{
 		return nRenderType;
+	}
+	
+	@Override
+	public void setLightingType(int nLight) 
+	{
+		if (nLight > 3 || nLight < 0)
+			nLightType = 0;
+		else
+			if(nLightType != nLight)
+			{
+				nLightType = nLight;
+				listeners.list.forEach( l -> l.setupParametersChanged( this ) );
+			}
+	}
+
+	@Override
+	public int getLightingType() 
+	{
+		return nLightType;
 	}
 
 	@Override

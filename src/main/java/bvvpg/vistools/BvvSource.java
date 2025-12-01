@@ -77,8 +77,12 @@ public abstract class BvvSource implements Bvv
 	
 	public abstract void setAlphaGammaRangeBounds(final double min, final double max);
 	
-	/** 0 = maximum intensity projection; 1 = "volumetric" **/
+	/** 0 = maximum intensity projection; 1 = volumetric; 2 = surface**/
 	public abstract void setRenderType(final int nRenderType);
+	
+	/** Light type for volumetric and surface render types
+	 * 0 = plain; 1 = shaded; 2 = shiny**/
+	public abstract void setLightingType(final int nLightType);
 	
 	/** 0 = no interpolation; 1 = trilinear **/
 	public abstract void setVoxelRenderInterpolation(final int nInterpolationType);

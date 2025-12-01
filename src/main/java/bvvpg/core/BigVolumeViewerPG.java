@@ -278,16 +278,8 @@ public class BigVolumeViewerPG
 		for ( final ConverterSetup setup : setupAssignments.getConverterSetups() )
 			if (setup instanceof GammaConverterSetup)
 			{
-				if(((GammaConverterSetup)setup).getRenderType()==0)
-				{
-					//viewer.showMessage("volumetric");
-					((GammaConverterSetup)setup).setRenderType(1);
-				}
-				else
-				{
-					//viewer.showMessage("maximum intensity");
-					((GammaConverterSetup)setup).setRenderType(0);					
-				}
+				final int nRenderType = ((GammaConverterSetup)setup).getRenderType();
+				((GammaConverterSetup)setup).setRenderType( (nRenderType + 1) % 3);
 			}
 		
 		viewer.requestRepaint();
