@@ -1,5 +1,10 @@
 # Updates history
 
+
+## 0.5.1
+
+- added isosurface rendering of volumes;
+
 ## 0.5.0
 
 - added loading of 8-bit images;

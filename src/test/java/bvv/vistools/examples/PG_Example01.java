@@ -29,11 +29,13 @@
 package bvv.vistools.examples;
 
 import java.util.List;
+import java.util.ArrayList;
 
 import bdv.spimdata.SpimDataMinimal;
 import bdv.spimdata.XmlIoSpimDataMinimal;
 
 import bvvpg.vistools.BvvFunctions;
+import bvvpg.vistools.BvvOptions;
 import bvvpg.vistools.BvvSource;
 import bvvpg.vistools.BvvStackSource;
 import ij.IJ;
@@ -44,6 +46,7 @@ import mpicbg.spim.data.sequence.VoxelDimensions;
 import net.imglib2.FinalRealInterval;
 import net.imglib2.img.Img;
 import net.imglib2.img.display.imagej.ImageJFunctions;
+import net.imglib2.realtransform.AffineTransform3D;
 import net.imglib2.type.numeric.integer.UnsignedShortType;
 
 
@@ -51,79 +54,87 @@ public class PG_Example01 {
 	
 	/**
 	 * Show 16-bit volume, change display range, change gamma,
-	 * rendering type, alpha value, apply LUT and clip volume in half
+	 * rendering type, lighting type, alpha value, apply LUT and clip volume in half
 	 */
 	public static void main( final String[] args )
 	{
 		
 		//regular tif init
 		/**/
+		//you can download the data here
 		//final ImagePlus imp = IJ.openImage( "https://imagej.nih.gov/ij/images/t1-head.zip" );
 		final ImagePlus imp = IJ.openImage( "/home/eugene/Desktop/projects/BigTrace/BigTrace_data/t1-head.tif" );
 		final Img< UnsignedShortType > img = ImageJFunctions.wrapShort( imp );
-		final BvvSource source = BvvFunctions.show( img, "t1-head" );
 
+		//let's put volumes next to each other
+		AffineTransform3D shift2 = new AffineTransform3D();
+		shift2.translate( 200.0, 0.0, 0.0 );
+		
+		AffineTransform3D shift3 = new AffineTransform3D();
+		shift3.translate( 400.0, 0.0, 0.0 );
+		
+		ArrayList<BvvSource> bvvSources = new ArrayList<>();
+		
+		final BvvSource source1 = BvvFunctions.show( img, "headMAX" );
+		bvvSources.add( source1 );
+		final BvvSource source2 = BvvFunctions.show( img, "headVOL", BvvOptions.options().addTo( source1 ).sourceTransform( shift2 ) );
+		bvvSources.add( source2 );
+		final BvvSource source3 = BvvFunctions.show( img, "headSurface", BvvOptions.options().addTo( source1 ).sourceTransform( shift3 ) );
+		bvvSources.add( source3 );
+		
+		
+		//clipping interval
 		double [] minI = img.minAsDoubleArray();
 		double [] maxI = img.maxAsDoubleArray();
-		/**/
-
-		//BDV XML init (multiscale cached)
-		/*
-		final String xmlFilename = "/home/eugene/Desktop/projects/BigTrace/BigTrace_data/t1-head.xml";
-		SpimDataMinimal spimData = null;
-		try {
-			spimData = new XmlIoSpimDataMinimal().load( xmlFilename );
-		} catch (SpimDataException e) {
-			e.printStackTrace();
-		}		
-		final List< BvvStackSource< ? > > sources = BvvFunctions.show( spimData );
-		final BvvSource source = sources.get(0);
-		double [] minI = spimData.getSequenceDescription().getImgLoader().getSetupImgLoader(0).getImage(0).minAsDoubleArray();
-		double [] maxI = spimData.getSequenceDescription().getImgLoader().getSetupImgLoader(0).getImage(0).maxAsDoubleArray();
+		//clip half of the volume along Z axis 	
+		minI[2] = 0.5 * maxI[2] ;	
 		
-		//scale clipping interval
-		VoxelDimensions voxSize = spimData.getSequenceDescription().getViewSetupsOrdered().get( 0 ).getVoxelSize();
-		for(int d=0; d<3; d++)
-		{
-			minI[d] *= voxSize.dimension( d );
-			maxI[d] *= voxSize.dimension( d );
-
-		}
-		*/
-	
-		source.setDisplayRangeBounds( 0, 40000 );
-		source.setDisplayRange(0, 655);
-		source.setDisplayGamma(0.5);
-		
+		final FinalRealInterval clipInterval = new FinalRealInterval(minI,maxI);
 		
 		//set volumetric rendering (1), instead of max intensity max intensity (0)
-		source.setRenderType(1);
+		bvvSources.get( 1 ).setRenderType(1);
+		//set isosurface rendering (2), instead of max intensity max intensity (0)
+		bvvSources.get( 2 ).setRenderType(2);
 		
-		//DisplayRange maps colors (or LUT values) to intensity values
-		source.setDisplayRange(0, 400);
-		//it is also possible to change gamma value
-		//source.setDisplayGamma(0.9);
+		//set "shiny" lighting (2) for the surface instead of the plain (0)
+		bvvSources.get( 2 ).setLightingType( 2 );
 		
-		//alpha channel to intensity mapping can be changed independently
-		source.setAlphaRange(0, 500);
-		//it is also possible to change alpha-channel gamma value
-		//source.setAlphaGamma(0.9);
+		for(final BvvSource source:bvvSources)
+		{	
+			source.setDisplayRangeBounds( 0, 655 );
+			source.setDisplayRange(0, 655);
+			source.setDisplayGamma(0.5);
 		
-		//assign a "Fire" lookup table to this source
-		source.setLUT("Fire");
+			//DisplayRange maps colors (or LUT values) to intensity values
+			source.setDisplayRange(0, 400);
+			//it is also possible to change gamma value
+			//source.setDisplayGamma(0.9);
 		
-		//or one can assign custom IndexColorModel + name as string
-		//in this illustration we going to get IndexColorModel from IJ 
-		//(but it could be made somewhere else)
-		//final IndexColorModel icm_lut = LutLoader.getLut("Spectrum");
-		//source.setLUT( icm_lut, "SpectrumLUT" );
+			//alpha channel to intensity mapping can be changed independently
+			source.setAlphaRange(0, 500);
+			//it is also possible to change alpha-channel gamma value
+			//source.setAlphaGamma(0.9);
+		
+			//assign a "Fire" lookup table to this source
+			source.setLUT("Fire");
+		
+			//or one can assign custom IndexColorModel + name as string
+			//in this illustration we going to get IndexColorModel from IJ 
+			//(but it could be made somewhere else)
+			//final IndexColorModel icm_lut = LutLoader.getLut("Spectrum");
+			//source.setLUT( icm_lut, "SpectrumLUT" );
 
+	
+			source.setClipInterval(clipInterval);		
+			//turn on clipping "inside" mode
+			source.setClipState( 1 );
+		}
+		//move clipping to the corresponding volume position
+		bvvSources.get( 1 ).setClipTransform( shift2 );
+		bvvSources.get( 2 ).setClipTransform( shift3 );
 		
-		//clip half of the volume along Z axis in the shaders	
-		minI[2]=0.5*maxI[2];		
-		source.setClipInterval(new FinalRealInterval(minI,maxI));		
-		//turn on clipping
-		source.setClipState( 1 );
+		//adjust surface threshold
+		bvvSources.get( 2 ).setAlphaRange(0, 50);
 	}
 	
 }

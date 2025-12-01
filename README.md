@@ -5,21 +5,22 @@
 This is a fork of [BVV](https://github.com/bigdataviewer/bigvolumeviewer-core) with some additional features:
 - alpha opacity/transparency slider;
 - gamma correction for brightness/opacity (and alpha);
-- "volumetric" rendering method ("alpha-blending");
+- volumetric ("alpha-blending") + isosurface rendering modes;
+- plain, shaded and shiny lighting modes for volume/surface modes;
 - nearest-neighbor and trilinear interpolation;
-- lookup tables (LUTs, custom with alpha values and coming from ImageJ);
+- lookup tables (LUTs, custom with alpha values and loaded from ImageJ);
 - clipping of displayed sources in shaders (optionally using custom transform);
 - perspective and orthographic projections;
 - separate rendering for opaque and transparent objects (allows [weighted OIT](https://jcgt.org/published/0002/02/09/)).
 
 Currently synced to BVV version 0.4.1 (this [commit](https://github.com/bigdataviewer/bigvolumeviewer-core/commit/7ca399a73c84b37461ca5e9f5b6c547d62867bae)).
 
+For a stand-alone usage check out [BigVolumeBrowser](https://github.com/ekatrukha/bigvolumebrowser) plugin.
+
 Similar to [BDV](https://github.com/bigdataviewer/bigdataviewer-core)/[BVV](https://github.com/bigdataviewer/bigvolumeviewer-core), this fork is mostly intended to be used as a visualization  
 component in other plugins (like [BigTrace](https://github.com/ekatrukha/BigTrace), [MoBIE](https://github.com/mobie/mobie-viewer-fiji)).  
- 
-For a stand-alone usage we recommend looking at the [BigVolumeBrowser](https://github.com/ekatrukha/bigvolumebrowser) plugin (in active development).
 
-## How to install it for users
+## Installation for users
 
 Download latest zip archive with jar files from <a href="https://github.com/ekatrukha/bvv-playground/releases">releases</a>  
 (it is called *bvv-playground-X.X.X_jar_files.zip*),   
@@ -29,12 +30,9 @@ The plugin should appear in the _Plugins>BigDataViewer>BVV-playground_
 
 ## Additional features
 
-### Volumetric rendering
-A new shortcut <kbd>O</kbd> (letter) is used to switch between "Maximum intensity projection" and "Volumetric" rendering. By "volumetric" I mean "transparency" or "alpha-blending" ray-casting. These two different rendering methods are illustrated below:  
-_Maximum intensity_  
-![Maximum intensity render](https://katpyxa.info/software/bvv_playground/bvvPG_maximum_intensity_render.png)  
-_Volumetric_  
-![Maximum intensity render](https://katpyxa.info/software/bvv_playground/bvvPG_volumetric_render.png)  
+### Volumetric/surface rendering
+A new shortcut <kbd>O</kbd> (letter) is used to switch between "Maximum intensity projection", "Volumetric" and "Surface" rendering. By "volumetric" I mean "transparency" or "alpha-blending" ray-casting. These three different rendering methods are illustrated below:  
+![Maximum intensity render](https://katpyxa.info/software/bvv_playground/bvvPG_volumerender.png)  
 
 ### Gamma and opacity sliders
 The standard "Brightness and Color" dialog (shortcut <kbd>S</kbd>) is now different:
@@ -73,8 +71,7 @@ The code for this example can be found [here](https://github.com/UU-cellbiology/
 
 ## For developers
 
-A list of additional methods (adjusting gamma and opacity, adding LUTs and volume clipping) is illustrated by [this example](https://github.com/UU-cellbiology/bvv-playground/blob/master/src/test/java/bvv/vistools/examples/PG_Example01.java).  
-There is a possibility to specify "clipping transform", shown [here](https://github.com/UU-cellbiology/bvv-playground/blob/master/src/test/java/bvv/vistools/examples/PG_Example03.java).   
+A list of additional methods (adjusting gamma and opacity, adding LUTs and volume clipping) is illustrated by [this example](https://github.com/UU-cellbiology/bvv-playground/blob/master/src/test/java/bvv/vistools/examples/PG_Example01.java). Volume interpolation shown [here](https://github.com/UU-cellbiology/bvv-playground/blob/master/src/test/java/bvv/vistools/examples/PG_Example02.java).   
 
 Newly added functions of BvvSource can be found [here](https://github.com/UU-cellbiology/bvv-playground/blob/c65494c3c2be4bcd30d1d000ad68ead9d8804a7f/src/main/java/bvvpg/vistools/BvvSource.java#L66). 
    
