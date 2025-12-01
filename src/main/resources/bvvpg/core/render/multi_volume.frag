@@ -4,6 +4,8 @@ uniform vec2 dsp;
 uniform mat4 ipv;
 uniform float fwnw;
 uniform float nw;
+const vec3 lightDir = normalize(vec3(0.0, -0.2, -1.0));
+const float gradientHalfStep = 3.0;
 
 // intersect ray with a box
 // http://www.siggraph.org/education/materials/HyperGraph/raytrace/rtinter3.htm
@@ -21,6 +23,13 @@ void intersectBox( vec3 r_o, vec3 r_d, vec3 boxmin, vec3 boxmax, out float tnear
 	// find the largest tmin and the smallest tmax
 	tnear = max( max( tmin.x, tmin.y ), max( tmin.x, tmin.z ) );
 	tfar = min( min( tmax.x, tmax.y ), min( tmax.x, tmax.z ) );
+}
+
+vec3 specular(vec3 norm, vec3 viewDir, vec3 lightDir, vec3 lightColor, float shininess, float specularStrength)
+{
+	vec3 reflectDir = reflect(-lightDir, norm);
+	float spec = pow(max(dot(viewDir, reflectDir), 0.0), shininess);
+	return specularStrength * spec * lightColor;
 }
 
 // ---------------------
@@ -67,6 +76,9 @@ void main()
 	if (tnear < tfar)
 	{
 		vec4 fb = wback - wfront;
+		
+		vec3 viewDir = normalize((front-back).xyz);
+		
 		int numSteps =
 			(fwnw > 0.00001)
 			? int (log((tfar * fwnw + nw) / (tnear * fwnw + nw)) / log (1 + fwnw))
@@ -89,7 +101,7 @@ void main()
 				v = max(v, convert(x));
 			}
 			*/
-			if(v.a>0.99)
+			if(v.a > 0.99)
 			{
 				v.a = 1.0;
 				i = numSteps;
@@ -99,5 +111,5 @@ void main()
 		FragColor = v;
 	}
 	else
-	FragColor = vec4(0, 0, 0, 0);
+		FragColor = vec4(0, 0, 0, 0);
 }

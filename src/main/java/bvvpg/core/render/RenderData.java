@@ -32,11 +32,15 @@ import net.imglib2.realtransform.AffineTransform3D;
 import org.joml.Matrix4f;
 import org.joml.Matrix4fc;
 
+import bvvpg.core.util.MatrixMath;
+
 public class RenderData
 {
-	private final Matrix4f pv;
 	private int timepoint;
 	private final AffineTransform3D renderTransformWorldToScreen;
+	private final Matrix4f view;
+	private final Matrix4f camview;
+	private final Matrix4f pv;
 	private double dCam;
 	private double dClipNear;
 	private double dClipFar;
@@ -57,7 +61,6 @@ public class RenderData
 			final double screenWidth,
 			final double screenHeight )
 	{
-		this.pv = new Matrix4f( pv );
 		this.timepoint = timepoint;
 		this.renderTransformWorldToScreen = renderTransformWorldToScreen;
 		this.dCam = dCam;
@@ -65,11 +68,16 @@ public class RenderData
 		this.dClipFar = dClipFar;
 		this.screenWidth = screenWidth;
 		this.screenHeight = screenHeight;
+		this.pv = new Matrix4f( pv );
+		this.view = MatrixMath.affine( renderTransformWorldToScreen, new Matrix4f() );
+		this.camview = MatrixMath.screen( dCam, screenWidth, screenHeight, new Matrix4f() ).mul( view );
 	}
 
 	public RenderData()
 	{
 		this.pv = new Matrix4f();
+		this.view = new Matrix4f();
+		this.camview = new Matrix4f();
 		this.renderTransformWorldToScreen = new AffineTransform3D();
 	}
 
@@ -83,11 +91,23 @@ public class RenderData
 		this.dClipFar = other.dClipFar;
 		this.screenWidth = other.screenWidth;
 		this.screenHeight = other.screenHeight;
+		this.view.set( MatrixMath.affine( renderTransformWorldToScreen, new Matrix4f() ));
+		this.camview.set( MatrixMath.screen( dCam, screenWidth, screenHeight, new Matrix4f() ).mul( view ));
 	}
 
 	public Matrix4f getPv()
 	{
 		return pv;
+	}
+	
+	public Matrix4fc getView()
+	{
+		return view;
+	}
+
+	public Matrix4fc getCamview()
+	{
+		return camview;
 	}
 
 	public int getTimepoint()

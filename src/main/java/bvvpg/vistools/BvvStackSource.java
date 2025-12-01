@@ -236,6 +236,19 @@ public class BvvStackSource< T > extends BvvSource
 			}
 		}
 	}
+	
+	@Override
+	public void setLightingType(final int nLightType)
+	{
+		for ( final ConverterSetup setup : converterSetups )
+		{
+			if (setup instanceof GammaConverterSetup)
+			{
+				final GammaConverterSetup gconverter = ((GammaConverterSetup)setup);
+				gconverter.setLightingType( nLightType );
+			}
+		}
+	}
 		
 	@Override
 	public void setLUT(final IndexColorModel icm_, String sLUTName )

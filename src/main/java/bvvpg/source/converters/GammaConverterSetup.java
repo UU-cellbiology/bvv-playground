@@ -66,11 +66,17 @@ public interface GammaConverterSetup extends ConverterSetup, Clippable3D
 	
 	public int getLUTSize();	
 	
-	/** 0 = maximum intensity projection; 1 = "volumetric" **/
+	/** 0 = maximum intensity projection; 1 = "volumetric"; 2 = surface **/
 	void setRenderType(int nRender);
 	
-	/** 0 = maximum intensity projection; 1 = "volumetric" **/
+	/** 0 = maximum intensity projection; 1 = "volumetric"; 2 = surface **/
 	int getRenderType ();
+	
+	/** 0 = plain; 1 = shaded; 2 = shiny **/
+	void setLightingType(int nLightType);
+
+	/** 0 = plain; 1 = shaded; 2 = shiny **/
+	int getLightingType();
 	
 	/** 0 = nearest neighbor (cubes); 1 = tri-linear **/
 	void setVoxelRenderInterpolation(int nInterpolation);
