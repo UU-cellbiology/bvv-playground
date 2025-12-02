@@ -68,20 +68,20 @@ public class DebugClipInterval
 	{
 		
 		//regular tif init
-		/**/
+		/*
 
-//		final ImagePlus imp = IJ.openImage( "/home/eugene/Desktop/projects/BVB/cliptest.tif" );
-//		final Img< UnsignedShortType > img = ImageJFunctions.wrapShort( imp );
-//		ArrayList< BvvStackSource< ? >> sources =  new ArrayList<>();
-//		
-//		AffineTransform3D scaleAF = new AffineTransform3D();
-//		scaleAF.scale( 2.0 );
-//		
-//		sources.add( BvvFunctions.show( Views.hyperSlice(img,2,0), "ch1",  Bvv.options().sourceTransform( scaleAF ) ));
-//		sources.add( BvvFunctions.show( Views.hyperSlice(img,2,1), "ch2", Bvv.options().sourceTransform( scaleAF ).addTo( sources.get( 0 ).getBvvHandle() ) ));
+		final ImagePlus imp = IJ.openImage( "/home/eugene/Desktop/projects/BVB/cliptest.tif" );
+		final Img< UnsignedShortType > img = ImageJFunctions.wrapShort( imp );
+		ArrayList< BvvStackSource< ? >> sources =  new ArrayList<>();
 		
+		AffineTransform3D scaleAF = new AffineTransform3D();
+		scaleAF.scale( 2.0 );
 		
+		sources.add( BvvFunctions.show( Views.hyperSlice(img,2,0), "ch1",  Bvv.options().sourceTransform( scaleAF ) ));
+		sources.add( BvvFunctions.show( Views.hyperSlice(img,2,1), "ch2", Bvv.options().sourceTransform( scaleAF ).addTo( sources.get( 0 ).getBvvHandle() ) ));
+		*/
 		
+		/**/
 		final String xmlFilename = "/home/eugene/Desktop/projects/BVB/cliptest.xml";
 		SpimDataMinimal spimData = null;
 		try {
@@ -90,7 +90,7 @@ public class DebugClipInterval
 			e.printStackTrace();
 		}		
 		List< BvvStackSource< ? > > sources = BvvFunctions.show( spimData );
-		
+		/**/
 		
 		
 		sources.get( 0 ).setLUT( "Green" );
