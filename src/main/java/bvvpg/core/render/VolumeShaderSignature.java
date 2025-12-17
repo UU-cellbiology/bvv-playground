@@ -37,6 +37,7 @@ public final class VolumeShaderSignature
 {
 	public enum PixelType
 	{
+		SFLOAT,
 		USHORT,
 		UBYTE,
 		ARGB
