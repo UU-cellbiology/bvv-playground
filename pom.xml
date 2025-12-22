@@ -69,7 +69,7 @@
 	<scm>
 		<connection>scm:git:git://github.com/UU-cellbiology/bvv-playground</connection>
 		<developerConnection>scm:git:git@github.com:UU-cellbiology/bvv-playground</developerConnection>
-		<tag>bvv-playground-0.5.2</tag>
+		<tag>bvv-playground-0.5.3</tag>
 		<url>https://github.com/UU-cellbiology/bvv-playground</url>
 	</scm>
 	<issueManagement>

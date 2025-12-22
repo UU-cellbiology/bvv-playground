@@ -1,5 +1,8 @@
 # Updates history
 
+## 0.5.2
+
+- added 32-bit images support;
 
 ## 0.5.1
 
