@@ -169,29 +169,42 @@ public class SourceTablePG extends JTable
 		return sources;
 	}
 	
-	public void setSelectedSources(List< SourceAndConverter< ? > > sacList)
+	public void setSelectedSources(final List< SourceAndConverter< ? > > sacList)
 	{
+		if(sacList == null)
+		{
+			this.clearSelection();
+			return;			
+		}
+		
 		if( sacList.size() == 0 )
 		{
 			this.clearSelection();
+			return;
 		}
 		
 		final ArrayList<Integer> selectedIndices = new ArrayList<>();
 		
-		for(SourceAndConverter< ? > sac:sacList)
+		for(final SourceAndConverter< ? > sac : sacList)
 		{		
-				final int nIndex = model.model.getSources().indexOf( new SourceModel(sac,state) );
-				selectedIndices.add( new Integer ( nIndex ));
+			final int nIndex = model.model.getSources().indexOf( new SourceModel(sac,state) );
+			selectedIndices.add( new Integer ( nIndex ));
 		}
-		for(int i=0;i<selectedIndices.size(); i++)
+		
+		for(int i = 0; i < selectedIndices.size(); i++)
 		{
-			if(i==0)
+			final int nInd = selectedIndices.get( i ).intValue();
+			
+			if (nInd >= 0)
 			{
-				this.setRowSelectionInterval( selectedIndices.get( i ).intValue(), selectedIndices.get( i ).intValue() );
-			}
-			else
-			{
-				this.getSelectionModel().addSelectionInterval( selectedIndices.get( i ).intValue(), selectedIndices.get( i ).intValue() );				
+				if(this.getSelectionModel().isSelectionEmpty())
+				{
+					this.setRowSelectionInterval( nInd, nInd );
+				}
+				else
+				{
+					this.getSelectionModel().addSelectionInterval( nInd, nInd );				
+				}
 			}
 		}
 		
