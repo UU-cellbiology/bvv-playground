@@ -312,9 +312,14 @@ public class InteractiveGLDisplayCanvas< C extends Component & GLAutoDrawable > 
 
 	// -- forwarding some panel methods for convenience --
 
-	public void addGLEventListener( GLEventListener listener)
+	public void addGLEventListener( GLEventListener listener )
 	{
 		canvas.addGLEventListener( listener );
+	}
+	
+	public void removeGLEventListener( GLEventListener listener )
+	{
+		canvas.removeGLEventListener( listener );
 	}
 
 	public void display()
