@@ -190,16 +190,17 @@ public class SourceTablePG extends JTable
 			final int nIndex = model.model.getSources().indexOf( new SourceModel(sac,state) );
 			selectedIndices.add( new Integer ( nIndex ));
 		}
-		
+		boolean bFirstSelection = true;
 		for(int i = 0; i < selectedIndices.size(); i++)
 		{
-			final int nInd = selectedIndices.get( i ).intValue();
+			final int nInd = selectedIndices.get( i ).intValue();				
 			
 			if (nInd >= 0)
 			{
-				if(this.getSelectionModel().isSelectionEmpty())
+				if(bFirstSelection)
 				{
 					this.setRowSelectionInterval( nInd, nInd );
+					bFirstSelection = false;
 				}
 				else
 				{

@@ -143,8 +143,6 @@ public class RealARGBColorGammaConverterSetup implements GammaConverterSetup
 			listeners.list.forEach( l -> l.setupParametersChanged( this ) );
 	}
 	
-	
-	
 	@Override
 	public void setDisplayGamma(double gamma) {
 		boolean changed = false;
@@ -283,7 +281,6 @@ public class RealARGBColorGammaConverterSetup implements GammaConverterSetup
 	{
 		return converters.get( 0 ).getColor();
 	}
-
 	
 	@Override
 	public void setLUT(final IndexColorModel icm_, String sLUTName) 
@@ -312,7 +309,7 @@ public class RealARGBColorGammaConverterSetup implements GammaConverterSetup
 	@Override
 	public String getLUTName()
 	{
-		if(sizeLUT>0)
+		if(sizeLUT > 0)
 			return sLUTName;
 		
 		return null;
