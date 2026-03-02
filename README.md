@@ -11,9 +11,11 @@ This is a fork of [BVV](https://github.com/bigdataviewer/bigvolumeviewer-core) w
 - lookup tables (LUTs, custom with alpha values and loaded from ImageJ);
 - clipping of displayed sources in shaders (optionally using custom transform);
 - perspective and orthographic projections;
-- separate rendering for opaque and transparent objects (allows [weighted OIT](https://jcgt.org/published/0002/02/09/)).
+- separate rendering for opaque and transparent objects (allows [weighted OIT](https://jcgt.org/published/0002/02/09/));
+- additional "rendering" mode that waits for data to be loaded in full resolution;
+- supports 32-bit data.
 
-Currently synced to BVV version 0.4.1 (this [commit](https://github.com/bigdataviewer/bigvolumeviewer-core/commit/7ca399a73c84b37461ca5e9f5b6c547d62867bae)).
+Currently synchronized to BVV version 0.4.1 (this [commit](https://github.com/bigdataviewer/bigvolumeviewer-core/commit/7ca399a73c84b37461ca5e9f5b6c547d62867bae)).
 
 For a stand-alone usage check out [BigVolumeBrowser](https://github.com/ekatrukha/bigvolumebrowser) plugin.
 
