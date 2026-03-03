@@ -1,5 +1,10 @@
 # Updates history
 
+
+## 0.5.3
+
+- graceful handling of setting selected sources from outside;
+
 ## 0.5.2
 
 - added 32-bit images support;
