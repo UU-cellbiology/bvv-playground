@@ -35,7 +35,8 @@ public class ConverterSetupsPG extends ConverterSetups {
 
 	private final ConverterSetupBoundsGamma boundsGamma;
 	private final ConverterSetupBoundsAlpha boundsAlpha;
-	private final ConverterSetupBoundsGammaAlpha boundsGammaAlpha;
+	private final ConverterSetupBoundsGammaAlpha boundsGammaAlpha;	
+	private final ConverterSetupSyncState syncState;
 	
 	public ConverterSetupsPG( final ViewerState state )
 	{
@@ -43,12 +44,14 @@ public class ConverterSetupsPG extends ConverterSetups {
 		boundsAlpha = new ConverterSetupBoundsAlpha( this );
 		boundsGamma = new ConverterSetupBoundsGamma();
 		boundsGammaAlpha = new ConverterSetupBoundsGammaAlpha();
+		syncState = new ConverterSetupSyncState();
 	}
 
 	public ConverterSetupBoundsGamma getBoundsGamma()
 	{
 		return boundsGamma;
 	}
+	
 	public ConverterSetupBoundsAlpha getBoundsAlpha()
 	{
 		return boundsAlpha;
@@ -59,4 +62,8 @@ public class ConverterSetupsPG extends ConverterSetups {
 		return boundsGammaAlpha;
 	}
 	
+	public ConverterSetupSyncState getSyncStateMap()
+	{
+		return syncState;
+	}
 }

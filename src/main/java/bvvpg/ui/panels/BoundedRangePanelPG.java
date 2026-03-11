@@ -1,5 +1,3 @@
-package bvvpg.ui.panels;
-
 /*-
  * #%L
  * Volume rendering of bdv datasets with gamma and transparency option
@@ -28,7 +26,7 @@ package bvvpg.ui.panels;
  * POSSIBILITY OF SUCH DAMAGE.
  * #L%
  */
-
+package bvvpg.ui.panels;
 
 import java.awt.Color;
 import java.awt.Font;
