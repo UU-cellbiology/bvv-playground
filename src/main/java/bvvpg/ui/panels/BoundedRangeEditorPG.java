@@ -334,7 +334,6 @@ public class BoundedRangeEditorPG {
 			return;
 
 		final BoundedRange range = rangePanel.getRange();
-		//boolean bSync = cbSync.isSelected();
 
 		for ( final ConverterSetup converterSetup : converterSetups )
 		{
@@ -423,7 +422,7 @@ public class BoundedRangeEditorPG {
 		{
 			gcs.fireParametersChanged();
 		}
-//		updateSyncPanel();
+
 	}
 	
 	private synchronized void updateSyncPanel()

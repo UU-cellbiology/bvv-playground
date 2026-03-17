@@ -53,7 +53,6 @@ import bdv.viewer.animate.TextOverlayAnimator;
 import bdv.viewer.animate.TextOverlayAnimator.TextPosition;
 import bdv.viewer.overlay.MultiBoxOverlayRenderer;
 import bdv.viewer.overlay.ScaleBarOverlayRenderer;
-import bdv.viewer.overlay.SourceInfoOverlayRenderer;
 import bdv.viewer.state.SourceGroup;
 import bdv.viewer.state.ViewerState;
 import bdv.viewer.state.XmlIoViewerState;
@@ -67,6 +66,7 @@ import bvvpg.core.util.MatrixMath;
 import bvvpg.pgcards.sourcetable.SourceSelectionState;
 import bvvpg.pgcards.sourcetable.SourceSelectionWindowState;
 import bvvpg.source.converters.ConverterSetupsPG;
+import bvvpg.ui.overlay.SourceInfoColorOverlayRenderer;
 
 import com.jogamp.opengl.GL3;
 import com.jogamp.opengl.GLAutoDrawable;
@@ -184,6 +184,8 @@ public class VolumeViewerPanel
 	/** screen projection method,
 	 * 0 - perspective, 1 - orthographic **/
 	private int nProjectionType = 0;
+	
+	private Color textOverlayColor = Color.white;
 
 	private final Repaint repaint = new Repaint();
 	
@@ -225,7 +227,7 @@ public class VolumeViewerPanel
 	 * Overlay current source name and current timepoint.
 	 */
 	// TODO: move to specialized class
-	private final SourceInfoOverlayRenderer sourceInfoOverlayRenderer;
+	private final SourceInfoColorOverlayRenderer sourceInfoOverlayRenderer;
 
 	/**
 	 * TODO
@@ -336,7 +338,7 @@ public class VolumeViewerPanel
 		if ( !sources.isEmpty() )
 			state.setCurrentSource( 0 );
 		multiBoxOverlayRenderer = new MultiBoxOverlayRenderer();
-		sourceInfoOverlayRenderer = new SourceInfoOverlayRenderer();
+		sourceInfoOverlayRenderer = new SourceInfoColorOverlayRenderer();
 		scaleBarOverlayRenderer = new ScaleBarOverlayRenderer();
 
 		setups = new ConverterSetupsPG( state() );
@@ -466,6 +468,11 @@ public class VolumeViewerPanel
 			this.nProjectionType = newProj;
 			requestRepaint();
 		}
+	}
+	
+	public void setOverlayTextColor (final Color color)
+	{
+		textOverlayColor = new Color(color.getRGB());
 	}
 	/**
 	 * @deprecated Modify {@link #state()} directly
@@ -651,6 +658,7 @@ public class VolumeViewerPanel
 		if ( Prefs.showTextOverlay() )
 		{
 			sourceInfoOverlayRenderer.setViewerState( state() );
+			sourceInfoOverlayRenderer.setOverlayTextColor( textOverlayColor );
 			sourceInfoOverlayRenderer.setSourceNameOverlayPosition( Prefs.sourceNameOverlayPosition() );
 			sourceInfoOverlayRenderer.paint( ( Graphics2D ) g );
 
@@ -659,7 +667,7 @@ public class VolumeViewerPanel
 			final String mousePosGlobalString = String.format( "(%6.1f,%6.1f,%6.1f)", gPos.getDoublePosition( 0 ), gPos.getDoublePosition( 1 ), gPos.getDoublePosition( 2 ) );
 
 			g.setFont( new Font( "Monospaced", Font.PLAIN, 12 ) );
-			g.setColor( Color.white );
+			g.setColor( textOverlayColor );
 			g.drawString( mousePosGlobalString, ( int ) g.getClipBounds().getWidth() - 170, 25 );
 		}
 
@@ -1198,7 +1206,7 @@ public class VolumeViewerPanel
 		return options.getInputTriggerConfig();
 	}
 
-	public SourceInfoOverlayRenderer getSourceInfoOverlayRenderer()
+	public SourceInfoColorOverlayRenderer getSourceInfoOverlayRenderer()
 	{
 		return sourceInfoOverlayRenderer;
 	}
