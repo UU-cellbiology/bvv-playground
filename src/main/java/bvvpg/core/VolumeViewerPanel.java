@@ -28,18 +28,65 @@
  */
 package bvvpg.core;
 
+import static bdv.ui.UIUtils.TextPosition.TOP_RIGHT;
+import static bdv.viewer.DisplayMode.SINGLE;
+import static bdv.viewer.Interpolation.NEARESTNEIGHBOR;
+import static bvvpg.core.render.VolumeRenderer.RepaintType.FULL;
+import static bvvpg.core.render.VolumeRenderer.RepaintType.LOAD;
+import static bvvpg.core.render.VolumeRenderer.RepaintType.NONE;
+import static bvvpg.core.render.VolumeRenderer.RepaintType.SCENE;
+import static com.jogamp.opengl.GL.GL_DEPTH_TEST;
+import static com.jogamp.opengl.GL.GL_LESS;
+import static com.jogamp.opengl.GL.GL_RGB8;
+
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Font;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
+import java.util.Locale;
+import java.util.Set;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.stream.Collectors;
+
+import javax.swing.DefaultBoundedRangeModel;
+import javax.swing.JSlider;
+import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
+
+import org.jdom2.Element;
+import org.joml.Matrix4f;
+import org.scijava.listeners.Listeners;
+import org.scijava.ui.behaviour.io.InputTriggerConfig;
+
+import com.jogamp.opengl.GL3;
+import com.jogamp.opengl.GLAutoDrawable;
+import com.jogamp.opengl.GLEventListener;
+
 import bdv.TransformEventHandler;
 import bdv.TransformState;
 import bdv.cache.CacheControl;
 import bdv.tools.brightness.ConverterSetup;
+import bdv.ui.UIUtils;
 import bdv.util.Prefs;
 import bdv.viewer.AbstractViewerPanel;
+import bdv.viewer.BasicViewerState;
+import bdv.viewer.ConverterSetups;
 import bdv.viewer.DisplayMode;
 import bdv.viewer.NavigationActions;
 import bdv.viewer.OverlayRenderer;
 import bdv.viewer.Source;
 import bdv.viewer.SourceAndConverter;
+import bdv.viewer.SourceGroup;
 import bdv.viewer.SynchronizedViewerState;
+import bdv.viewer.ViewerState;
 import bdv.viewer.TimePointListener;
 import bdv.viewer.TransformListener;
 import bdv.viewer.ViewerPanel;
@@ -53,11 +100,12 @@ import bdv.viewer.animate.TextOverlayAnimator;
 import bdv.viewer.animate.TextOverlayAnimator.TextPosition;
 import bdv.viewer.overlay.MultiBoxOverlayRenderer;
 import bdv.viewer.overlay.ScaleBarOverlayRenderer;
-import bdv.viewer.state.SourceGroup;
-import bdv.viewer.state.ViewerState;
+import bdv.viewer.overlay.SourceInfoOverlayRenderer;
+import bdv.viewer.render.PainterThread;
 import bdv.viewer.state.XmlIoViewerState;
 import bvvpg.core.multires.SourceStacks;
 import bvvpg.core.multires.Stack3D;
+import bvvpg.core.offscreen.OffScreenFrameBuffer;
 import bvvpg.core.offscreen.OffScreenFrameBufferWithDepth;
 import bvvpg.core.render.RenderData;
 import bvvpg.core.render.VolumeRenderer;
@@ -68,45 +116,11 @@ import bvvpg.pgcards.sourcetable.SourceSelectionWindowState;
 import bvvpg.source.converters.ConverterSetupsPG;
 import bvvpg.ui.overlay.SourceInfoColorOverlayRenderer;
 
-import com.jogamp.opengl.GL3;
-import com.jogamp.opengl.GLAutoDrawable;
-import com.jogamp.opengl.GLEventListener;
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Font;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentEvent;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
-import java.util.Set;
-import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.stream.Collectors;
-import javax.swing.DefaultBoundedRangeModel;
-import javax.swing.JSlider;
-import javax.swing.SwingConstants;
-import javax.swing.SwingUtilities;
 import net.imglib2.RealLocalizable;
 import net.imglib2.RealPoint;
 import net.imglib2.RealPositionable;
 import net.imglib2.cache.iotiming.CacheIoTiming;
 import net.imglib2.realtransform.AffineTransform3D;
-import org.jdom2.Element;
-import org.joml.Matrix4f;
-import org.scijava.listeners.Listeners;
-import org.scijava.ui.behaviour.io.InputTriggerConfig;
-
-import static bvvpg.core.render.VolumeRenderer.RepaintType.FULL;
-import static bvvpg.core.render.VolumeRenderer.RepaintType.LOAD;
-import static bvvpg.core.render.VolumeRenderer.RepaintType.NONE;
-import static bvvpg.core.render.VolumeRenderer.RepaintType.SCENE;
-import static com.jogamp.opengl.GL.GL_DEPTH_TEST;
-import static com.jogamp.opengl.GL.GL_LESS;
-import static com.jogamp.opengl.GL.GL_RGB8;
 
 
 public class VolumeViewerPanel
@@ -177,6 +191,11 @@ public class VolumeViewerPanel
 		}
 	}
 	
+	// extra things for BVVPG
+	
+	public SourceSelectionState sourceSelection;
+	public SourceSelectionState sourceGroupSelection;
+	public SourceSelectionWindowState sourceSelectionWindowState;
 	/** activates "rendering mode", 
 	 * changing repaint style update mode **/
 	private boolean bRenderMode = false;
@@ -185,17 +204,18 @@ public class VolumeViewerPanel
 	 * 0 - perspective, 1 - orthographic **/
 	private int nProjectionType = 0;
 	
+	/** color of the text for mouse position coordinates and 
+	 * source info **/
 	private Color textOverlayColor = Color.white;
 
-	private final Repaint repaint = new Repaint();
+	protected final OffScreenFrameBufferWithDepth finalBuf;
 	
-	public SourceSelectionState sourceSelection;
-	public SourceSelectionState sourceGroupSelection;
-	public SourceSelectionWindowState sourceSelectionWindowState;
+	//end of extra things
+
+	private final Repaint repaint = new Repaint();
 
 	protected final OffScreenFrameBufferWithDepth sceneBuf;	
 	protected final OffScreenFrameBufferWithDepth offscreen;	
-	protected final OffScreenFrameBufferWithDepth finalBuf;
 
 	// TODO: should be settable
 	private final long[] iobudget = new long[] { 100l * 1000000l,  10l * 1000000l };
@@ -203,10 +223,14 @@ public class VolumeViewerPanel
 	protected final int maxRenderMillis;
 
 	/**
-	 * Currently rendered state (visible sources, transformation, timepoint,
-	 * etc.) A copy can be obtained by {@link #getState()}.
+	 * Currently rendered state (visible sources, transformation, timepoint, etc.)
 	 */
-	protected final ViewerState state;
+	private final SynchronizedViewerState state;
+
+	/**
+	 * Legacy wrapper around {@code state} to support deprecated API
+	 */
+	private final bdv.viewer.state.ViewerState deprecatedState;
 
 	private final ConverterSetupsPG setups;
 
@@ -281,21 +305,21 @@ public class VolumeViewerPanel
 	 * calling {@link #requestRepaint()} so listeners have the chance to
 	 * interfere.
 	 */
-	protected final CopyOnWriteArrayList< TimePointListener > timePointListeners;
+	private final Listeners.List< TimePointListener > timePointListeners;
 
 	/**
 	 * Current animator for viewer transform, or null. This is for example used
-	 * to make smooth transitions when {@link #align(AlignPlane)} aligning to
+	 * to make smooth transitions when {@link #align(AlignPlane) aligning to
 	 * orthogonal planes}.
 	 */
-	protected AbstractTransformAnimator currentAnimator = null;
+	private AtomicReference<AbstractTransformAnimator> currentAnimator = new AtomicReference<>();
 
 	/**
 	 * A list of currently incomplete (see {@link OverlayAnimator#isComplete()})
 	 * animators. Initially, this contains a {@link TextOverlayAnimator} showing
 	 * the "press F1 for help" message.
 	 */
-	protected final ArrayList< OverlayAnimator > overlayAnimators;
+	private final ArrayList< OverlayAnimator > overlayAnimators;
 
 	/**
 	 * Fade-out overlay of recent messages. See {@link #showMessage(String)}.
@@ -327,21 +351,14 @@ public class VolumeViewerPanel
 
 		this.cacheControl = cacheControl;
 
-		final int numGroups = options.getNumSourceGroups();
-		final ArrayList< SourceGroup > groups = new ArrayList<>( numGroups );
-		for ( int i = 0; i < numGroups; ++i )
-			groups.add( new SourceGroup( "group " + Integer.toString( i + 1 ) ) );
-		state = new ViewerState( sources, groups, numTimepoints );
-		for ( int i = Math.min( numGroups, sources.size() ) - 1; i >= 0; --i )
-			state.getSourceGroups().get( i ).addSource( i );
+		state = setupState( sources, numTimepoints, options.getNumSourceGroups() );
+		deprecatedState = new bdv.viewer.state.ViewerState( state );
 
-		if ( !sources.isEmpty() )
-			state.setCurrentSource( 0 );
 		multiBoxOverlayRenderer = new MultiBoxOverlayRenderer();
 		sourceInfoOverlayRenderer = new SourceInfoColorOverlayRenderer();
 		scaleBarOverlayRenderer = new ScaleBarOverlayRenderer();
 
-		setups = new ConverterSetupsPG( state() );
+		setups = new ConverterSetupsPG( state );
 		setups.listeners().add( s -> requestRepaint() );
 
 		threadGroup = new ThreadGroup( this.toString() );
@@ -398,14 +415,14 @@ public class VolumeViewerPanel
 			add( sliderTime, BorderLayout.SOUTH );
 		setFocusable( false );
 
-		visibilityAndGrouping = new VisibilityAndGrouping( state );
+		visibilityAndGrouping = new VisibilityAndGrouping( deprecatedState );
 
 		transformListeners = new Listeners.SynchronizedList<>( l -> l.transformChanged( state().getViewerTransform() ) );
 		renderTransformListeners = new Listeners.SynchronizedList<>( l -> {
 			if ( renderData != null )
 				l.transformChanged( renderData.getRenderTransformWorldToScreen() );
 		} );
-		timePointListeners = new CopyOnWriteArrayList<>();
+		timePointListeners = new Listeners.SynchronizedList<>( l -> l.timePointChanged( state.getCurrentTimepoint() ) );
 
 		msgOverlay = options.getMsgOverlay();
 
@@ -423,9 +440,41 @@ public class VolumeViewerPanel
 			}
 		} );
 
-		state.getState().changeListeners().add( this );
+		state.changeListeners().add( this );
 
 		painterThread.start();
+	}
+	
+	/**
+	 * Initialize ViewerState with the given {@code sources} and {@code numTimepoints}.
+	 * Set up {@code numGroups} SourceGroups named "group 1", "group 2", etc. Add the
+	 * first source to the first group, the second source to the second group etc.
+	 *
+	 * TODO: Setting up groups like this doesn't make a lot of sense. This just
+	 *   replicates legacy behaviour. The remaining thing that stands in the way of
+	 *   removing it is ViewerState serialization, which assumes that there are always 10
+	 *   groups ... m(
+	 */
+	private static SynchronizedViewerState setupState( final List< SourceAndConverter< ? > > sources, final int numTimepoints, final int numGroups )
+	{
+		final SynchronizedViewerState state = new SynchronizedViewerState( new BasicViewerState() );
+		state.addSources( sources );
+		state.setSourcesActive( sources, true );
+		for ( int i = 0; i < numGroups; ++i ) {
+			final SourceGroup handle = new SourceGroup();
+			state.addGroup( handle );
+			state.setGroupName( handle,  "group " + ( i + 1 ) );
+			state.setGroupActive( handle, true );
+			if ( i < sources.size() )
+				state.addSourceToGroup( sources.get( i ), handle );
+		}
+		state.setNumTimepoints( numTimepoints );
+		state.setInterpolation( NEARESTNEIGHBOR );
+		state.setDisplayMode( SINGLE );
+		state.setCurrentSource( sources.isEmpty() ? null : sources.get( 0 ) );
+		state.setCurrentGroup( numGroups <= 0 ? null : state.getGroups().get( 0 ) );
+
+		return state;
 	}
 	
 	public RepaintType getRepaintStatus()
@@ -480,8 +529,8 @@ public class VolumeViewerPanel
 	@Deprecated
 	public void addSource( final SourceAndConverter< ? > sourceAndConverter )
 	{
-		state().addSource( sourceAndConverter );
-		state().setSourceActive( sourceAndConverter, true );
+		state.addSource( sourceAndConverter );
+		state.setSourceActive( sourceAndConverter, true );
 	}
 
 	/**
@@ -490,14 +539,14 @@ public class VolumeViewerPanel
 	@Deprecated
 	public void addSources( final Collection< SourceAndConverter< ? > > sourceAndConverter )
 	{
-		state().addSources( sourceAndConverter );
+		state.addSources( sourceAndConverter );
 	}
 
 	// helper for deprecated methods taking Source<?>
 	@Deprecated
 	private SourceAndConverter< ? > soc( final Source< ? > source )
 	{
-		for ( final SourceAndConverter< ? > soc : state().getSources() )
+		for ( final SourceAndConverter< ? > soc : state.getSources() )
 			if ( soc.getSpimSource() == source )
 				return soc;
 		return null;
@@ -509,10 +558,7 @@ public class VolumeViewerPanel
 	@Deprecated
 	public void removeSource( final Source< ? > source )
 	{
-		synchronized ( state() )
-		{
-			state().removeSource( soc( source ) );
-		}
+		state.removeSource( soc( source ) );
 	}
 
 	/**
@@ -521,10 +567,7 @@ public class VolumeViewerPanel
 	@Deprecated
 	public void removeSources( final Collection< Source< ? > > sources )
 	{
-		synchronized ( state() )
-		{
-			state().removeSources( sources.stream().map( this::soc ).collect( Collectors.toList() ) );
-		}
+		state.removeSources( sources.stream().map( this::soc ).collect( Collectors.toList() ) );
 	}
 
 	/**
@@ -533,18 +576,18 @@ public class VolumeViewerPanel
 	@Deprecated
 	public void removeAllSources()
 	{
-		state().clearSources();
+		state.clearSources();
 	}
 
 	/**
 	 * @deprecated Modify {@link #state()} directly
 	 */
 	@Deprecated
-	public void addGroup( final SourceGroup group )
+	public void addGroup( final bdv.viewer.state.SourceGroup group )
 	{
-		synchronized ( state() )
+		synchronized ( state )
 		{
-			state.addGroup( group );
+			deprecatedState.addGroup( group );
 		}
 	}
 
@@ -552,11 +595,11 @@ public class VolumeViewerPanel
 	 * @deprecated Modify {@link #state()} directly
 	 */
 	@Deprecated
-	public void removeGroup( final SourceGroup group )
+	public void removeGroup( final bdv.viewer.state.SourceGroup group )
 	{
-		synchronized ( state() )
+		synchronized ( state )
 		{
-			state.removeGroup( group );
+			deprecatedState.removeGroup( group );
 		}
 	}
 
@@ -570,7 +613,7 @@ public class VolumeViewerPanel
 	public void displayToGlobalCoordinates( final double[] gPos )
 	{
 		assert gPos.length >= 3;
-		state().getViewerTransform().applyInverse( gPos, gPos );
+		state.getViewerTransform().applyInverse( gPos, gPos );
 	}
 
 	/**
@@ -583,7 +626,7 @@ public class VolumeViewerPanel
 	public < P extends RealLocalizable & RealPositionable > void displayToGlobalCoordinates( final P gPos )
 	{
 		assert gPos.numDimensions() >= 3;
-		state().getViewerTransform().applyInverse( gPos, gPos );
+		state.getViewerTransform().applyInverse( gPos, gPos );
 	}
 
 	/**
@@ -599,25 +642,23 @@ public class VolumeViewerPanel
 		final RealPoint lPos = new RealPoint( 3 );
 		lPos.setPosition( x, 0 );
 		lPos.setPosition( y, 1 );
-		state().getViewerTransform().applyInverse( gPos, lPos );
+		state.getViewerTransform().applyInverse( gPos, lPos );
 	}
 
 	@Override
 	public void paint()
 	{
 		display.display();
-
-		synchronized ( this )
+		
+		final AbstractTransformAnimator animator = currentAnimator.get();
+		if ( animator != null )
 		{
-			if ( currentAnimator != null )
-			{
-				final AffineTransform3D transform = currentAnimator.getCurrent( System.currentTimeMillis() );
-				state().setViewerTransform( transform );
-				if ( currentAnimator.isComplete() )
-					currentAnimator = null;
-				else
-					requestRepaint( NONE ); // just to keep animator going. TODO: should really switch to timer-based animations
-			}
+			final AffineTransform3D transform = animator.getCurrent( System.currentTimeMillis() );
+			state.setViewerTransform( transform );
+			if ( animator.isComplete() )
+				currentAnimator.compareAndSet( animator, null );
+			else
+				requestRepaint( NONE ); // just to keep animator going. TODO: should really switch to timer-based animations
 		}
 	}
 
@@ -649,7 +690,7 @@ public class VolumeViewerPanel
 		boolean requiresRepaint = false;
 		if ( Prefs.showMultibox() )
 		{
-			multiBoxOverlayRenderer.setViewerState( state() );
+			multiBoxOverlayRenderer.setViewerState( state );
 			multiBoxOverlayRenderer.updateVirtualScreenSize( display.getWidth(), display.getHeight() );
 			multiBoxOverlayRenderer.paint( ( Graphics2D ) g );
 			requiresRepaint = multiBoxOverlayRenderer.isHighlightInProgress();
@@ -657,23 +698,25 @@ public class VolumeViewerPanel
 
 		if ( Prefs.showTextOverlay() )
 		{
-			sourceInfoOverlayRenderer.setViewerState( state() );
+			final Font font = UIUtils.getFont( "monospaced.small.font" );
+			sourceInfoOverlayRenderer.setViewerState( state );
 			sourceInfoOverlayRenderer.setOverlayTextColor( textOverlayColor );
 			sourceInfoOverlayRenderer.setSourceNameOverlayPosition( Prefs.sourceNameOverlayPosition() );
 			sourceInfoOverlayRenderer.paint( ( Graphics2D ) g );
 
-			final RealPoint gPos = new RealPoint( 3 );
-			getGlobalMouseCoordinates( gPos );
-			final String mousePosGlobalString = String.format( "(%6.1f,%6.1f,%6.1f)", gPos.getDoublePosition( 0 ), gPos.getDoublePosition( 1 ), gPos.getDoublePosition( 2 ) );
-
-			g.setFont( new Font( "Monospaced", Font.PLAIN, 12 ) );
+			final double[] gPos = new double[ 3 ];
+			getGlobalMouseCoordinates( RealPoint.wrap( gPos ) );
+			final String mousePosGlobalString = String.format(
+					Locale.ROOT, "%6.1f, %6.1f, %6.1f", gPos[ 0 ], gPos[ 1 ], gPos[ 2 ] );
+			
+			g.setFont( font );
 			g.setColor( textOverlayColor );
-			g.drawString( mousePosGlobalString, ( int ) g.getClipBounds().getWidth() - 170, 25 );
+			UIUtils.drawString( g, TOP_RIGHT, 1, mousePosGlobalString );
 		}
 
 		if ( Prefs.showScaleBar() )
 		{
-			scaleBarOverlayRenderer.setViewerState( state() );
+			scaleBarOverlayRenderer.setViewerState( state );
 			scaleBarOverlayRenderer.paint( ( Graphics2D ) g );
 		}
 
@@ -698,11 +741,11 @@ public class VolumeViewerPanel
 		switch ( change )
 		{
 		case CURRENT_SOURCE_CHANGED:
-			multiBoxOverlayRenderer.highlight( state().getSources().indexOf( state().getCurrentSource() ) );
+			multiBoxOverlayRenderer.highlight( state.getSources().indexOf( state().getCurrentSource() ) );
 			getDisplayComponent().repaint();
 			break;
 		case DISPLAY_MODE_CHANGED:
-			showMessage( state().getDisplayMode().getName() );
+			showMessage( state.getDisplayMode().getName() );
 			getDisplayComponent().repaint();
 			break;
 		case GROUP_NAME_CHANGED:
@@ -726,7 +769,7 @@ public class VolumeViewerPanel
 //		case INTERPOLATION_CHANGED:
 		case NUM_TIMEPOINTS_CHANGED:
 		{
-			final int numTimepoints = state().getNumTimepoints();
+			final int numTimepoints = state.getNumTimepoints();
 			final int timepoint = Math.max( 0, Math.min( state.getCurrentTimepoint(), numTimepoints - 1 ) );
 			SwingUtilities.invokeLater( () -> {
 				final boolean sliderVisible = Arrays.asList( getComponents() ).contains( sliderTime );
@@ -741,30 +784,29 @@ public class VolumeViewerPanel
 		}
 		case CURRENT_TIMEPOINT_CHANGED:
 		{
-			final int timepoint = state().getCurrentTimepoint();
+			final int timepoint = state.getCurrentTimepoint();
 			SwingUtilities.invokeLater( () -> {
 				blockSliderTimeEvents = true;
 				if ( sliderTime.getValue() != timepoint )
 					sliderTime.setValue( timepoint );
 				blockSliderTimeEvents = false;
 			} );
-			for ( final TimePointListener l : timePointListeners )
-				l.timePointChanged( timepoint );
+			timePointListeners.list.forEach( l -> l.timePointChanged( timepoint ) );
 			requestRepaint();
 			break;
 		}
 		case VIEWER_TRANSFORM_CHANGED:
-			final AffineTransform3D transform = state().getViewerTransform();
+			final AffineTransform3D transform = state.getViewerTransform();
 			transformListeners.list.forEach( l -> l.transformChanged( transform ) );
 			requestRepaint();
 		}
 	}
 
 	@Override
-	public synchronized void setTransformAnimator( final AbstractTransformAnimator animator )
+	public void setTransformAnimator( final AbstractTransformAnimator animator )
 	{
-		currentAnimator = animator;
-		currentAnimator.setTime( System.currentTimeMillis() );
+		animator.setTime( System.currentTimeMillis() );
+		currentAnimator.set( animator );
 		requestRepaint();
 	}
 
@@ -772,9 +814,9 @@ public class VolumeViewerPanel
 	 * Set the {@link DisplayMode}.
 	 */
 	// TODO: Deprecate or leave as convenience?
-	public synchronized void setDisplayMode( final DisplayMode displayMode )
+	public void setDisplayMode( final DisplayMode displayMode )
 	{
-		state().setDisplayMode( displayMode );
+		state.setDisplayMode( displayMode );
 	}
 
 	/**
@@ -783,7 +825,7 @@ public class VolumeViewerPanel
 	@Deprecated
 	public void setCurrentViewerTransform( final AffineTransform3D viewerTransform )
 	{
-		state().setViewerTransform( viewerTransform );
+		state.setViewerTransform( viewerTransform );
 	}
 
 	/**
@@ -793,27 +835,27 @@ public class VolumeViewerPanel
 	 *            time-point index.
 	 */
 	// TODO: Deprecate or leave as convenience?
-	public synchronized void setTimepoint( final int timepoint )
+	public void setTimepoint( final int timepoint )
 	{
-		state().setCurrentTimepoint( timepoint );
+		state.setCurrentTimepoint( timepoint );
 	}
 
 	/**
 	 * Show the next time-point.
 	 */
 	// TODO: Deprecate or leave as convenience?
-	public synchronized void nextTimePoint()
+	public void nextTimePoint()
 	{
-		NavigationActions.nextTimePoint( state() );
+		NavigationActions.nextTimePoint( state );
 	}
 
 	/**
 	 * Show the previous time-point.
 	 */
 	// TODO: Deprecate or leave as convenience?
-	public synchronized void previousTimePoint()
+	public void previousTimePoint()
 	{
-		NavigationActions.previousTimePoint( state() );
+		NavigationActions.previousTimePoint( state );
 	}
 
 	/**
@@ -829,20 +871,20 @@ public class VolumeViewerPanel
 	 */
 	public void setNumTimepoints( final int numTimepoints )
 	{
-		state().setNumTimepoints( numTimepoints );
+		state.setNumTimepoints( numTimepoints );
 	}
 
 	/**
 	 * @deprecated Use {@link #state()} instead.
 	 *
-	 * Get a copy of the current {@link ViewerState}.
+	 * Get a copy of the current {@link bdv.viewer.state.ViewerState}.
 	 *
-	 * @return a copy of the current {@link ViewerState}.
+	 * @return a copy of the current {@link bdv.viewer.state.ViewerState}.
 	 */
 	@Deprecated
-	public ViewerState getState()
+	public bdv.viewer.state.ViewerState getState()
 	{
-		return state.copy();
+		return deprecatedState.copy();
 	}
 
 	/**
@@ -853,7 +895,7 @@ public class VolumeViewerPanel
 	@Override
 	public SynchronizedViewerState state()
 	{
-		return state.getState();
+		return state;
 	}
 
 	/**
@@ -881,11 +923,6 @@ public class VolumeViewerPanel
 	public TransformEventHandler getTransformEventHandler()
 	{
 		return transformEventHandler;
-	}
-
-	public ConverterSetupsPG getConverterSetups()
-	{
-		return setups;
 	}
 
 	/**
@@ -937,52 +974,49 @@ public class VolumeViewerPanel
 	{
 		return renderTransformListeners;
 	}
+	
+	/**
+	 * Add/remove {@link TimePointListener} to notify about time-point
+	 * changes. Listeners will be notified <em>before</em> calling
+	 * {@link #requestRepaint()} so listeners have the chance to interfere.
+	 */
+	//@Override
+	public Listeners< TimePointListener > timePointListeners()
+	{
+		return timePointListeners;
+	}
+
+	//@Override
+	public ConverterSetupsPG getConverterSetups()
+	{
+		return setups;
+	}
 
 	/**
-	 * Add a {@link TimePointListener} to notify about time-point
-	 * changes. Listeners will be notified <em>before</em> calling
-	 * {@link #requestRepaint()} so they have the chance to interfere.
-	 *
-	 * @param listener
-	 *            the listener to add.
+	 * @deprecated Use {@code timePointListeners().add( listener )}.
 	 */
+	@Deprecated
 	public void addTimePointListener( final TimePointListener listener )
 	{
-		addTimePointListener( listener, Integer.MAX_VALUE );
+		timePointListeners().add( listener );
 	}
 
 	/**
-	 * Add a {@link TimePointListener} to notify about time-point
-	 * changes. Listeners will be notified <em>before</em> calling
-	 * {@link #requestRepaint()} so they have the chance to interfere.
-	 *
-	 * @param listener
-	 *            the listener to add.
-	 * @param index
-	 *            position in the list of listeners at which to insert this one.
+	 * @deprecated Use {@code timePointListeners().add( index, listener )}.
 	 */
+	@Deprecated
 	public void addTimePointListener( final TimePointListener listener, final int index )
 	{
-		synchronized ( timePointListeners )
-		{
-			final int s = timePointListeners.size();
-			timePointListeners.add( index < 0 ? 0 : index > s ? s : index, listener );
-			listener.timePointChanged( state.getCurrentTimepoint() );
-		}
+		timePointListeners().add( index, listener );
 	}
 
 	/**
-	 * Remove a {@link TimePointListener}.
-	 *
-	 * @param listener
-	 *            the listener to remove.
+	 * @deprecated Use {@code timePointListeners().remove( listener )}.
 	 */
+	@Deprecated
 	public void removeTimePointListener( final TimePointListener listener )
 	{
-		synchronized ( timePointListeners )
-		{
-			timePointListeners.remove( listener );
-		}
+		timePointListeners().remove( listener );
 	}
 
 	private static int getDitherStep( final int ditherWidth )
@@ -1041,7 +1075,6 @@ public class VolumeViewerPanel
 	@SuppressWarnings( "unchecked" )
 	private void setRenderState()
 	{
-		final SynchronizedViewerState state = state();
 		synchronized ( state )
 		{
 			final int currentTimepoint = state.getCurrentTimepoint();
@@ -1171,15 +1204,21 @@ public class VolumeViewerPanel
 		}
 	};
 
-	public synchronized Element stateToXml()
+	public Element stateToXml()
 	{
-		return new XmlIoViewerState().toXml( state );
+		synchronized ( state )
+		{
+			return new XmlIoViewerState().toXml( deprecatedState );
+		}
 	}
 
-	public synchronized void stateFromXml( final Element parent )
+	public void stateFromXml( final Element parent )
 	{
-		final XmlIoViewerState io = new XmlIoViewerState();
-		io.restoreFromXml( parent.getChild( io.getTagName() ), state );
+		synchronized ( state )
+		{
+			final XmlIoViewerState io = new XmlIoViewerState();
+			io.restoreFromXml( parent.getChild( io.getTagName() ), deprecatedState );
+		}
 	}
 
 	/**
@@ -1225,7 +1264,8 @@ public class VolumeViewerPanel
 		{
 			e.printStackTrace();
 		}
-		state.kill();
+		state.clearGroups();
+		state.clearSources();
 	}
 
 

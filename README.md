@@ -15,7 +15,7 @@ This is a fork of [BVV](https://github.com/bigdataviewer/bigvolumeviewer-core) w
 - additional "rendering" mode that waits for data to be loaded in full resolution;
 - supports 32-bit data.
 
-Currently synchronized to BVV version 0.4.1 (this [commit](https://github.com/bigdataviewer/bigvolumeviewer-core/commit/7ca399a73c84b37461ca5e9f5b6c547d62867bae)).
+Currently synchronized to BVV version 0.4.2 (this [commit](https://github.com/bigdataviewer/bigvolumeviewer-core/commit/326248353fa1bc869be3ae1ab216ba284c20519c)).
 
 For a stand-alone usage check out [BigVolumeBrowser](https://github.com/ekatrukha/bigvolumebrowser) plugin.
 
