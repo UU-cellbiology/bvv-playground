@@ -37,7 +37,6 @@ import bdv.util.Bounds;
 
 public class ConverterSetupBoundsGamma {
 
-
 	private final Map< ConverterSetup, Bounds > setupToBounds = new HashMap<>();
 
 	ConverterSetupBoundsGamma()
@@ -59,7 +58,7 @@ public class ConverterSetupBoundsGamma {
 			final double gamma = ((GammaConverterSetup)setup).getDisplayGamma();
 			final double min = bounds.getMinBound();
 			final double max = bounds.getMaxBound();
-			if(gamma<min)
+			if(gamma < min)
 			{
 				((GammaConverterSetup)setup).setDisplayGamma(min);
 			}

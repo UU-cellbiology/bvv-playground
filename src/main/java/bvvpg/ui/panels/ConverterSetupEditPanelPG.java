@@ -35,7 +35,6 @@ import java.net.URL;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
-import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
@@ -61,7 +60,7 @@ public class ConverterSetupEditPanelPG extends JPanel
 	
 	private final JButton expandButton;
 	private final JPanel extendedPanel;
-	private final JCheckBox cbSync;
+	private final SyncPanel syncPanel;
 	private final ImageIcon expandIcon; 
 	private final ImageIcon collapseIcon; 
 
@@ -77,7 +76,7 @@ public class ConverterSetupEditPanelPG extends JPanel
 			final ConverterSetupsPG converterSetups )
 	{
 		this();
-		rangeEditor = new BoundedRangeEditorPG( tree, converterSetups, rangePanel, gammaPanel, rangeAlphaPanel, gammaAlphaPanel, cbSync);
+		rangeEditor = new BoundedRangeEditorPG( tree, converterSetups, rangePanel, gammaPanel, rangeAlphaPanel, gammaAlphaPanel, syncPanel);
 		colorEditor = new ColorEditorPG( tree, converterSetups, colorPanel );
 	}
 
@@ -86,7 +85,7 @@ public class ConverterSetupEditPanelPG extends JPanel
 			final ConverterSetupsPG converterSetups )
 	{
 		this();
-		rangeEditor = new BoundedRangeEditorPG( table, converterSetups, rangePanel, gammaPanel, rangeAlphaPanel,gammaAlphaPanel, cbSync);
+		rangeEditor = new BoundedRangeEditorPG( table, converterSetups, rangePanel, gammaPanel, rangeAlphaPanel,gammaAlphaPanel, syncPanel);
 		colorEditor = new ColorEditorPG( table, converterSetups, colorPanel );
 	}
 	public ConverterSetupEditPanelPG(
@@ -94,7 +93,7 @@ public class ConverterSetupEditPanelPG extends JPanel
 			final ConverterSetupsPG converterSetups )
 	{
 		this();
-		rangeEditor = new BoundedRangeEditorPG( singleCS, converterSetups, rangePanel, gammaPanel, rangeAlphaPanel,gammaAlphaPanel, cbSync);
+		rangeEditor = new BoundedRangeEditorPG( singleCS, converterSetups, rangePanel, gammaPanel, rangeAlphaPanel,gammaAlphaPanel, syncPanel);
 		colorEditor = new ColorEditorPG( singleCS, converterSetups, colorPanel );
 	}
 
@@ -105,15 +104,15 @@ public class ConverterSetupEditPanelPG extends JPanel
 		colorPanel = new ColorPanelPG();
 		rangePanel = new BoundedRangePanelPG();
 		rangePanel.setToolTipText( "Color/LUT range" );
-		gammaPanel = new BoundedValuePanelPG( new BoundedValueDouble(0.01,5.0,1.0));
+		gammaPanel = new BoundedValuePanelPG( new BoundedValueDouble(0.01, 5.0, 1.0));
 		gammaPanel.setToolTipText( "Color/LUT gamma" );
 		rangeAlphaPanel = new BoundedRangePanelPG();
 		rangeAlphaPanel.setToolTipText( "Opacity range"  );
-		gammaAlphaPanel = new BoundedValuePanelPG( new BoundedValueDouble(0.01,5.0,1.0));
+		gammaAlphaPanel = new BoundedValuePanelPG( new BoundedValueDouble(0.01, 5.0, 1.0));
 		gammaAlphaPanel.setToolTipText( "Opacity gamma"  );
-		cbSync = new JCheckBox();
-		cbSync.setSelected(true);
-		cbSync.setToolTipText( "Change in LUT\nchanges opacity" );
+		syncPanel = new SyncPanel();
+		syncPanel.setSelected(true);
+		syncPanel.setToolTipText( "Change in LUT\nchanges opacity" );
 
 		//( ( MigLayout ) rangePanel.getLayout() ).setLayoutConstraints( "fillx, filly, hidemode 3" );
 		//( ( MigLayout ) gammaPanel.getLayout() ).setLayoutConstraints( "ins 5 5 5 10, fillx, filly, hidemode 3" );
@@ -132,7 +131,7 @@ public class ConverterSetupEditPanelPG extends JPanel
 		extendedPanel.setLayout( new MigLayout( "ins 0 0 0 0, fillx, filly, hidemode 3", "[][][grow]", "[]0[]" ) );
 		extendedPanel.add( new JLabel(" γ"), "" );
 		extendedPanel.add( gammaPanel, "growx, span, wrap" );
-		extendedPanel.add(cbSync);
+		extendedPanel.add( syncPanel );
 		extendedPanel.add( new JLabel(" α"), "" );
 		extendedPanel.add( rangeAlphaPanel, "growx, span, wrap" );
 		extendedPanel.add( new JLabel(" γ α"), "" );
@@ -183,7 +182,6 @@ public class ConverterSetupEditPanelPG extends JPanel
 	public void addExpandActionListener(ActionListener al)
 	{
 		listeners.add( al );
-		//expandButton.addActionListener( al );
 	}
 	public synchronized void update()
 	{
@@ -191,8 +189,8 @@ public class ConverterSetupEditPanelPG extends JPanel
 			rangeEditor.updateSelection();
 		if( colorEditor != null)
 			colorEditor.updateSelection();
-
 	}
+	
 	public boolean isExpanded()
 	{
 		return bExpanded;

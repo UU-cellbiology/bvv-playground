@@ -444,6 +444,10 @@ public class RealARGBColorGammaConverterSetup implements GammaConverterSetup
 	}
 
 
-
+	@Override
+	public void fireParametersChanged()
+	{
+		listeners.list.forEach( l -> l.setupParametersChanged( this ) );
+	}
 
 }

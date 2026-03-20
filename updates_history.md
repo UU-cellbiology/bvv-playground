@@ -1,5 +1,10 @@
 # Updates history
 
+## 0.5.4
+
+- updates of LUT/alpha range sliders and both gamma sliders happens simultaneously;
+- stores the value of "sync" checkbox per converter setup + updates it on change;
+- possibility to change text overlay color (if canvas background color is not black). 
 
 ## 0.5.3
 
@@ -36,7 +41,7 @@
 
 ## 0.3.4
 
-- updated to fiji POM 40.0.0;
+- updated to scijava POM 40.0.0;
 
 ## 0.3.3
 

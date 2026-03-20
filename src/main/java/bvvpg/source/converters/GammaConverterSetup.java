@@ -84,4 +84,6 @@ public interface GammaConverterSetup extends ConverterSetup, Clippable3D
 	/** 0 = nearest neighbor (cubes); 1 = tri-linear **/
 	int getVoxelRenderInterpolation();
 	
+	/** fake update of listeners **/
+	void fireParametersChanged();
 }
