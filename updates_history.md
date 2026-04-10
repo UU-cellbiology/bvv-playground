@@ -1,5 +1,10 @@
 # Updates history
 
+## 0.5.5
+
+- changes depth buffer interpolation from linear to nearest (fixes depth leakage);
+- fixes stitching of dithered rendering mode for depth and color. 
+
 ## 0.5.4
 
 - updates of LUT/alpha range sliders and both gamma sliders happens simultaneously;
