@@ -1,10 +1,16 @@
 # Updates history
 
+## 0.5.5
+
+- changes depth buffer interpolation from linear to nearest (fixes depth leakage);
+- fixes stitching of dithered rendering mode for depth and color. 
+
 ## 0.5.4
 
 - updates of LUT/alpha range sliders and both gamma sliders happens simultaneously;
 - stores the value of "sync" checkbox per converter setup + updates it on change;
-- possibility to change text overlay color (if canvas background color is not black). 
+- possibility to change text overlay color (if canvas background color is not black);
+- sync to BVV 0.4.2 version. 
 
 ## 0.5.3
 

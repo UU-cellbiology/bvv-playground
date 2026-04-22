@@ -410,8 +410,8 @@ public class OffScreenFrameBufferWithDepth
 		progQuadDepth.use( context );
 		gl.glActiveTexture( GL_TEXTURE0 );
 		gl.glBindTexture( GL_TEXTURE_2D, texDepthBuffer );
-		gl.glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
-		gl.glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
+		gl.glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL.GL_NEAREST );
+		gl.glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL.GL_NEAREST );
 		gl.glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE );
 		gl.glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE );
 		gl.glBindVertexArray( vaoQuad );
@@ -484,13 +484,15 @@ public class OffScreenFrameBufferWithDepth
 		@Override
 		public MinFilter texMinFilter()
 		{
-			return MinFilter.LINEAR;
+			return MinFilter.NEAREST;
 		}
 
+		// changed to nearest due to interpolation artifacts
+		// of fine shapes
 		@Override
 		public MagFilter texMagFilter()
 		{
-			return MagFilter.LINEAR;
+			return MagFilter.NEAREST;
 		}
 
 		@Override
