@@ -106,7 +106,7 @@ public class DebugLargeLUT
 		colors[0][0] = ( byte ) 0;
 		colors[1][0] = ( byte )  0 ;
 		colors[2][0] = ( byte ) 255 ;
-		for(int i=1;i<nTotLength;i++)
+		for(int i = 1; i < nTotLength; i++)
 		{
 			int nStep = (int) Math.round( 255.0*i/(nTotLength));
 			colors[0][i] = ( byte ) nStep ;
@@ -129,7 +129,7 @@ public class DebugLargeLUT
 		colors[2][0] = ( byte ) 255 ;
 		colors[3][0] = ( byte ) 255 ;
 		
-		for(int i=1;i<nTotLength;i++)
+		for(int i = 1; i < nTotLength; i++)
 		{
 			int nStep = (int) Math.round( 255.0*i/(nTotLength));
 			colors[0][i] = ( byte ) nStep ;

@@ -1,5 +1,11 @@
 # Updates history
 
+
+## 0.5.6
+
+- removes the assumption that ViewerImgLoader#getCacheControl() of SpimData always returns a
+VolatileGlobalCellCache.
+
 ## 0.5.5
 
 - changes depth buffer interpolation from linear to nearest (fixes depth leakage);
