@@ -96,7 +96,7 @@ public class DebugClipInterval
 		sources.get( 0 ).setLUT( "Green" );
 		sources.get( 1 ).setLUT( "Red" );
 		sources.get( 0 ).setVoxelRenderInterpolation( 0 );
-		sources.get( 1 ).setVoxelRenderInterpolation( 0 );
+		sources.get( 1 ).setVoxelRenderInterpolation( 1 );
 		double [] min = new double[3];
 		double [] max = new double[3];
 		//min[0]=0.1;

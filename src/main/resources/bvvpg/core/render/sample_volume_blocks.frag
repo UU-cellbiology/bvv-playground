@@ -37,11 +37,11 @@ uniform vec3 lutOffset;
 float sampleRaw (vec3 posin)
 {	
 	vec3 pos = vec3(posin);
-	float zerofade = 1.0;
+	
 	vec3 B0 = vec3(0.0,0.0,0.0);
 	vec3 sj = vec3(0.0,0.0,0.0);
 	
-	//no interpolation
+	//nearest neighbor
 	if(voxelInterpolation == 0)
 	{	
 		pos = pos + 0.5;
@@ -50,43 +50,44 @@ float sampleRaw (vec3 posin)
 		uvec4 lutv = texture( lutSampler, q / lutSize );
 		B0 = lutv.xyz * paddedBlockSize + cachePadOffset;
 		sj = blockScales[ lutv.w ];
-		pos = pos*sj;
-		
+		pos = mod(pos * sj, blockSize);
 		pos = floor(pos);
+		vec3 c0 = B0 + pos + 0.5;
+		return texture( volumeCache, c0 / cacheSize ).r;		
 
 	}
+	//trilinear
 	else
 	{	
 		//cannot read texture with negative coordinates,
 		//so let's take the value at the border	
 		vec3 over = pos * step(0.0, pos) - pos;
 		pos = over + pos;
-		over = clamp(over,0,1);
+		over = clamp(over, 0, 1);
 		
 		//fake interpolation to zero		
-		zerofade = (1.0-over.x)*(1.0-over.y)*(1.0-over.z);		
+		float zerofade = (1.0 - over.x) * (1.0 - over.y) * (1.0 - over.z);		
 
 		vec3 q = floor( pos / blockSize ) - lutOffset + 0.5;	
 		uvec4 lutv = texture( lutSampler, q / lutSize );
 		B0 = lutv.xyz * paddedBlockSize + cachePadOffset;
 		sj = blockScales[ lutv.w ];
-		pos = pos*sj;		
+				
+		vec3 c0 = B0 + mod( pos * sj, blockSize ) + 0.5 * sj ;
+	                                       // + 0.5 ( sj - 1 )   + 0.5 for tex coord offset	
+		return zerofade * texture( volumeCache, c0 / cacheSize ).r;	
 	}
-	
-	vec3 c0 = B0 + mod( pos, blockSize ) + 0.5 * sj ;
-	                                       // + 0.5 ( sj - 1 )   + 0.5 for tex coord offset
-	
-	return zerofade * texture( volumeCache, c0 / cacheSize ).r;		
+		
 }
 
 float sampleVolume( vec4 wpos )
 {
 	//check if in the clipping area
-	if(clipactive>0)
+	if(clipactive > 0)
 	{		
-		vec3 posclip = (cliptransform*wpos).xyz;
+		vec3 posclip = (cliptransform * wpos).xyz;
 		vec3 s = step(clipmin, posclip) - step(clipmax, posclip);
-		if(s.x * s.y * s.z == clipactive-1)
+		if(s.x * s.y * s.z == clipactive - 1)
 			return 0.0;
 	}
 
@@ -102,9 +103,9 @@ vec3 gradientVolume( vec4 wpos, float fStep )
 	{
 		pos = floor(pos) + 0.5;
 	}
-	vec3 ox = vec3(fStep,0,0);
-	vec3 oy = vec3(0,fStep,0);
-	vec3 oz = vec3(0,0,fStep);
+	vec3 ox = vec3(fStep, 0, 0);
+	vec3 oy = vec3(0, fStep, 0);
+	vec3 oz = vec3(0, 0, fStep);
 	float fx1 = sampleRaw(pos + ox);
 	float fx0 = sampleRaw(pos - ox);
 	float fy1 = sampleRaw(pos + oy);

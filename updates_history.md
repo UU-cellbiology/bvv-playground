@@ -1,5 +1,8 @@
 # Updates history
 
+## 0.5.7
+
+- fixed nearest neighbor sampling of multi-resolution volumes in shader.
 
 ## 0.5.6
 
