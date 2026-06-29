@@ -88,7 +88,7 @@ import bvvpg.core.render.VolumeShaderSignature.VolumeSignature;
 import bvvpg.core.multires.MultiResolutionStack3D;
 import bvvpg.core.multires.SimpleStack3D;
 import bvvpg.core.multires.Stack3D;
-import bvvpg.core.offscreen.OffScreenFrameBufferWithDepth;
+import bvvpg.core.offscreen.MultisampleGeometryBuffer;
 import bvvpg.source.converters.GammaConverterSetup;
 
 public class VolumeRenderer
@@ -277,7 +277,7 @@ public class VolumeRenderer
 	public RepaintType draw(
 			final GL3 gl,
 			final RepaintType type,
-			final OffScreenFrameBufferWithDepth sceneBuf,
+			final MultisampleGeometryBuffer sceneBuf,
 			final List< Stack3D< ? > > renderStacks,
 			final List< ConverterSetup > renderConverters,
 			final RenderData renderData,

@@ -1,5 +1,9 @@
 # Updates history
 
+## 0.5.8
+
+- added multisampling anti-aliasing for the scene part of the render.
+
 ## 0.5.7
 
 - fixed nearest neighbor sampling of multi-resolution volumes in shader.

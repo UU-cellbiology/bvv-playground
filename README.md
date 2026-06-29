@@ -12,6 +12,7 @@ This is a fork of [BVV](https://github.com/bigdataviewer/bigvolumeviewer-core) w
 - clipping of displayed sources in shaders (optionally using custom transform);
 - perspective and orthographic projections;
 - separate rendering for opaque and transparent objects (allows [weighted OIT](https://jcgt.org/published/0002/02/09/));
+- [multisampling anti-aliasing](https://learnopengl.com/Advanced-OpenGL/Anti-Aliasing) for geometry objects rendering;
 - additional "rendering" mode that waits for data to be loaded in full resolution;
 - supports 32-bit data.
 
