@@ -17,6 +17,9 @@ import static com.jogamp.opengl.GL3.GL_TEXTURE_2D_MULTISAMPLE;
 import com.jogamp.opengl.GL;
 import com.jogamp.opengl.GL3;
 
+import net.imglib2.img.Img;
+import net.imglib2.type.numeric.real.FloatType;
+
 import bvvpg.core.backend.Texture2D;
 
 /** 
@@ -149,12 +152,6 @@ public class MultisampleGeometryBuffer
 		bind( gl, true );
 	}
 
-	public Texture2D getDepthTexture()
-	{
-		return resolveBuffer.getDepthTexture();
-	}
-
-
 	public void bind( GL3 gl, boolean clear )
 	{
 		initFrameBuffer( gl );
@@ -180,7 +177,7 @@ public class MultisampleGeometryBuffer
 		gl.glEnable( GL.GL_MULTISAMPLE );
 	}
 
-	public void unbind( GL3 gl )
+	public void unbind( GL3 gl, boolean getTexture )
 	{		
 		gl.glBindFramebuffer(GL.GL_READ_FRAMEBUFFER, framebuffer);
 		gl.glBindFramebuffer(GL.GL_DRAW_FRAMEBUFFER, resolveBuffer.getFrameBuffer());
@@ -193,6 +190,18 @@ public class MultisampleGeometryBuffer
 		gl.glDisable( GL.GL_MULTISAMPLE );
 		gl.glBindFramebuffer( GL_FRAMEBUFFER, restoreFramebuffer );
 		gl.glViewport( viewport[ 0 ], viewport[ 1 ], viewport[ 2 ], viewport[ 3 ] );
+		if ( getTexture )
+			resolveBuffer.getTexture( gl );
+	}	
+	
+	public Img< FloatType > getDepthImg()
+	{
+		return resolveBuffer.getDepthImg();
+	}
+
+	public Texture2D getDepthTexture()
+	{
+		return resolveBuffer.getDepthTexture();
 	}
 
 	/**
