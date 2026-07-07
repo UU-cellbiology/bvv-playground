@@ -2,7 +2,7 @@
 
 ## 0.5.8
 
-- added multisampling anti-aliasing for the scene part of the render.
+- added multisampling anti-aliasing FBO for the scene part of the render.
 
 ## 0.5.7
 
