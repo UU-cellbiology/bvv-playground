@@ -175,7 +175,7 @@ public class OffScreenFrameBufferWithDepth
 		depthTexture = new DepthTexture( fbWidth, fbHeight );
 	}
 
-	private void initFrameBuffer( GL3 gl )
+	void initFrameBuffer( GL3 gl )
 	{
 		if ( framebufferInitialized )
 			return;
@@ -356,6 +356,11 @@ public class OffScreenFrameBufferWithDepth
 
 		if ( getTexture )
 			getTexture( gl );
+	}
+	
+	int getFrameBuffer()
+	{
+		return framebuffer;
 	}
 
 	/**

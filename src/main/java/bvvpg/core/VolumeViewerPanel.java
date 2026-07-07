@@ -39,6 +39,8 @@ import static com.jogamp.opengl.GL.GL_DEPTH_TEST;
 import static com.jogamp.opengl.GL.GL_LESS;
 import static com.jogamp.opengl.GL.GL_RGB8;
 
+import com.jogamp.opengl.GL;
+
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
@@ -105,6 +107,7 @@ import bdv.viewer.render.PainterThread;
 import bdv.viewer.state.XmlIoViewerState;
 import bvvpg.core.multires.SourceStacks;
 import bvvpg.core.multires.Stack3D;
+import bvvpg.core.offscreen.MultisampleGeometryBuffer;
 import bvvpg.core.offscreen.OffScreenFrameBuffer;
 import bvvpg.core.offscreen.OffScreenFrameBufferWithDepth;
 import bvvpg.core.render.RenderData;
@@ -214,7 +217,7 @@ public class VolumeViewerPanel
 
 	private final Repaint repaint = new Repaint();
 
-	protected final OffScreenFrameBufferWithDepth sceneBuf;	
+	protected final MultisampleGeometryBuffer sceneBuf;	
 	protected final OffScreenFrameBufferWithDepth offscreen;	
 
 	// TODO: should be settable
@@ -370,7 +373,7 @@ public class VolumeViewerPanel
 		final int renderWidth = options.getRenderWidth();
 		final int renderHeight = options.getRenderHeight();
 		
-		sceneBuf = new OffScreenFrameBufferWithDepth( renderWidth, renderHeight, GL_RGB8 );
+		sceneBuf = new MultisampleGeometryBuffer( renderWidth, renderHeight, GL_RGB8 );
 		
 		offscreen = new OffScreenFrameBufferWithDepth( renderWidth, renderHeight, GL_RGB8 );
 
