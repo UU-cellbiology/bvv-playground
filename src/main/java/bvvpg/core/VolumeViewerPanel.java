@@ -217,7 +217,7 @@ public class VolumeViewerPanel
 
 	private final Repaint repaint = new Repaint();
 
-	protected final MultisampleGeometryBuffer sceneBuf;	
+	protected final OffScreenFrameBufferWithDepth sceneBuf;	
 	protected final OffScreenFrameBufferWithDepth offscreen;	
 
 	// TODO: should be settable
@@ -373,7 +373,7 @@ public class VolumeViewerPanel
 		final int renderWidth = options.getRenderWidth();
 		final int renderHeight = options.getRenderHeight();
 		
-		sceneBuf = new MultisampleGeometryBuffer( renderWidth, renderHeight, GL_RGB8 );
+		sceneBuf = new OffScreenFrameBufferWithDepth( renderWidth, renderHeight, GL_RGB8 );
 		
 		offscreen = new OffScreenFrameBufferWithDepth( renderWidth, renderHeight, GL_RGB8 );
 
