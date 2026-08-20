@@ -44,6 +44,8 @@ import net.imglib2.img.Img;
 import net.imglib2.img.array.ArrayImgs;
 import net.imglib2.type.numeric.real.FloatType;
 
+import org.joml.Vector2f;
+
 import static com.jogamp.opengl.GL.GL_ARRAY_BUFFER;
 import static com.jogamp.opengl.GL.GL_CLAMP_TO_EDGE;
 import static com.jogamp.opengl.GL.GL_COLOR_ATTACHMENT0;
@@ -60,6 +62,7 @@ import static com.jogamp.opengl.GL.GL_LINEAR;
 import static com.jogamp.opengl.GL.GL_RGB;
 import static com.jogamp.opengl.GL.GL_RGB32F;
 import static com.jogamp.opengl.GL.GL_TEXTURE0;
+import static com.jogamp.opengl.GL.GL_TEXTURE1;
 import static com.jogamp.opengl.GL.GL_TEXTURE_2D;
 import static com.jogamp.opengl.GL.GL_TEXTURE_MAG_FILTER;
 import static com.jogamp.opengl.GL.GL_TEXTURE_MIN_FILTER;
@@ -77,11 +80,15 @@ public class OffScreenFrameBufferWithDepth
 {
 	private int vaoQuad;
 
-	private final DefaultShader progQuad;
+	private final DefaultShader progQuadFlip;
+
+	private final DefaultShader progQuadOnlyDepth;
+	
+	private final DefaultShader progQuadColorDepth;
 	
 	private final DefaultShader progQuadAlpha;
 	
-	private final DefaultShader progQuadDepth;
+	private final DefaultShader progQuadEDL;
 	
 	private boolean flipY;
 
@@ -163,14 +170,23 @@ public class OffScreenFrameBufferWithDepth
 
 		final Segment quadvp = new SegmentTemplate( OffScreenFrameBufferWithDepth.class, "osfbquad.vp" ).instantiate();
 		final Segment quadfp = new SegmentTemplate( OffScreenFrameBufferWithDepth.class, "osfbquad.fp" ).instantiate();
-		progQuad = new DefaultShader( quadvp.getCode(), quadfp.getCode() );
+		
+		final Segment quadvpFlip = new SegmentTemplate( OffScreenFrameBufferWithDepth.class, "osfbquadwflip.vp" ).instantiate();
+
+		//final Segment quadvpd = new SegmentTemplate( OffScreenFrameBufferWithDepth.class, "osfbquad_depth.vp" ).instantiate();
+		progQuadFlip = new DefaultShader( quadvpFlip.getCode(), quadfp.getCode() );
+
+		final Segment quadfpd = new SegmentTemplate( OffScreenFrameBufferWithDepth.class, "osfbquad_depth.fp" ).instantiate();
+		progQuadOnlyDepth = new DefaultShader( quadvpFlip.getCode(), quadfpd.getCode() );
+
+		final Segment quadcdfp = new SegmentTemplate( OffScreenFrameBufferWithDepth.class, "osfbquadwithdepth.fp" ).instantiate();
+		progQuadColorDepth = new DefaultShader( quadvpFlip.getCode(), quadcdfp.getCode() );
 
 		final Segment quadfpa = new SegmentTemplate( OffScreenFrameBufferWithDepth.class, "osfbquad_alpha.fp" ).instantiate();
 		progQuadAlpha = new DefaultShader( quadvp.getCode(), quadfpa.getCode() );
 		
-		final Segment quadvpd = new SegmentTemplate( OffScreenFrameBufferWithDepth.class, "osfbquad_depth.vp" ).instantiate();
-		final Segment quadfpd = new SegmentTemplate( OffScreenFrameBufferWithDepth.class, "osfbquad_depth.fp" ).instantiate();
-		progQuadDepth = new DefaultShader( quadvpd.getCode(), quadfpd.getCode() );
+		final Segment quadfpEDL = new SegmentTemplate( OffScreenFrameBufferWithDepth.class, "edlfbquad.fp" ).instantiate();
+		progQuadEDL = new DefaultShader( quadvp.getCode(), quadfpEDL.getCode() );
 
 		depthTexture = new DepthTexture( fbWidth, fbHeight );
 	}
@@ -368,14 +384,21 @@ public class OffScreenFrameBufferWithDepth
 	 */
 	public void drawQuad( GL3 gl )
 	{
-		drawQuad( gl, GL_LINEAR, GL_LINEAR );
+		drawQuad( gl, GL_LINEAR, GL_LINEAR, false );
 	}
 
-	public void drawQuad( GL3 gl, int minFilter, int magFilter )
+	public void drawQuad( GL3 gl, boolean bFlipY )
+	{
+		drawQuad( gl, GL_LINEAR, GL_LINEAR, bFlipY );
+	}
+
+	public void drawQuad( GL3 gl, int minFilter, int magFilter, boolean bFlipY )
 	{
 		initQuad( gl );
-
-		progQuad.use( JoglGpuContext.get( gl ) );
+		JoglGpuContext context = JoglGpuContext.get( gl );
+		progQuadFlip.getUniform1i( "nFlip" ).set( bFlipY?1:0 );
+		progQuadFlip.setUniforms( context );
+		progQuadFlip.use( context );
 		gl.glActiveTexture( GL_TEXTURE0 );
 		gl.glBindTexture( GL_TEXTURE_2D, texColorBuffer );
 		gl.glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, minFilter );
@@ -388,6 +411,7 @@ public class OffScreenFrameBufferWithDepth
 		gl.glBindTexture( GL_TEXTURE_2D, 0 );
 	}
 	
+	/** draws quad with alpha OIT calculations **/
 	public void drawQuadAlpha( GL3 gl )
 	{
 		initQuad( gl );
@@ -406,19 +430,92 @@ public class OffScreenFrameBufferWithDepth
 	}
 
 	/** draws only current stored depth component, optionally flipping it **/
-	public void drawQuadDepth( GL3 gl, boolean bFlipY )
+	public void drawQuadOnlyDepth( GL3 gl, boolean bFlipY )
 	{
 		initQuad( gl );
 		JoglGpuContext context = JoglGpuContext.get( gl );
-		progQuadDepth.getUniform1i( "nFlip" ).set( bFlipY?1:0 );
-		progQuadDepth.setUniforms( context );
-		progQuadDepth.use( context );
+		progQuadOnlyDepth.getUniform1i( "nFlip" ).set( bFlipY?1:0 );
+		progQuadOnlyDepth.setUniforms( context );
+		progQuadOnlyDepth.use( context );
 		gl.glActiveTexture( GL_TEXTURE0 );
 		gl.glBindTexture( GL_TEXTURE_2D, texDepthBuffer );
 		gl.glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL.GL_NEAREST );
 		gl.glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL.GL_NEAREST );
 		gl.glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE );
 		gl.glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE );
+		gl.glBindVertexArray( vaoQuad );
+		gl.glDrawElements( GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0 );
+		gl.glBindVertexArray( 0 );
+		gl.glBindTexture( GL_TEXTURE_2D, 0 );
+	}
+
+	/** draws both color and depth **/
+	public void drawQuadColorDepth( GL3 gl )
+	{
+		drawQuadColorDepth(gl, false);		
+	}
+	
+	/** draws both color and depth and optional Y flipping **/
+	public void drawQuadColorDepth( GL3 gl, boolean bFlipY )
+	{
+		initQuad( gl );
+		JoglGpuContext context = JoglGpuContext.get( gl );
+		progQuadColorDepth.getUniform1i( "nFlip" ).set( bFlipY?1:0 );
+		progQuadColorDepth.setUniforms( context );
+		progQuadColorDepth.use( context );
+		gl.glActiveTexture( GL_TEXTURE0 );
+		gl.glBindTexture( GL_TEXTURE_2D, texColorBuffer);
+		gl.glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,  GL_LINEAR);
+		gl.glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,  GL_LINEAR );
+		gl.glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE );
+		gl.glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE );
+		progQuadColorDepth.getUniform1i( "colorTex" ).set( 0 );
+		gl.glActiveTexture(GL_TEXTURE1);
+		gl.glBindTexture(GL_TEXTURE_2D, texDepthBuffer );
+		gl.glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL.GL_NEAREST);
+		gl.glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL.GL_NEAREST);
+		gl.glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+		gl.glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+		
+		progQuadColorDepth.getUniform1i( "depthTex" ).set( 1 );
+		progQuadColorDepth.use( context );
+		progQuadColorDepth.setUniforms( context );
+
+		gl.glBindVertexArray( vaoQuad );
+		gl.glDrawElements( GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0 );
+		gl.glBindVertexArray( 0 );
+		gl.glBindTexture( GL_TEXTURE_2D, 0 );
+	}
+	
+	/** re-draws buffers using EDL lighting **/
+	public void drawQuadEDL( GL3 gl, float fnratio, float fRadius, float fStrength)
+	{
+		initQuad( gl );
+		JoglGpuContext context = JoglGpuContext.get( gl );
+
+		gl.glActiveTexture( GL_TEXTURE0 );
+		gl.glBindTexture( GL_TEXTURE_2D, texColorBuffer);
+		gl.glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,  GL_LINEAR);
+		gl.glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,  GL_LINEAR );
+		gl.glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE );
+		gl.glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE );
+		progQuadEDL.getUniform1i( "colorTex" ).set( 0 );
+		gl.glActiveTexture(GL_TEXTURE1);
+		gl.glBindTexture(GL_TEXTURE_2D, texDepthBuffer );
+		gl.glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL.GL_NEAREST);
+		gl.glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL.GL_NEAREST);
+		gl.glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+		gl.glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+		
+		progQuadEDL.getUniform1i( "depthTex" ).set( 1 );
+		progQuadEDL.use( context );
+		Vector2f texel = new Vector2f ((1.0f) / fbWidth, (1.0f) / fbHeight); 
+		progQuadEDL.getUniform2f( "texel" ).set( texel );
+		progQuadEDL.getUniform1f( "fnratio" ).set( fnratio );
+		progQuadEDL.getUniform1f( "strength" ).set( fStrength );
+		progQuadEDL.getUniform1f( "radius" ).set( fRadius );
+		progQuadEDL.setUniforms( context );
+
 		gl.glBindVertexArray( vaoQuad );
 		gl.glDrawElements( GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0 );
 		gl.glBindVertexArray( 0 );

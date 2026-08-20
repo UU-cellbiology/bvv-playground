@@ -1,31 +1,3 @@
-/*-
- * #%L
- * Volume rendering of bdv datasets with gamma and transparency option
- * %%
- * Copyright (C) 2022 - 2026 Cell Biology, Neurobiology and Biophysics Department of Utrecht University.
- * %%
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
- * 
- * 1. Redistributions of source code must retain the above copyright notice,
- *    this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright notice,
- *    this list of conditions and the following disclaimer in the documentation
- *    and/or other materials provided with the distribution.
- * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDERS OR CONTRIBUTORS BE
- * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
- * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
- * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
- * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- * #L%
- */
 package bvvpg.core.offscreen;
 
 import static com.jogamp.opengl.GL.GL_COLOR_ATTACHMENT0;
@@ -39,8 +11,7 @@ import static com.jogamp.opengl.GL.GL_FRAMEBUFFER_COMPLETE;
 import static com.jogamp.opengl.GL.GL_LINEAR;
 import static com.jogamp.opengl.GL.GL_RGB32F;
 import static com.jogamp.opengl.GL.GL_VIEWPORT;
-
-import static com.jogamp.opengl.GL3.GL_TEXTURE_2D_MULTISAMPLE;
+import static com.jogamp.opengl.GL2ES2.GL_TEXTURE_2D_MULTISAMPLE;
 
 import com.jogamp.opengl.GL;
 import com.jogamp.opengl.GL3;
@@ -50,17 +21,8 @@ import net.imglib2.type.numeric.real.FloatType;
 
 import bvvpg.core.backend.Texture2D;
 
-/** 
- * Framebuffer that supports multisampling anti-aliasing.
- * Intended to be used for geometry primitives rendering.
- * Hardcoded number of samples is equal to 4.
- * 
- * @author Eugene Katrukha
- *
- */
-public class MultisampleGeometryBuffer
+public class FlexibleFBO
 {
-
 	private int framebuffer;
 
 	private int texColorBuffer;
@@ -86,6 +48,9 @@ public class MultisampleGeometryBuffer
 
 	private int restoreFramebuffer;
 
+	private boolean useMSAA = false;
+	
+	private boolean bIsFBOBound = false;
 	
 	/**
 	 * Use {@code GL_RGB32F} as internalFormat.
@@ -93,7 +58,7 @@ public class MultisampleGeometryBuffer
 	 * @param fbHeight height of offscreen framebuffer
 	 * @param internalFormat internal texture format
 	 */
-	public MultisampleGeometryBuffer( final int fbWidth, final int fbHeight, final int internalFormat )
+	public FlexibleFBO( final int fbWidth, final int fbHeight, final int internalFormat )
 	{
 		this( fbWidth, fbHeight, internalFormat, false );
 	}
@@ -104,7 +69,7 @@ public class MultisampleGeometryBuffer
 	 * @param fbHeight height of offscreen framebuffer
 	 * @param flipY whether to flip the Y axis when {@link #drawQuad drawing the texture}
 	 */
-	public MultisampleGeometryBuffer( final int fbWidth, final int fbHeight, final boolean flipY )
+	public FlexibleFBO( final int fbWidth, final int fbHeight, final boolean flipY )
 	{
 		this( fbWidth, fbHeight, GL_RGB32F, flipY );
 	}
@@ -115,7 +80,7 @@ public class MultisampleGeometryBuffer
 	 * @param internalFormat internal texture format
 	 * @param flipY whether to flip the Y axis when {@link #drawQuad drawing the texture}
 	 */
-	public MultisampleGeometryBuffer( final int fbWidth, final int fbHeight, final int internalFormat, final boolean flipY )
+	public FlexibleFBO( final int fbWidth, final int fbHeight, final int internalFormat, final boolean flipY )
 	{
 		this.fbWidth = fbWidth;
 		this.fbHeight = fbHeight;
@@ -160,6 +125,18 @@ public class MultisampleGeometryBuffer
 		gl.glBindFramebuffer( GL_FRAMEBUFFER, restoreFramebuffer );
 
 	}
+	
+	public void setMSAAEnabled(boolean bEnabled)
+	{
+		if(!bIsFBOBound)
+		{
+			useMSAA = bEnabled;
+		}
+		else
+		{
+			System.err.println("Cannot change buffer MSAA settings while bound.");
+		}
+	}
 
 	public int getTexColorBuffer()
 	{
@@ -183,7 +160,7 @@ public class MultisampleGeometryBuffer
 	public void bind( GL3 gl, boolean clear )
 	{
 		initFrameBuffer( gl );
-			
+		bIsFBOBound = true;	
 		if(!bInitResolveBuffer)
 		{
 			resolveBuffer.initFrameBuffer( gl );
@@ -193,8 +170,15 @@ public class MultisampleGeometryBuffer
 		final int[] tmp = new int[ 1 ];
 		gl.glGetIntegerv( GL_FRAMEBUFFER_BINDING, tmp, 0 );
 		restoreFramebuffer = tmp[ 0 ];
-
-		gl.glBindFramebuffer( GL_FRAMEBUFFER, framebuffer );
+		
+		if(useMSAA)
+		{	
+			gl.glBindFramebuffer( GL_FRAMEBUFFER, framebuffer );
+		}
+		else
+		{
+			gl.glBindFramebuffer( GL_FRAMEBUFFER, resolveBuffer.getFrameBuffer() );
+		}
 		gl.glGetIntegerv( GL_VIEWPORT, viewport, 0 );
 		gl.glViewport( 0, 0, fbWidth, fbHeight );
 		if ( clear )
@@ -202,24 +186,33 @@ public class MultisampleGeometryBuffer
 			gl.glClearColor( 0, 0, 0, 0 );
 			gl.glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 		}
-		gl.glEnable( GL.GL_MULTISAMPLE );
+		
+		if(useMSAA)
+		{
+			gl.glEnable( GL.GL_MULTISAMPLE );		
+		}
 	}
 
 	public void unbind( GL3 gl, boolean getTexture )
-	{		
-		gl.glBindFramebuffer(GL.GL_READ_FRAMEBUFFER, framebuffer);
-		gl.glBindFramebuffer(GL.GL_DRAW_FRAMEBUFFER, resolveBuffer.getFrameBuffer());
-		gl.glBlitFramebuffer(
-			    0, 0, fbWidth, fbHeight, 
-			    0, 0, fbWidth, fbHeight, 
-			    GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT, // Resolve both color and depth!
-			    GL.GL_NEAREST
-			);
-		gl.glDisable( GL.GL_MULTISAMPLE );
+	{	
+		if(useMSAA)
+		{
+			gl.glBindFramebuffer(GL.GL_READ_FRAMEBUFFER, framebuffer);
+			gl.glBindFramebuffer(GL.GL_DRAW_FRAMEBUFFER, resolveBuffer.getFrameBuffer());
+			gl.glBlitFramebuffer(
+				    0, 0, fbWidth, fbHeight, 
+				    0, 0, fbWidth, fbHeight, 
+				    GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT, // Resolve both color and depth!
+				    GL.GL_NEAREST
+				);
+			gl.glDisable( GL.GL_MULTISAMPLE );
+		}
+		
 		gl.glBindFramebuffer( GL_FRAMEBUFFER, restoreFramebuffer );
 		gl.glViewport( viewport[ 0 ], viewport[ 1 ], viewport[ 2 ], viewport[ 3 ] );
 		if ( getTexture )
 			resolveBuffer.getTexture( gl );
+		bIsFBOBound = false;
 	}	
 	
 	public Img< FloatType > getDepthImg()
@@ -233,7 +226,7 @@ public class MultisampleGeometryBuffer
 	}
 
 	/**
-	 * Render fullscreen quad with the texture.
+	 * Render fullscreen quad with the texture (only color).
 	 */
 	public void drawQuad( GL3 gl )
 	{
@@ -242,7 +235,12 @@ public class MultisampleGeometryBuffer
 
 	public void drawQuad( GL3 gl, int minFilter, int magFilter )
 	{
-		resolveBuffer.drawQuad( gl, minFilter, magFilter );
+		resolveBuffer.drawQuad( gl, minFilter, magFilter, false );
+	}
+
+	public void drawQuad( GL3 gl, boolean bFlipY )
+	{
+		resolveBuffer.drawQuad( gl, GL_LINEAR, GL_LINEAR, bFlipY );
 	}
 	
 	public void drawQuadAlpha( GL3 gl )
@@ -253,7 +251,18 @@ public class MultisampleGeometryBuffer
 	/** draws only current stored depth component, optionally flipping it **/
 	public void drawQuadDepth( GL3 gl, boolean bFlipY )
 	{
-		resolveBuffer.drawQuadDepth( gl, bFlipY );
+		resolveBuffer.drawQuadOnlyDepth( gl, bFlipY );
+	}
+	
+	/** draws both color and depth **/
+	public void drawQuadColorDepth( GL3 gl )
+	{
+		resolveBuffer.drawQuadColorDepth( gl );
+	}
+	
+	public void drawQuadEDL( GL3 gl, float fnratio, float fRadius, float fStrength)
+	{
+		resolveBuffer.drawQuadEDL( gl, fnratio, fRadius, fStrength );
 	}
 
 	public int getWidth()
@@ -265,5 +274,4 @@ public class MultisampleGeometryBuffer
 	{
 		return fbHeight;
 	}
-
 }

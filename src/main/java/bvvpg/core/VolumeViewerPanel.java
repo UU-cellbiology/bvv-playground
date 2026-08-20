@@ -39,8 +39,6 @@ import static com.jogamp.opengl.GL.GL_DEPTH_TEST;
 import static com.jogamp.opengl.GL.GL_LESS;
 import static com.jogamp.opengl.GL.GL_RGB8;
 
-import com.jogamp.opengl.GL;
-
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
@@ -80,7 +78,6 @@ import bdv.ui.UIUtils;
 import bdv.util.Prefs;
 import bdv.viewer.AbstractViewerPanel;
 import bdv.viewer.BasicViewerState;
-import bdv.viewer.ConverterSetups;
 import bdv.viewer.DisplayMode;
 import bdv.viewer.NavigationActions;
 import bdv.viewer.OverlayRenderer;
@@ -102,13 +99,9 @@ import bdv.viewer.animate.TextOverlayAnimator;
 import bdv.viewer.animate.TextOverlayAnimator.TextPosition;
 import bdv.viewer.overlay.MultiBoxOverlayRenderer;
 import bdv.viewer.overlay.ScaleBarOverlayRenderer;
-import bdv.viewer.overlay.SourceInfoOverlayRenderer;
-import bdv.viewer.render.PainterThread;
 import bdv.viewer.state.XmlIoViewerState;
 import bvvpg.core.multires.SourceStacks;
 import bvvpg.core.multires.Stack3D;
-import bvvpg.core.offscreen.MultisampleGeometryBuffer;
-import bvvpg.core.offscreen.OffScreenFrameBuffer;
 import bvvpg.core.offscreen.OffScreenFrameBufferWithDepth;
 import bvvpg.core.render.RenderData;
 import bvvpg.core.render.VolumeRenderer;
@@ -983,13 +976,13 @@ public class VolumeViewerPanel
 	 * changes. Listeners will be notified <em>before</em> calling
 	 * {@link #requestRepaint()} so listeners have the chance to interfere.
 	 */
-	//@Override
+	@Override
 	public Listeners< TimePointListener > timePointListeners()
 	{
 		return timePointListeners;
 	}
 
-	//@Override
+	@Override
 	public ConverterSetupsPG getConverterSetups()
 	{
 		return setups;
@@ -1168,9 +1161,9 @@ public class VolumeViewerPanel
 			gl.glDepthMask(true);
 			gl.glDepthFunc( GL_LESS );
 			//from scene (in case volumes are absent)
-			sceneBuf.drawQuadDepth( gl, false);
+			sceneBuf.drawQuadOnlyDepth( gl, false);
 			//draw depth from "volumetric" rendering, if present			
-			offscreen.drawQuadDepth( gl, false );		
+			offscreen.drawQuadOnlyDepth( gl, false );		
 
 			//read the depth to the texture
 			finalBuf.unbind(gl, false);
