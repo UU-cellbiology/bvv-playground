@@ -202,7 +202,13 @@ public class FlexibleFBO
 			gl.glBlitFramebuffer(
 				    0, 0, fbWidth, fbHeight, 
 				    0, 0, fbWidth, fbHeight, 
-				    GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT, // Resolve both color and depth!
+				    GL.GL_COLOR_BUFFER_BIT, 
+				    GL.GL_LINEAR
+				); 
+				gl.glBlitFramebuffer(
+				    0, 0, fbWidth, fbHeight, 
+				    0, 0, fbWidth, fbHeight, 
+				    GL.GL_DEPTH_BUFFER_BIT, 
 				    GL.GL_NEAREST
 				);
 			gl.glDisable( GL.GL_MULTISAMPLE );
