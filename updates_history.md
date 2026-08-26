@@ -3,7 +3,6 @@
 ## 0.5.9
 
 - change main scene buffer back to "regular" FBO. If needed, multisample can be used in render functions;
-- bump to scijava POM 45.0.0;
 - modified `SegmentTemplate` for shader builder to work directly with strings.
 
 ## 0.5.8
