@@ -205,6 +205,8 @@
 					<release combine.self="override" />
 					<source>1.8</source>
 					<target>1.8</target>
+					<testSource>1.8</testSource>
+                	<testTarget>1.8</testTarget>
 				</configuration>
 			</plugin>
 		</plugins>
