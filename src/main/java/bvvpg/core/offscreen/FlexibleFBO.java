@@ -285,7 +285,7 @@ public class FlexibleFBO
 	/** draws only current stored depth component, optionally flipping it **/
 	public void drawQuadDepth( GL3 gl, boolean bFlipY )
 	{
-		resolveBuffer.drawQuadOnlyDepth( gl, bFlipY );
+		resolveBuffer.drawQuadDepth( gl, bFlipY );
 	}
 	
 	/** draws both color and depth **/

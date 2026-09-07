@@ -3,7 +3,10 @@
 ## 0.5.9
 
 - change main scene buffer back to "regular" FBO. If needed, multisample can be used in render functions;
-- modified `SegmentTemplate` for shader builder to work directly with strings.
+- added "flexible" FBO, wrapping around regular and multisample buffers;
+- added extra quad rendering functions to `OffScreenFrameBufferWithDepth`; 
+- modified `SegmentTemplate` for shader builder to work directly with strings;
+- switched to pom 45.0.0;
 
 ## 0.5.8
 

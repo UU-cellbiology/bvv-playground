@@ -430,7 +430,7 @@ public class OffScreenFrameBufferWithDepth
 	}
 
 	/** draws only current stored depth component, optionally flipping it **/
-	public void drawQuadOnlyDepth( GL3 gl, boolean bFlipY )
+	public void drawQuadDepth( GL3 gl, boolean bFlipY )
 	{
 		initQuad( gl );
 		JoglGpuContext context = JoglGpuContext.get( gl );

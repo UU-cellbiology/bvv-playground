@@ -1161,9 +1161,9 @@ public class VolumeViewerPanel
 			gl.glDepthMask(true);
 			gl.glDepthFunc( GL_LESS );
 			//from scene (in case volumes are absent)
-			sceneBuf.drawQuadOnlyDepth( gl, false);
+			sceneBuf.drawQuadDepth( gl, false);
 			//draw depth from "volumetric" rendering, if present			
-			offscreen.drawQuadOnlyDepth( gl, false );		
+			offscreen.drawQuadDepth( gl, false );		
 
 			//read the depth to the texture
 			finalBuf.unbind(gl, false);
