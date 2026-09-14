@@ -259,6 +259,12 @@ public class JoglGpuContext implements GpuContext
 			gl.glBindTexture( GL_TEXTURE_3D, restoreTextureId );
 	}
 
+	@Override
+	public void glPixelStorei( final int pname, final int param )
+	{
+	    gl.glPixelStorei( pname, param );
+	}
+	
 	public static JoglGpuContext get( final GL3 gl )
 	{
 		return contexts.computeIfAbsent( gl, JoglGpuContext::new );

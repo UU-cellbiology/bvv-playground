@@ -111,6 +111,11 @@ public class LookupTextureARGB implements Texture3D
 		context.delete( this );
 		context.texSubImage3D( this, 0, 0, 0, texWidth(), texHeight(), texDepth(), data );
 	}
+	
+	public void addToGlobalLut( final GlobalCacheLutTexture globalLut )
+	{
+		globalLut.addVolumeLUT( this.getSize(), data );
+	}
 
 	public Vector3f getOffset3f()
 	{
@@ -120,6 +125,11 @@ public class LookupTextureARGB implements Texture3D
 	public Vector3f getSize3f()
 	{
 		return new Vector3f( size[ 0 ], size[ 1 ], size[ 2 ] );
+	}
+	
+	public int[] getSize()
+	{
+		return new int [] { size[ 0 ], size[ 1 ], size[ 2 ] };
 	}
 
 	@Override

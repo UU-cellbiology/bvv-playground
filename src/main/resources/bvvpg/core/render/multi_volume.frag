@@ -7,6 +7,18 @@ uniform float nw;
 const vec3 lightDir = normalize(vec3(0, -0.2, -1));
 const float gradientHalfStep = 3.0;
 
+//$insert{cachesNumber}
+#define NUM_BLOCK_SCALES 10
+
+uniform sampler3D u_Caches[CACHES_NUMBER];
+
+uniform vec3 cacheBlockSize;
+uniform vec3 paddedBlockSize;
+uniform vec3 cachePadOffset;
+uniform vec3 cacheSize[CACHES_NUMBER];
+
+uniform usampler3D globalCacheLut;
+
 // intersect ray with a box
 // http://www.siggraph.org/education/materials/HyperGraph/raytrace/rtinter3.htm
 void intersectBox( vec3 r_o, vec3 r_d, vec3 boxmin, vec3 boxmax, out float tnear, out float tfar )

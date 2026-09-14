@@ -1,5 +1,3 @@
-#define NUM_BLOCK_SCALES 10
-
 uniform mat4 im;
 uniform mat3 itvm;
 uniform vec3 sourcemin;
@@ -18,66 +16,59 @@ void intersectBoundingBox( vec4 wfront, vec4 wback, out float tnear, out float t
 	intersectBox( mfront.xyz, (mback - mfront).xyz, sourcemin - 0.5, sourcemax + 0.5, tnear, tfar );
 }
 
-
-uniform sampler3D volumeCache;
-
-// -- comes from CacheSpec -----
-uniform vec3 blockSize;
-uniform vec3 paddedBlockSize;
-uniform vec3 cachePadOffset;
-
-// -- comes from TextureCache --
-uniform vec3 cacheSize;// TODO: get from texture!?
-
-uniform usampler3D lutSampler;
 uniform vec3 blockScales[ NUM_BLOCK_SCALES ];
 uniform vec3 lutSize;
 uniform vec3 lutOffset;
+uniform int cacheType;
+uniform int cacheLutZOffset;
 
-float sampleRaw (vec3 posin)
+float sampleRaw( vec3 posin )
 {	
-	vec3 pos = vec3(posin);
-	
-	vec3 B0 = vec3(0.0,0.0,0.0);
-	vec3 sj = vec3(0.0,0.0,0.0);
-	
-	//nearest neighbor
-	if(voxelInterpolation == 0)
-	{	
-		pos = pos + 0.5;
-					
-		vec3 q = floor( pos / blockSize ) - lutOffset + 0.5;
-		uvec4 lutv = texture( lutSampler, q / lutSize );
-		B0 = lutv.xyz * paddedBlockSize + cachePadOffset;
-		sj = blockScales[ lutv.w ];
-		pos = mod(pos * sj, blockSize);
-		pos = floor(pos);
-		vec3 c0 = B0 + pos + 0.5;
-		return texture( volumeCache, c0 / cacheSize ).r;		
+	vec3 pos = posin;
 
+	// 1. Calculate tile index on raw position (unclamped)
+	vec3 tileIndexBase = floor( pos / cacheBlockSize );
+	ivec3 localI = ivec3( tileIndexBase - lutOffset );
+
+	// 2. STRICT BOUNDS GUARD: Catches negative pos and outer bounds directly
+	if ( any( lessThan( localI, ivec3( 0 ) ) ) || any( greaterThanEqual( localI, ivec3( lutSize ) ) ) )
+		return 0.0;
+
+	// 3. Safe texelFetch using discrete global coordinate
+	ivec3 globalQ = ivec3( localI.x, localI.y, localI.z + cacheLutZOffset );
+	uvec4 lutv = texelFetch( globalCacheLut, globalQ, 0 );
+
+	// 4. Unpack cache block position and scale factor
+	vec3 B0 = vec3( lutv.xyz ) * paddedBlockSize + cachePadOffset;
+	vec3 sj = blockScales[ lutv.w ];
+
+	// 5. Coarse tile origin alignment for multiscale levels (sj > 1)
+	vec3 tileIndexCoarse = floor( pos / ( cacheBlockSize * sj ) );
+	vec3 relativePos = pos - tileIndexCoarse * ( cacheBlockSize * sj );
+
+	// Nearest-neighbor sampling
+	if ( voxelInterpolation == 0 )
+	{	
+		vec3 voxelPos = floor( relativePos * sj );
+		
+		// Clamp voxelPos to stay within the inner unpadded block volume [0, blockSize - 1]
+		voxelPos = clamp( voxelPos, vec3( 0.0 ), cacheBlockSize - 1.0 );
+		vec3 c0 = B0 + voxelPos + 0.5;
+
+		return texture( u_Caches[cacheType], c0 / cacheSize[cacheType] ).r;		
 	}
-	//trilinear
+	// Trilinear sampling (hardware accelerated)
 	else
 	{	
-		//cannot read texture with negative coordinates,
-		//so let's take the value at the border	
-		vec3 over = pos * step(0.0, pos) - pos;
-		pos = over + pos;
-		over = clamp(over, 0, 1);
+		vec3 localCachePos = relativePos * sj;
 		
-		//fake interpolation to zero		
-		float zerofade = (1.0 - over.x) * (1.0 - over.y) * (1.0 - over.z);		
+		// PREVENT TRILINEAR BLEEDING: Clamp continuous coordinate within half-texel padding bounds
+		// Restricts sampling strictly to [B0 + 0.5, B0 + cacheBlockSize - 0.5]
+		localCachePos = clamp( localCachePos, vec3( 0.0 ), cacheBlockSize );
+		vec3 c0 = B0 + localCachePos + 0.5;
 
-		vec3 q = floor( pos / blockSize ) - lutOffset + 0.5;	
-		uvec4 lutv = texture( lutSampler, q / lutSize );
-		B0 = lutv.xyz * paddedBlockSize + cachePadOffset;
-		sj = blockScales[ lutv.w ];
-				
-		vec3 c0 = B0 + mod( pos * sj, blockSize ) + 0.5 * sj ;
-	                                       // + 0.5 ( sj - 1 )   + 0.5 for tex coord offset	
-		return zerofade * texture( volumeCache, c0 / cacheSize ).r;	
+		return texture( u_Caches[cacheType], c0 / cacheSize[cacheType] ).r;	
 	}
-		
 }
 
 float sampleVolume( vec4 wpos )
