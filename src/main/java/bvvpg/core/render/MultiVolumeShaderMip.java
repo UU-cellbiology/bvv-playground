@@ -378,7 +378,7 @@ public class MultiVolumeShaderMip
 		 uniformGlobalCacheLut.set( globalLutTexture );
 	}
 
-	public void setConverter( int index, ConverterSetup converter )
+	public void setConverter( int index, GammaConverterSetup converter )
 	{
 		converterSegments[ index ].setData( converter );
 	}
@@ -550,7 +550,7 @@ public class MultiVolumeShaderMip
 			uniformClipActive = prog.getUniform1i( segmentVol,"clipactive" );
 			uniformClipMin = prog.getUniform3f( segmentVol,"clipmin" );
 			uniformClipMax = prog.getUniform3f( segmentVol,"clipmax" );
-			uniformClipTransform = prog.getUniformMatrix4f(segmentVol,"cliptransform" );
+			uniformClipTransform = prog.getUniformMatrix4f( segmentVol,"cliptransform" );
 
 			this.pixelType = pixelType;
 
@@ -570,42 +570,39 @@ public class MultiVolumeShaderMip
 			}
 		}
 
-		public void setData( ConverterSetup converter)
+		public void setData( GammaConverterSetup converter )
 		{
 			final double fmin = converter.getDisplayRangeMin() / rangeScale;
 			final double fmax = converter.getDisplayRangeMax() / rangeScale;
 			double fminA = fmin;
 			double fmaxA = fmax;
 
-			uniformGamma.set(1.0f);
-			uniformGammaAlpha.set(1.0f);
-			uniformRenderType.set(0);
-			uniformLightType.set(0);
-			uniformClipActive.set(0);
+			uniformGamma.set( 1.0f );
+			uniformGammaAlpha.set( 1.0f );
+			uniformRenderType.set( 0 );
+			uniformLightType.set( 0 );
+			uniformClipActive.set( 0 );
 			uniformVoxelInterpolation.set( 0 );
 
-			if (converter instanceof GammaConverterSetup)
-			{	
-				final GammaConverterSetup gconverter = ((GammaConverterSetup)converter);
-				uniformGamma.set(1.0f/(float)gconverter.getDisplayGamma());
-				uniformGammaAlpha.set(1.0f/(float)gconverter.getAlphaGamma());
-				uniformRenderType.set(gconverter.getRenderType());
-				uniformLightType.set(gconverter.getLightingType());
-				uniformVoxelInterpolation.set(gconverter.getVoxelRenderInterpolation());
-				fminA = gconverter.getAlphaRangeMin() / rangeScale;
-				fmaxA = gconverter.getAlphaRangeMax() / rangeScale;
-				if(gconverter.getClipState()!=0 && gconverter.getClipInterval() != null)
-				{
-					uniformClipActive.set(gconverter.getClipState());
-					uniformClipMin.set(gconverter.getClipInterval(),bvvpg.core.shadergen.MinMax.MIN);
-					uniformClipMax.set(gconverter.getClipInterval(),bvvpg.core.shadergen.MinMax.MAX);	
-					final AffineTransform3D t = new AffineTransform3D();
-					gconverter.getClipTransform(t);
-					t.set(t.inverse());
-					uniformClipTransform.set(MatrixMath.affine(t, new Matrix4f()));
-				}
-				uniformLUT.set(((GammaConverterSetup) converter).getLUTTexture());
+			uniformGamma.set( 1.0f / (float)converter.getDisplayGamma() );
+			uniformGammaAlpha.set( 1.0f / (float)converter.getAlphaGamma() );
+			uniformRenderType.set( converter.getRenderType() );
+			uniformLightType.set( converter.getLightingType() );
+			uniformVoxelInterpolation.set(converter.getVoxelRenderInterpolation());
+			fminA = converter.getAlphaRangeMin() / rangeScale;
+			fmaxA = converter.getAlphaRangeMax() / rangeScale;
+			if( converter.getClipState() != 0 && converter.getClipInterval() != null )
+			{
+				uniformClipActive.set(converter.getClipState());
+				uniformClipMin.set(converter.getClipInterval(),bvvpg.core.shadergen.MinMax.MIN);
+				uniformClipMax.set(converter.getClipInterval(),bvvpg.core.shadergen.MinMax.MAX);	
+				final AffineTransform3D t = new AffineTransform3D();
+				converter.getClipTransform( t );
+				t.set( t.inverse() );
+				uniformClipTransform.set( MatrixMath.affine( t, new Matrix4f() ) );
 			}
+			uniformLUT.set( converter.getLUTTexture() );
+
 			
 			final double s = 1.0 / ( fmax - fmin );
 			final double o = -fmin * s;
@@ -614,36 +611,31 @@ public class MultiVolumeShaderMip
 
 			if ( pixelType == VolumeShaderSignature.PixelType.ARGB )
 			{
-				uniformSizeLUT.set(0);
+				uniformSizeLUT.set( 0 );
 				uniformOffset.set( ( float ) o, ( float ) o, ( float ) o, ( float ) o );
 				uniformScale.set( ( float ) s, ( float ) s, ( float ) s, ( float ) s );
 			}
 			else
 			{
 				boolean bUseLUT = false;
-				
-				if (converter instanceof GammaConverterSetup)
+
+				final int nLUTSize = converter.getLUTSize();
+				if(nLUTSize > 0)
 				{
-					final int nLUTSize = ((GammaConverterSetup) converter).getLUTSize();
-					if(nLUTSize > 0)
-					{
-						bUseLUT = true;
-						uniformSizeLUT.set(nLUTSize);
-						uniformOffset.set(
-								( float ) ( o * 1.0 ),
-								( float ) ( o * 1.0 ),
-								( float ) ( o * 1.0 ),
-								( float ) ( oA ) );
-						uniformScale.set(
-								( float ) ( s * 1.0 ),
-								( float ) ( s * 1.0 ),
-								( float ) ( s * 1.0 ),
-								( float ) ( sA ) );
-					}
-					
+					bUseLUT = true;
+					uniformSizeLUT.set(nLUTSize);
+					uniformOffset.set(
+							( float ) ( o * 1.0 ),
+							( float ) ( o * 1.0 ),
+							( float ) ( o * 1.0 ),
+							( float ) ( oA ) );
+					uniformScale.set(
+							( float ) ( s * 1.0 ),
+							( float ) ( s * 1.0 ),
+							( float ) ( s * 1.0 ),
+							( float ) ( sA ) );
 				}
-				
-				
+		
 				if(!bUseLUT)
 				{
 					uniformSizeLUT.set(0);
