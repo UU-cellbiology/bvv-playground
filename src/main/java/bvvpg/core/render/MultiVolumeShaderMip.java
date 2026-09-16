@@ -30,6 +30,7 @@ package bvvpg.core.render;
 
 import bdv.tools.brightness.ConverterSetup;
 import bvvpg.core.backend.GpuContext;
+import bvvpg.core.backend.Texture;
 import bvvpg.core.backend.Texture2D;
 import bvvpg.core.cache.CacheSpec;
 import bvvpg.core.cache.TextureCache;
@@ -92,6 +93,8 @@ public class MultiVolumeShaderMip
 
     //Global cache lut-leve table for mutlires volumes
 	private final UniformSampler uniformGlobalCacheLut;
+	
+	private final UniformSampler uniformGlobalColorLut;
 	
 	private final UniformMatrix4f uniformIpv;
 	private final Uniform2f uniformViewportSize;
@@ -271,7 +274,8 @@ public class MultiVolumeShaderMip
 		uniformPaddedBlockSize.set( pbs[ 0 ], pbs[ 1 ], pbs[ 2 ] );
 		uniformCachePadOffset.set( bo[ 0 ], bo[ 1 ], bo[ 2 ] );	
 
-		uniformGlobalCacheLut = prog.getUniformSampler( "globalCacheLut" );        
+		uniformGlobalCacheLut = prog.getUniformSampler( "globalCacheLut" );
+		uniformGlobalColorLut = prog.getUniformSampler( "globalColorLutArray" );
 		
 		volumeSegments = new VolumeSegment[ numVolumes ];
 		converterSegments = new ConverterSegment[ numVolumes ];
@@ -300,9 +304,9 @@ public class MultiVolumeShaderMip
 //		final StringBuilder vertexShaderCode = prog.getVertexShaderCode();
 //		System.out.println( "vertexShaderCode = " + vertexShaderCode );
 //		System.out.println( "\n\n--------------------------------\n\n" );
-//		final StringBuilder fragmentShaderCode = prog.getFragmentShaderCode();
-//		System.out.println( "fragmentShaderCode = " + fragmentShaderCode );
-//		System.out.println( "\n\n--------------------------------\n\n" );
+		final StringBuilder fragmentShaderCode = prog.getFragmentShaderCode();
+		System.out.println( "fragmentShaderCode = " + fragmentShaderCode );
+		System.out.println( "\n\n--------------------------------\n\n" );
 	}
 
 	public static Map< SegmentType, SegmentTemplate > getDefaultSegments( boolean useDepthTexture )
@@ -333,10 +337,10 @@ public class MultiVolumeShaderMip
 				"convert.frag",
 				"convert", "offset", "scale", "gamma", "alphagamma",
 				"renderType", "lightType",
-				"sizeLUT","lut" ) );
+				"sizeColorLut", "lLayer" ) );
 		segments.put( SegmentType.ConvertRGBA, new SegmentTemplate(
 				"convert_rgba.frag",
-				"convert", "offset", "scale", "gamma", "alphagamma", "renderType", "sizeLUT","lut" ) );
+				"convert", "offset", "scale", "gamma", "alphagamma") );
 		segments.put( SegmentType.MaxDepth, new SegmentTemplate(
 				useDepthTexture ? "maxdepthtexture.frag" : "maxdepthone.frag" ) );
 		segments.put( SegmentType.VertexShader, new SegmentTemplate( "multi_volume.vert" ) );
@@ -377,10 +381,16 @@ public class MultiVolumeShaderMip
 	{
 		 uniformGlobalCacheLut.set( globalLutTexture );
 	}
-
-	public void setConverter( int index, GammaConverterSetup converter )
+	
+	public void setGlobalColorLutTexture(final Texture colorLutTexture)
 	{
-		converterSegments[ index ].setData( converter );
+		uniformGlobalColorLut.set( colorLutTexture );
+	}
+
+	public void setConverter( int index, ConverterSetup converter, final int globalLUTLayer )
+	{
+		//System.out.println("converter index "+ index);
+		converterSegments[ index ].setData( converter, globalLUTLayer );
 	}
 
 	/**
@@ -526,34 +536,34 @@ public class MultiVolumeShaderMip
 		private final Uniform1i uniformSizeLUT;
 		private final Uniform1i uniformRenderType;
 		private final Uniform1f uniformLightType;
-		private final UniformSampler uniformLUT;
+		//private final UniformSampler uniformLUT;
 		private final Uniform1i uniformClipActive;
 		private final Uniform1i uniformVoxelInterpolation;
 		private final Uniform3f uniformClipMin;
 		private final Uniform3f uniformClipMax;
 		private final UniformMatrix4f uniformClipTransform;
+		private final Uniform1f uniformLutLayer;
 		
 		private final VolumeShaderSignature.PixelType pixelType;
 		private final double rangeScale;
 
 		public ConverterSegment( final SegmentedShader prog, final Segment segmentConv, final Segment segmentVol, final VolumeShaderSignature.PixelType pixelType )
 		{
-			uniformOffset = prog.getUniform4f( segmentConv,"offset" );
-			uniformScale = prog.getUniform4f( segmentConv,"scale" );
-			uniformGamma = prog.getUniform1f( segmentConv,"gamma" );
-			uniformGammaAlpha = prog.getUniform1f( segmentConv,"alphagamma" );
-			uniformRenderType = prog.getUniform1i( segmentConv,"renderType" );
-			uniformLightType = prog.getUniform1f( segmentConv,"lightType" );
-			uniformVoxelInterpolation = prog.getUniform1i( segmentVol,"voxelInterpolation" );
-			uniformSizeLUT = prog.getUniform1i( segmentConv,"sizeLUT" );
-			uniformLUT = prog.getUniformSampler(segmentConv, "lut");
-			uniformClipActive = prog.getUniform1i( segmentVol,"clipactive" );
-			uniformClipMin = prog.getUniform3f( segmentVol,"clipmin" );
-			uniformClipMax = prog.getUniform3f( segmentVol,"clipmax" );
-			uniformClipTransform = prog.getUniformMatrix4f( segmentVol,"cliptransform" );
-
+			uniformOffset = prog.getUniform4f( segmentConv, "offset" );
+			uniformScale = prog.getUniform4f( segmentConv, "scale" );
+			uniformGamma = prog.getUniform1f( segmentConv, "gamma" );
+			uniformGammaAlpha = prog.getUniform1f( segmentConv, "alphagamma" );
+			uniformRenderType = prog.getUniform1i( segmentConv, "renderType" );
+			uniformLightType = prog.getUniform1f( segmentConv, "lightType" );
+			uniformVoxelInterpolation = prog.getUniform1i( segmentVol, "voxelInterpolation" );
+			uniformSizeLUT = prog.getUniform1i( segmentConv, "sizeColorLut" );
+			//uniformLUT = prog.getUniformSampler(segmentConv, "lut");
+			uniformClipActive = prog.getUniform1i( segmentVol, "clipactive" );
+			uniformClipMin = prog.getUniform3f( segmentVol, "clipmin" );
+			uniformClipMax = prog.getUniform3f( segmentVol, "clipmax" );
+			uniformClipTransform = prog.getUniformMatrix4f( segmentVol, "cliptransform" );
+			uniformLutLayer = prog.getUniform1f( segmentConv, "lLayer" );
 			this.pixelType = pixelType;
-
 			switch ( pixelType )
 			{
 			default:
@@ -568,40 +578,38 @@ public class MultiVolumeShaderMip
 				rangeScale = 1.0;
 				break;
 			}
+
 		}
 
-		public void setData( GammaConverterSetup converter )
+		public void setData( ConverterSetup converter, final int globalLUTLayer )
 		{
-			final double fmin = converter.getDisplayRangeMin() / rangeScale;
-			final double fmax = converter.getDisplayRangeMax() / rangeScale;
+			GammaConverterSetup gc = (GammaConverterSetup)converter;
+			final double fmin = gc.getDisplayRangeMin() / rangeScale;
+			final double fmax = gc.getDisplayRangeMax() / rangeScale;
 			double fminA = fmin;
 			double fmaxA = fmax;
 
-			uniformGamma.set( 1.0f );
-			uniformGammaAlpha.set( 1.0f );
-			uniformRenderType.set( 0 );
-			uniformLightType.set( 0 );
-			uniformClipActive.set( 0 );
-			uniformVoxelInterpolation.set( 0 );
 
-			uniformGamma.set( 1.0f / (float)converter.getDisplayGamma() );
-			uniformGammaAlpha.set( 1.0f / (float)converter.getAlphaGamma() );
-			uniformRenderType.set( converter.getRenderType() );
-			uniformLightType.set( converter.getLightingType() );
-			uniformVoxelInterpolation.set(converter.getVoxelRenderInterpolation());
-			fminA = converter.getAlphaRangeMin() / rangeScale;
-			fmaxA = converter.getAlphaRangeMax() / rangeScale;
-			if( converter.getClipState() != 0 && converter.getClipInterval() != null )
+			uniformClipActive.set( 0 );
+
+			uniformGamma.set( 1.0f / (float)gc.getDisplayGamma() );
+			uniformGammaAlpha.set( 1.0f / (float)gc.getAlphaGamma() );
+			uniformRenderType.set( gc.getRenderType() );
+			uniformLightType.set( gc.getLightingType() );
+			uniformVoxelInterpolation.set(gc.getVoxelRenderInterpolation());
+			fminA = gc.getAlphaRangeMin() / rangeScale;
+			fmaxA = gc.getAlphaRangeMax() / rangeScale;
+			if( gc.getClipState() != 0 && gc.getClipInterval() != null )
 			{
-				uniformClipActive.set(converter.getClipState());
-				uniformClipMin.set(converter.getClipInterval(),bvvpg.core.shadergen.MinMax.MIN);
-				uniformClipMax.set(converter.getClipInterval(),bvvpg.core.shadergen.MinMax.MAX);	
+				uniformClipActive.set(gc.getClipState());
+				uniformClipMin.set(gc.getClipInterval(),bvvpg.core.shadergen.MinMax.MIN);
+				uniformClipMax.set(gc.getClipInterval(),bvvpg.core.shadergen.MinMax.MAX);	
 				final AffineTransform3D t = new AffineTransform3D();
-				converter.getClipTransform( t );
+				gc.getClipTransform( t );
 				t.set( t.inverse() );
 				uniformClipTransform.set( MatrixMath.affine( t, new Matrix4f() ) );
 			}
-			uniformLUT.set( converter.getLUTTexture() );
+			//uniformLUT.set( gc.getLUTTexture() );
 
 			
 			final double s = 1.0 / ( fmax - fmin );
@@ -617,13 +625,15 @@ public class MultiVolumeShaderMip
 			}
 			else
 			{
-				boolean bUseLUT = false;
 
-				final int nLUTSize = converter.getLUTSize();
+				final int nLUTSize = gc.getLUTSize();
+				uniformSizeLUT.set( nLUTSize );
+				System.out.println("converter " + converter);
+				System.out.println("uniform " + uniformSizeLUT);
+				System.out.println("nLUTSize " + nLUTSize );
 				if(nLUTSize > 0)
 				{
-					bUseLUT = true;
-					uniformSizeLUT.set(nLUTSize);
+					uniformLutLayer.set( globalLUTLayer );
 					uniformOffset.set(
 							( float ) ( o * 1.0 ),
 							( float ) ( o * 1.0 ),
@@ -635,12 +645,10 @@ public class MultiVolumeShaderMip
 							( float ) ( s * 1.0 ),
 							( float ) ( sA ) );
 				}
-		
-				if(!bUseLUT)
-				{
-					uniformSizeLUT.set(0);
-				
-					final int color = converter.getColor().get();
+				else
+				{				
+					uniformLutLayer.set( 0 );				
+					final int color = gc.getColor().get();
 					final double r = ARGBType.red( color ) / 255.0;
 					final double g = ARGBType.green( color ) / 255.0;
 					final double b = ARGBType.blue( color ) / 255.0;

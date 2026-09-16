@@ -37,6 +37,7 @@ import bvvpg.core.backend.SetUniforms;
 import bvvpg.core.backend.StagingBuffer;
 import bvvpg.core.backend.Texture;
 import bvvpg.core.backend.Texture3D;
+import bvvpg.core.render.ColorLutArrayTexture;
 import bvvpg.core.shadergen.Shader;
 
 import java.nio.Buffer;
@@ -79,6 +80,8 @@ import static com.jogamp.opengl.GL2ES3.GL_PIXEL_UNPACK_BUFFER;
 import static com.jogamp.opengl.GL2ES3.GL_PIXEL_UNPACK_BUFFER_BINDING;
 import static com.jogamp.opengl.GL2ES3.GL_RGBA8UI;
 import static com.jogamp.opengl.GL2ES3.GL_RGBA_INTEGER;
+import static com.jogamp.opengl.GL2ES3.GL_TEXTURE_2D_ARRAY;
+import static com.jogamp.opengl.GL2ES3.GL_TEXTURE_BINDING_2D_ARRAY;
 import static com.jogamp.opengl.GL2GL3.GL_R16;
 import static com.jogamp.opengl.GL2GL3.GL_TEXTURE_1D;
 import static com.jogamp.opengl.GL2GL3.GL_TEXTURE_BINDING_1D;
@@ -144,12 +147,12 @@ public class JoglGpuContext implements GpuContext
 
 		final int[] tmp = new int[ 1 ];
 		gl.glGetIntegerv( GL_ACTIVE_TEXTURE, tmp, 0 );
-		final int restoreActiveTextureId = tmp[ 0 ];
+		//final int restoreActiveTextureId = tmp[ 0 ];
 
 		gl.glActiveTexture( GL_TEXTURE0 + unit );
 
 		gl.glGetIntegerv( texId.binding, tmp, 0 );
-		final int restoreId = tmp[ 0 ];
+		//final int restoreId = tmp[ 0 ];
 
 		gl.glBindTexture( texId.target, texId.id );
 	}
@@ -212,7 +215,70 @@ public class JoglGpuContext implements GpuContext
 		if ( texId != null )
 			gl.glDeleteTextures( 1, new int[] { texId.id }, 0 );
 	}
+	@Override
+	public void texSubImage2D( final Texture texture, final int xoffset, final int yoffset, final int width, final int height, final Buffer pixels )
+	{
+		final TexId texId = getTextureId( texture );
 
+		final int[] tmp = new int[ 1 ];
+		gl.glGetIntegerv( texId.binding, tmp, 0 );
+		final int restoreTextureId = tmp[ 0 ];
+
+		if ( restoreTextureId != texId.id )
+			gl.glBindTexture( texId.target, texId.id );
+
+		gl.glTexSubImage2D( texId.target, 0, xoffset, yoffset, width, height, format( texture ), type( texture ), pixels );
+
+		if ( restoreTextureId != texId.id )
+			gl.glBindTexture( texId.target, restoreTextureId );
+	}
+	
+	@Override
+	public void texSubImage3D( final StagingBuffer stagingBuffer, final Texture texture, final int xoffset, final int yoffset, final int zoffset, final int width, final int height, final int depth, final long pixels_buffer_offset )
+	{
+		final int pboId = getPboId( stagingBuffer );
+		final TexId texId = getTextureId( texture );
+
+		final int[] tmp = new int[ 1 ];
+		gl.glGetIntegerv( GL_PIXEL_UNPACK_BUFFER_BINDING, tmp, 0 );
+		final int restorePboId = tmp[ 0 ];
+
+		gl.glGetIntegerv( texId.binding, tmp, 0 );
+		final int restoreTextureId = tmp[ 0 ];
+
+		if ( restorePboId != pboId )
+			gl.glBindBuffer( GL_PIXEL_UNPACK_BUFFER, pboId );
+
+		if ( restoreTextureId != texId.id )
+			gl.glBindTexture( texId.target, texId.id );
+
+		gl.glTexSubImage3D( texId.target, 0, xoffset, yoffset, zoffset, width, height, depth, format( texture ), type( texture ), pixels_buffer_offset );
+
+		if ( restorePboId != pboId )
+			gl.glBindBuffer( GL_PIXEL_UNPACK_BUFFER, restorePboId );
+
+		if ( restoreTextureId != texId.id )
+			gl.glBindTexture( texId.target, restoreTextureId );
+	}
+	
+	@Override
+	public void texSubImage3D( final Texture texture, final int xoffset, final int yoffset, final int zoffset, final int width, final int height, final int depth, final Buffer pixels )
+	{
+		final TexId texId = getTextureId( texture );
+
+		final int[] tmp = new int[ 1 ];
+		gl.glGetIntegerv( texId.binding, tmp, 0 );
+		final int restoreTextureId = tmp[ 0 ];
+
+		if ( restoreTextureId != texId.id )
+			gl.glBindTexture( texId.target, texId.id );
+
+		gl.glTexSubImage3D( texId.target, 0, xoffset, yoffset, zoffset, width, height, depth, format( texture ), type( texture ), pixels );
+
+		if ( restoreTextureId != texId.id )
+			gl.glBindTexture( texId.target, restoreTextureId );
+	}
+	
 	@Override
 	public void texSubImage3D( final StagingBuffer stagingBuffer, final Texture3D texture, final int xoffset, final int yoffset, final int zoffset, final int width, final int height, final int depth, final long pixels_buffer_offset )
 	{
@@ -405,6 +471,8 @@ public class JoglGpuContext implements GpuContext
 
 	private static int target( Texture texture )
 	{
+		if ( texture instanceof ColorLutArrayTexture )
+			return GL_TEXTURE_2D_ARRAY;
 		return target( texture.texDims() );
 	}
 
@@ -425,6 +493,8 @@ public class JoglGpuContext implements GpuContext
 
 	private static int targetBinding( Texture texture )
 	{
+		if ( texture instanceof ColorLutArrayTexture )
+			return GL_TEXTURE_BINDING_2D_ARRAY;
 		return targetBinding( texture.texDims() );
 	}
 

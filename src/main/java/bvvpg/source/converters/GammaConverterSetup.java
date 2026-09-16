@@ -29,6 +29,7 @@
 package bvvpg.source.converters;
 
 import bdv.tools.brightness.ConverterSetup;
+import bvvpg.core.render.ColorLutKey;
 import bvvpg.core.render.LutCSTexturePG;
 
 import java.awt.image.IndexColorModel;
@@ -58,11 +59,15 @@ public interface GammaConverterSetup extends ConverterSetup, Clippable3D
 	
 	IndexColorModel getLutICM();
 	
-	boolean updateNeededLUT();
+	ColorLutKey getLutKey();
 	
-	LutCSTexturePG getLUTTexture();
+//	void acknowledgeLUTUpdate();
+//	
+//	boolean updateNeededLUT();
 	
-	void setLUTTexture(LutCSTexturePG lut_);	
+//	LutCSTexturePG getLUTTexture();
+//	
+//	void setLUTTexture(LutCSTexturePG lut_);	
 	
 	public int getLUTSize();	
 	

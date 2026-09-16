@@ -86,6 +86,7 @@ float sampleVolume( vec4 wpos )
 
 	return sampleRaw(pos);	
 }
+
 vec3 gradientVolume( vec4 wpos, float fStep )
 {
 	vec3 pos = (im * wpos).xyz + 0.5;

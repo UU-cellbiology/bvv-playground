@@ -19,6 +19,8 @@ uniform vec3 cacheSize[CACHES_NUMBER];
 
 uniform usampler3D globalCacheLut;
 
+uniform sampler2DArray globalColorLutArray;
+
 // intersect ray with a box
 // http://www.siggraph.org/education/materials/HyperGraph/raytrace/rtinter3.htm
 void intersectBox( vec3 r_o, vec3 r_d, vec3 boxmin, vec3 boxmax, out float tnear, out float tfar )

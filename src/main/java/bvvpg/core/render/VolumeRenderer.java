@@ -178,7 +178,7 @@ public class VolumeRenderer
 	
 	/** handles LUTs (GPU upload and check if they are expired)
 	 * for converter Setups **/
-	private final SimpleLUTTextureManager simpleLUTManager = new SimpleLUTTextureManager();
+	private final GlobalColorLUTManager globalColorLUTManager = new GlobalColorLUTManager();
 
 	private final DefaultQuad quad;
 
@@ -380,13 +380,15 @@ public class VolumeRenderer
 			progvol = progvols.computeIfAbsent( new VolumeShaderSignature( volumeSignatures ), this::createMultiVolumeShader );
 			if ( progvol != null )
 			{
+				//fill color lut textures
+				globalColorLUTManager.updateLUTArray(context, renderConverters);
 				int mri = 0;
 				for ( int i = 0; i < renderStacks.size(); i++ )
 				{
-					final GammaConverterSetup gc = ( GammaConverterSetup ) renderConverters.get( i );
+					final ConverterSetup cs = renderConverters.get( i );
 					
-					simpleLUTManager.processTextureLUT( context, gc );
-					progvol.setConverter( i, gc );
+					progvol.setConverter( i, cs, globalColorLUTManager.getLayerIndex( cs ));
+					
 					if ( volumeSignatures.get( i ).getSourceStackType() == MULTIRESOLUTION )
 					{
 						final VolumeBlocks volume = volumes.get( mri++ );
@@ -403,12 +405,12 @@ public class VolumeRenderer
 				}
 				progvol.setDepthTexture( sceneBuf.getDepthTexture() );
 				progvol.setGlobalCacheLutTexture( globalCacheLutTexture );
+				progvol.setGlobalColorLutTexture( globalColorLUTManager.getGlobalLutArrayTexture() );
 				progvol.setViewportWidth( renderWidth );
 				progvol.setProjectionViewMatrix( renderData.getPv(), maxAllowedStepInVoxels * minWorldVoxelSize );
 			}
 
 			simpleStackManager.freeUnusedSimpleVolumes( context );
-			simpleLUTManager.freeUnusedLUTs( context );
 		}
 
 		if ( progvol != null )
