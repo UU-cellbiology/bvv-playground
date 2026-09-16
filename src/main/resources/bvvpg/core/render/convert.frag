@@ -45,7 +45,7 @@ vec4 convert(float v)
 	    q.z = lLayer;
 		
 		finC =  texture( globalColorLutArray, q);
-		finC = vec4(1,0,0,1);
+		//finC = vec4(1,0,0,1);
 		//lut->red
 		finC.a *= alphaFin;	
 

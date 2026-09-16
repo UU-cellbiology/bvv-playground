@@ -18,7 +18,7 @@ public class DebugSpimData
 	//test true multi res images of different types
 	public static void main( final String[] args )
 	{
-		final String xmlFilename8bit = "/home/eugene/Desktop/projects/BigTrace/BigTrace_data/t1-head_8bit.xml";
+		final String xmlFilename8bit = "/home/eugene/Desktop/projects/BigTrace/BigTrace_data/t1-head.xml";
 		final String xmlFilename16bit = "/home/eugene/Desktop/projects/BVB/points/mastodon/datasethdf5.xml";
 		//final String xmlFilename16bit = "/home/eugene/Desktop/projects/BigTrace/BigTrace_data/t1-head_shifted.xml";
 
