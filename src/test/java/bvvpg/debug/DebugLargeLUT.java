@@ -80,7 +80,7 @@ public class DebugLargeLUT
 
 		final BvvSource source = BvvFunctions.show( imgLUT, "LargeLUTView" );
 		//int nLUTMAX = nImageMaxRange;
-		int nLUTMAX = 256;
+		int nLUTMAX = 3000;
 		source.setLUT(  getLargeICM(nLUTMAX), null );
 		source.setDisplayRangeBounds( 0, nImageMaxRange -1);
 

@@ -178,7 +178,7 @@ public class VolumeRenderer
 	
 	/** handles LUTs (GPU upload and check if they are expired)
 	 * for converter Setups **/
-	private final GlobalColorLUTManager globalColorLUTManager = new GlobalColorLUTManager();
+	private final GlobalColorLutManager globalColorLUTManager = new GlobalColorLutManager();
 
 	private final DefaultQuad quad;
 

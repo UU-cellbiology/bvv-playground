@@ -43,15 +43,12 @@ import bvvpg.core.backend.GpuContext;
 import bvvpg.core.backend.Texture;
 import bvvpg.source.converters.GammaConverterSetup;
 
-public class GlobalColorLUTManager
+public class GlobalColorLutManager
 
 {	
 	private ColorLutArrayTexture globalLutArrayTexture = null;
 	private final Map<ColorLutKey, Integer> lutToLayerMap = new HashMap<>();
 	private final Map< ConverterSetup, Integer > converterToLayerMap = new HashMap<>();
-	private final HashMap< GammaConverterSetup, LutCSTexturePG > texturesLUT;
-	private final HashMap< LutCSTexturePG, Integer > timestamps;
-	private int currentTimestamp;
 	
 	private int maxAllocatedLayers = 0;
 	private static final int LUT_EDGE = 256; // Fixed resolution for 1D LUT ramps in 2D array slice
@@ -61,109 +58,9 @@ public class GlobalColorLUTManager
 	final ByteBuffer uploadBuffer = ByteBuffer.allocateDirect( LUT_SQUARE * 4 ).order( ByteOrder.nativeOrder() );
 	final IntBuffer sdata = data.asIntBuffer();
 	
-	public GlobalColorLUTManager()
+	public GlobalColorLutManager()
 	{
-		texturesLUT = new HashMap<>();
-		timestamps = new HashMap<>();
-		currentTimestamp = 0;
 	}
-	
-//	public synchronized void processTextureLUT( final GpuContext context, GammaConverterSetup gc )
-//	{
-//		final LutCSTexturePG texture;
-//		if(gc.updateNeededLUT())
-//		{
-//			final LutCSTexturePG old_texture = texturesLUT.get( gc );
-//			context.delete(old_texture);
-//			timestamps.remove( old_texture );
-//			texturesLUT.remove( gc );			
-//		}
-//		texture = texturesLUT.computeIfAbsent( gc, s -> uploadLUTToTexture( context, gc.getLutICM()) );
-//		gc.setLUTTexture( texture );
-//		timestamps.put( texture, currentTimestamp );
-//	}
-	
-	/**
-	 * Free allocated resources associated to all LUTS that have not been
-	 * {@link #processTextureLUT(GpuContext,GammaConverterSetup) requested} since the
-	 * last call to {@link #freeUnusedLUTs(GpuContext)}.
-	 */
-//	public synchronized void freeUnusedLUTs( final GpuContext context )
-//	{
-//		final Iterator< Map.Entry< LutCSTexturePG, Integer > > it = timestamps.entrySet().iterator();
-//
-//
-//		texturesLUT.entrySet().removeIf( entry -> timestamps.get( entry.getValue() ) < currentTimestamp );
-//		while ( it.hasNext() )
-//		{
-//			final Map.Entry< LutCSTexturePG, Integer > entry = it.next();
-//			if ( entry.getValue() < currentTimestamp )
-//			{
-//				context.delete( entry.getKey() );
-//				it.remove();
-//			}
-//		}
-//		++currentTimestamp;
-//	}
-	
-//	public void freeLUTs( final GpuContext context )
-//	{
-//
-//		texturesLUT.clear();
-//		timestamps.keySet().forEach( context::delete );
-//		timestamps.clear();
-//	}
-	
-//	private static LutCSTexturePG uploadLUTToTexture( final GpuContext context, final IndexColorModel icm )
-//	{
-//		final LutCSTexturePG texture = new LutCSTexturePG();
-//		final ByteBuffer data;
-//		if(icm != null)
-//		{
-//			int size_ = icm.getMapSize();
-//			if (size_ < 65536)
-//			{
-//				int nTextureSpan = 256*(int)Math.ceil(size_/256.0);
-//				texture.init( size_ );
-//				final int numBytes = 4 * nTextureSpan;
-//				data = ByteBuffer.allocateDirect( numBytes ); // allocate a bit more than needed...
-//				data.order( ByteOrder.nativeOrder() );	
-//				final IntBuffer sdata = data.asIntBuffer();
-//				byte [][] colorsARGB = new byte[4][nTextureSpan];
-//				icm.getAlphas( colorsARGB[0] );
-//				icm.getReds( colorsARGB[1] );
-//				icm.getGreens( colorsARGB[2] );
-//				icm.getBlues( colorsARGB[3] );
-//				int all = 0;
-//				for (int i=0; i<size_;i++)
-//				{
-//					final int a = colorsARGB[0][i] & 0xff;
-//					final int r = colorsARGB[1][i] & 0xff;
-//					final int g = colorsARGB[2][i] & 0xff;
-//					final int b = colorsARGB[3][i] & 0xff;
-//					all = ( a << 24 ) | ( b << 16 ) | ( g << 8 ) | r;
-//					sdata.put( i, all );	
-//				}
-//				//fill the rest with the last color
-//				for (int i=size_; i<nTextureSpan;i++)
-//				{
-//					sdata.put( i, all );
-//				}
-//				texture.upload( context, data );
-//				return texture;
-//			}
-//			
-//			System.out.println("Error! Provided LUT exceeds current maximum LUT size of 65536, loading dummy LUT.");
-//		}
-//		
-//		//upload dummy
-//		texture.init( 1 );
-//		data = ByteBuffer.allocateDirect( 256*4 ); // minimum one row of 2D texture
-//		data.order( ByteOrder.nativeOrder() );	
-//		texture.upload( context, data );
-//		return texture;
-//
-//	}
 	
 	public synchronized void updateLUTArray( final GpuContext context, final List< ConverterSetup > renderConverters )
 	{
@@ -246,86 +143,86 @@ public class GlobalColorLUTManager
 	}
 	
 	/** Map each setup converter to its corresponding allocated layer index **/
-	private void uploadLayerToTexture( final GpuContext context, final IndexColorModel icm, final int layer )
-	{
-		data.clear();
-		if ( icm != null )
-		{
-			final int size_ = icm.getMapSize();
-			final byte[][] colorsARGB = new byte[4][size_];
-			icm.getAlphas( colorsARGB[0] );
-			icm.getReds( colorsARGB[1] );
-			icm.getGreens( colorsARGB[2] );
-			icm.getBlues( colorsARGB[3] );
-
-			int lastColor = 0;
-			final int count = Math.min( size_, LUT_SQUARE );
-			for ( int i = 0; i < count; i++ )
-			{
-				final int a = colorsARGB[0][i] & 0xff;
-				final int r = colorsARGB[1][i] & 0xff;
-				final int g = colorsARGB[2][i] & 0xff;
-				final int b = colorsARGB[3][i] & 0xff;
-				lastColor = ( a << 24 ) | ( b << 16 ) | ( g << 8 ) | r;
-				sdata.put( i, lastColor );
-			}
-			// Fill remainder if LUT map size < 256
-			for ( int i = count; i < LUT_SQUARE; i++ )
-			{
-				sdata.put( i, lastColor );
-			}
-		}
-
-		data.rewind();
-		// Calls glTexSubImage3D(GL_TEXTURE_2D_ARRAY, 0, x=0, y=0, z=layer, width=LUT_WIDTH, height=1, depth=1, ...)
-		//globalLutArrayTexture.uploadSubImage3D( context, layer, data );
-		globalLutArrayTexture.uploadLayer( context, layer, data );
-	}
-	
 //	private void uploadLayerToTexture( final GpuContext context, final IndexColorModel icm, final int layer )
 //	{
-//		uploadBuffer.clear();
-//
+//		data.clear();
 //		if ( icm != null )
 //		{
 //			final int size_ = icm.getMapSize();
-//			final byte[] alphas = new byte[ size_ ];
-//			final byte[] reds   = new byte[ size_ ];
-//			final byte[] greens = new byte[ size_ ];
-//			final byte[] blues  = new byte[ size_ ];
+//			final byte[][] colorsARGB = new byte[4][size_];
+//			icm.getAlphas( colorsARGB[0] );
+//			icm.getReds( colorsARGB[1] );
+//			icm.getGreens( colorsARGB[2] );
+//			icm.getBlues( colorsARGB[3] );
 //
-//			icm.getAlphas( alphas );
-//			icm.getReds( reds );
-//			icm.getGreens( greens );
-//			icm.getBlues( blues );
-//
-//			int lastR = 0, lastG = 0, lastB = 0, lastA = 255;
+//			int lastColor = 0;
 //			final int count = Math.min( size_, LUT_SQUARE );
 //			for ( int i = 0; i < count; i++ )
 //			{
-//				lastR = reds[i] & 0xff;
-//				lastG = greens[i] & 0xff;
-//				lastB = blues[i] & 0xff;
-//				lastA = alphas[i] & 0xff;
-//
-//				uploadBuffer.put( (byte) lastR );
-//				uploadBuffer.put( (byte) lastG );
-//				uploadBuffer.put( (byte) lastB );
-//				uploadBuffer.put( (byte) lastA );
+//				final int a = colorsARGB[0][i] & 0xff;
+//				final int r = colorsARGB[1][i] & 0xff;
+//				final int g = colorsARGB[2][i] & 0xff;
+//				final int b = colorsARGB[3][i] & 0xff;
+//				lastColor = ( a << 24 ) | ( b << 16 ) | ( g << 8 ) | r;
+//				sdata.put( i, lastColor );
 //			}
-//			// Fill remaining buffer entries if ICM size < LUT_SQUARE
+//			// Fill remainder if LUT map size < 256
 //			for ( int i = count; i < LUT_SQUARE; i++ )
 //			{
-//				uploadBuffer.put( (byte) lastR );
-//				uploadBuffer.put( (byte) lastG );
-//				uploadBuffer.put( (byte) lastB );
-//				uploadBuffer.put( (byte) lastA );
+//				sdata.put( i, lastColor );
 //			}
 //		}
 //
-//		uploadBuffer.flip();
-//		globalLutArrayTexture.uploadLayer( context, layer, uploadBuffer );
+//		data.rewind();
+//		// Calls glTexSubImage3D(GL_TEXTURE_2D_ARRAY, 0, x=0, y=0, z=layer, width=LUT_WIDTH, height=1, depth=1, ...)
+//		//globalLutArrayTexture.uploadSubImage3D( context, layer, data );
+//		globalLutArrayTexture.uploadLayer( context, layer, data );
 //	}
+	
+	private void uploadLayerToTexture( final GpuContext context, final IndexColorModel icm, final int layer )
+	{
+		uploadBuffer.clear();
+
+		if ( icm != null )
+		{
+			final int size_ = icm.getMapSize();
+			final byte[] alphas = new byte[ size_ ];
+			final byte[] reds   = new byte[ size_ ];
+			final byte[] greens = new byte[ size_ ];
+			final byte[] blues  = new byte[ size_ ];
+
+			icm.getAlphas( alphas );
+			icm.getReds( reds );
+			icm.getGreens( greens );
+			icm.getBlues( blues );
+
+			int lastR = 0, lastG = 0, lastB = 0, lastA = 255;
+			final int count = Math.min( size_, LUT_SQUARE );
+			for ( int i = 0; i < count; i++ )
+			{
+				lastR = reds[i] & 0xff;
+				lastG = greens[i] & 0xff;
+				lastB = blues[i] & 0xff;
+				lastA = alphas[i] & 0xff;
+
+				uploadBuffer.put( (byte) lastR );
+				uploadBuffer.put( (byte) lastG );
+				uploadBuffer.put( (byte) lastB );
+				uploadBuffer.put( (byte) lastA );
+			}
+			// Fill remaining buffer entries if ICM size < LUT_SQUARE
+			for ( int i = count; i < LUT_SQUARE; i++ )
+			{
+				uploadBuffer.put( (byte) lastR );
+				uploadBuffer.put( (byte) lastG );
+				uploadBuffer.put( (byte) lastB );
+				uploadBuffer.put( (byte) lastA );
+			}
+		}
+
+		uploadBuffer.flip();
+		globalLutArrayTexture.uploadLayer( context, layer, uploadBuffer );
+	}
 	
 	public Texture getGlobalLutArrayTexture()
 	{

@@ -18,7 +18,7 @@ public class DebugSpimData
 	//test true multi res images of different types
 	public static void main( final String[] args )
 	{
-		final String xmlFilename8bit = "/home/eugene/Desktop/projects/BigTrace/BigTrace_data/t1-head.xml";
+		final String xmlFilename8bit = "/home/eugene/Desktop/projects/BigTrace/BigTrace_data/t1-head_8bit.xml";
 		final String xmlFilename16bit = "/home/eugene/Desktop/projects/BVB/points/mastodon/datasethdf5.xml";
 		//final String xmlFilename16bit = "/home/eugene/Desktop/projects/BigTrace/BigTrace_data/t1-head_shifted.xml";
 
@@ -37,9 +37,9 @@ public class DebugSpimData
 //		bvvSources16bit.get( 0 ).setDisplayRange( 0, 700 );
 		List< BvvStackSource< ? > > bvvSources16bit = BvvFunctions.show( spimData16bit, BvvOptions.options().addTo( bvv ) );
 		bvvSources16bit.get( 0 ).setDisplayRange( 0, 255 );
-		List< BvvStackSource< ? > > bvvSources8bit = BvvFunctions.show( spimData8bit, BvvOptions.options().addTo( bvv ) );
-		bvvSources8bit.get( 0 ).setDisplayRange( 0, 255 );
-
-		//bvvSources8bit.get( 0 ).setLUT( "Fire" );
+		//List< BvvStackSource< ? > > bvvSources8bit = BvvFunctions.show( spimData8bit, BvvOptions.options().addTo( bvv ) );
+		//bvvSources8bit.get( 0 ).setDisplayRange( 0, 255 );
+		bvvSources16bit.get( 0 ).setDisplayRange( 0, 1255 );
+		bvvSources16bit.get( 0 ).setLUT( "Fire" );
 	}
 }

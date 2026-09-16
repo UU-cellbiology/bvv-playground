@@ -337,7 +337,7 @@ public class MultiVolumeShaderMip
 				"convert.frag",
 				"convert", "offset", "scale", "gamma", "alphagamma",
 				"renderType", "lightType",
-				"sizeColorLut", "lLayer" ) );
+				"sizeColorLut", "colorLutLayer" ) );
 		segments.put( SegmentType.ConvertRGBA, new SegmentTemplate(
 				"convert_rgba.frag",
 				"convert", "offset", "scale", "gamma", "alphagamma") );
@@ -536,7 +536,6 @@ public class MultiVolumeShaderMip
 		private final Uniform1i uniformSizeLUT;
 		private final Uniform1i uniformRenderType;
 		private final Uniform1f uniformLightType;
-		//private final UniformSampler uniformLUT;
 		private final Uniform1i uniformClipActive;
 		private final Uniform1i uniformVoxelInterpolation;
 		private final Uniform3f uniformClipMin;
@@ -557,12 +556,11 @@ public class MultiVolumeShaderMip
 			uniformLightType = prog.getUniform1f( segmentConv, "lightType" );
 			uniformVoxelInterpolation = prog.getUniform1i( segmentVol, "voxelInterpolation" );
 			uniformSizeLUT = prog.getUniform1i( segmentConv, "sizeColorLut" );
-			//uniformLUT = prog.getUniformSampler(segmentConv, "lut");
 			uniformClipActive = prog.getUniform1i( segmentVol, "clipactive" );
 			uniformClipMin = prog.getUniform3f( segmentVol, "clipmin" );
 			uniformClipMax = prog.getUniform3f( segmentVol, "clipmax" );
 			uniformClipTransform = prog.getUniformMatrix4f( segmentVol, "cliptransform" );
-			uniformLutLayer = prog.getUniform1f( segmentConv, "lLayer" );
+			uniformLutLayer = prog.getUniform1f( segmentConv, "colorLutLayer" );
 			this.pixelType = pixelType;
 			switch ( pixelType )
 			{
@@ -589,9 +587,7 @@ public class MultiVolumeShaderMip
 			double fminA = fmin;
 			double fmaxA = fmax;
 
-
 			uniformClipActive.set( 0 );
-
 			uniformGamma.set( 1.0f / (float)gc.getDisplayGamma() );
 			uniformGammaAlpha.set( 1.0f / (float)gc.getAlphaGamma() );
 			uniformRenderType.set( gc.getRenderType() );
@@ -628,9 +624,6 @@ public class MultiVolumeShaderMip
 
 				final int nLUTSize = gc.getLUTSize();
 				uniformSizeLUT.set( nLUTSize );
-				System.out.println("converter " + converter);
-				System.out.println("uniform " + uniformSizeLUT);
-				System.out.println("nLUTSize " + nLUTSize );
 				if(nLUTSize > 0)
 				{
 					uniformLutLayer.set( globalLUTLayer );
