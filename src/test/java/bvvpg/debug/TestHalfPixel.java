@@ -41,8 +41,8 @@ public class TestHalfPixel
 		viewT.translate( 80., 140.0, 0.0 );
 		bvv.getBvvHandle().getViewerPanel().state().setViewerTransform( viewT );
 		
-		raiCS.setVoxelRenderInterpolation( 1 );
-		cachedRaiCS.setVoxelRenderInterpolation( 1 );
+		raiCS.setVoxelRenderInterpolation( 0 );
+		cachedRaiCS.setVoxelRenderInterpolation( 0 );
 
 	}
 }

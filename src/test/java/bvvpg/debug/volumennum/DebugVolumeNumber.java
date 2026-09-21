@@ -112,6 +112,7 @@ public class DebugVolumeNumber
 			convS.getConverterSetup( sac ).setColor( new ARGBType(rgb) );
 			GammaConverterSetup gammaConverterSetup = (GammaConverterSetup)convS.getConverterSetup( sac );
 			gammaConverterSetup.setRenderType( 1 );
+			gammaConverterSetup.setVoxelRenderInterpolation( 0 );
 		    sN++;
 		}
 	}

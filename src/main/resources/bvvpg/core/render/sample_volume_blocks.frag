@@ -33,8 +33,8 @@ float sampleRaw( vec3 posin )
 	
 	ivec3 localQ = ivec3( tileIndex - lutOffset );
 	
-	//if ( any( lessThan( localQ, ivec3( 0 ) ) ) || any( greaterThanEqual( localQ, ivec3( lutSize ) ) ) )
-	//	return 0.0;
+	if ( any( lessThan( localQ, ivec3( 0 ) ) ) || any( greaterThanEqual( localQ, ivec3( lutSize ) ) ) )
+		return 0.0;
 
 	// normalized sampling coordinate [0.0, 1.0] for lutSampler
 	vec3 q = (localQ + 0.5);
@@ -47,8 +47,11 @@ float sampleRaw( vec3 posin )
 	vec3 sj = blockScales[ lutv.w ];
 	
 	vec3 tileIndexCoarse = floor( qPos / ( cacheBlockSize * sj ) );
-	vec3 relativePos = pos - tileIndexCoarse * (cacheBlockSize * sj);
-	vec3 c0 = B0 + relativePos * sj + 0.5;
+	vec3 relativePos = (pos - tileIndexCoarse * (cacheBlockSize * sj)) * sj;
+	//nearest neighbor
+	if(voxelInterpolation == 0)
+		relativePos = floor(relativePos + 0.5);
+	vec3 c0 = B0 + relativePos + 0.5;
 
 	return texture( u_Caches[cacheType], c0/ cacheSize[cacheType] ).r;
 }
