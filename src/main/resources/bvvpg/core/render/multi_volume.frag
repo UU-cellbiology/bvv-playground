@@ -18,6 +18,7 @@ uniform vec3 cachePadOffset;
 uniform vec3 cacheSize[CACHES_NUMBER];
 
 uniform usampler3D globalCacheLut;
+uniform vec3 globalCacheLutSize;
 
 uniform sampler2DArray globalColorLutArray;
 

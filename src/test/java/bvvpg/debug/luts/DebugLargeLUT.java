@@ -26,7 +26,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  * #L%
  */
-package bvvpg.debug;
+package bvvpg.debug.luts;
 
 import com.formdev.flatlaf.FlatIntelliJLaf;
 import com.formdev.flatlaf.FlatLaf;
@@ -87,6 +87,7 @@ public class DebugLargeLUT
 		source.setRenderType( 1 );
 		source.setAlphaRangeBounds( 0, 2 );
 		source.setAlphaRange( 0, 2 );
+		source.setVoxelRenderInterpolation( 0 );
 		
 		//add lut with variable alphas
 		AffineTransform3D transform = new AffineTransform3D();
@@ -97,6 +98,7 @@ public class DebugLargeLUT
 		source2.setRenderType( 1 );
 		source2.setAlphaRangeBounds( 0, 2 );
 		source2.setAlphaRange( 0, 2 );
+		source2.setVoxelRenderInterpolation( 0 );
 	}
 	
 	public static IndexColorModel getLargeICM(int nTotLength)

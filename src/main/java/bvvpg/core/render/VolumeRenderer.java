@@ -89,7 +89,6 @@ import bvvpg.core.multires.MultiResolutionStack3D;
 import bvvpg.core.multires.SimpleStack3D;
 import bvvpg.core.multires.Stack3D;
 import bvvpg.core.offscreen.OffScreenFrameBufferWithDepth;
-import bvvpg.source.converters.GammaConverterSetup;
 
 public class VolumeRenderer
 {
@@ -154,9 +153,15 @@ public class VolumeRenderer
 	
 	private final TextureCacheAndPboChain cacheR32F;
 	
-	/**	 global 3D texture containing all separate multires level luts per volume (LookupTextureARGB),
-	each has an offset along z-axis. **/
+	/**	Global 3D texture containing all separate multires 
+	 * level luts per volume (LookupTextureARGB),
+	 * each has an offset along z-axis. **/
 	private final GlobalCacheLutTexture globalCacheLutTexture;
+	
+	/** sampler2DArray wrapper that handles color LUTs 
+	 * (GPU upload and check if they are expired) for ConverterSetups. 
+	 * One 256 x 256 layer per LUT. **/
+	private final GlobalColorLutManager globalColorLUTManager = new GlobalColorLutManager();
 
 	private final ForkJoinPool forkJoinPool;
 
@@ -176,10 +181,6 @@ public class VolumeRenderer
 	 */
 	private final SimpleStackManager simpleStackManager = new DefaultSimpleStackManager();
 	
-	/** handles LUTs (GPU upload and check if they are expired)
-	 * for converter Setups **/
-	private final GlobalColorLutManager globalColorLUTManager = new GlobalColorLutManager();
-
 	private final DefaultQuad quad;
 
 //	private boolean bShowInfo = true;

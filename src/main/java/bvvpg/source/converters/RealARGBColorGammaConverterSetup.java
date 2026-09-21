@@ -35,7 +35,6 @@ import java.util.List;
 import org.scijava.listeners.Listeners;
 
 import bvvpg.core.render.ColorLutKey;
-import bvvpg.core.render.LutCSTexturePG;
 import ij.plugin.LutLoader;
 
 import net.imglib2.FinalRealInterval;
@@ -76,8 +75,6 @@ public class RealARGBColorGammaConverterSetup implements GammaConverterSetup
 	
 	private String sLUTName = null;
 	
-	//private boolean bUpdateTexture = false;
-	
 	private ColorLutKey colorLutKey = null;
 
 	public RealARGBColorGammaConverterSetup( final int setupId, final ColorConverter... converters )
@@ -90,7 +87,6 @@ public class RealARGBColorGammaConverterSetup implements GammaConverterSetup
 		this.id = setupId;
 		this.converters = converters;
 		this.listeners = new Listeners.SynchronizedList<>();
-
 	}
 
 	@Override
@@ -117,7 +113,7 @@ public class RealARGBColorGammaConverterSetup implements GammaConverterSetup
 			}
 		}
 		if ( changed )
-			listeners.list.forEach( l -> l.setupParametersChanged( this ) );
+			fireParametersChanged();
 	}
 	
 	@Override
@@ -143,7 +139,7 @@ public class RealARGBColorGammaConverterSetup implements GammaConverterSetup
 			}
 		}
 		if ( changed )
-			listeners.list.forEach( l -> l.setupParametersChanged( this ) );
+			fireParametersChanged();
 	}
 	
 	@Override
@@ -163,7 +159,7 @@ public class RealARGBColorGammaConverterSetup implements GammaConverterSetup
 			}
 		}
 		if ( changed )
-			listeners.list.forEach( l -> l.setupParametersChanged( this ) );
+			fireParametersChanged();
 		
 	}
 	
@@ -184,15 +180,14 @@ public class RealARGBColorGammaConverterSetup implements GammaConverterSetup
 			}
 		}
 		if ( changed )
-			listeners.list.forEach( l -> l.setupParametersChanged( this ) );
+			fireParametersChanged();
 	}
-
 
 	@Override
 	public void setColor( final ARGBType color )
 	{
-		//if ( !supportsColor() )
-		//	return;
+		if ( !supportsColor() )
+			return;
 
 		boolean changed = false;
 		for ( final ColorConverter converter : converters )
@@ -207,16 +202,14 @@ public class RealARGBColorGammaConverterSetup implements GammaConverterSetup
 				sizeLUT = -1;
 				colorLutKey = null;
 				icm = null;
-				//bUpdateTexture = true;
 				changed = true;
 			}
 
 		}
 		if ( changed )
-			listeners.list.forEach( l -> l.setupParametersChanged( this ) );
+			fireParametersChanged();
 	}
 	
-
 	@Override
 	public boolean supportsColor()
 	{
@@ -289,15 +282,12 @@ public class RealARGBColorGammaConverterSetup implements GammaConverterSetup
 	
 	@Override
 	public void setLUT(final IndexColorModel icm_, String sLUTName) 
-	{
-		
+	{		
 		this.sLUTName = sLUTName;
 		icm = icm_;
 		sizeLUT = icm.getMapSize();
 		colorLutKey = new ColorLutKey (icm);
-		//bUpdateTexture = true;
-		
-		listeners.list.forEach( l -> l.setupParametersChanged( this ) );
+		fireParametersChanged();
 	}
 	
 	@Override
@@ -321,18 +311,6 @@ public class RealARGBColorGammaConverterSetup implements GammaConverterSetup
 		return null;
 	}
 	
-//	@Override
-//	public LutCSTexturePG getLUTTexture() 
-//	{		
-//			return texLUT;
-//	}
-//	
-//	@Override
-//	public void acknowledgeLUTUpdate()
-//	{
-//		bUpdateTexture = false;
-//	}
-	
 	@Override
 	public ColorLutKey getLutKey()
 	{
@@ -348,7 +326,7 @@ public class RealARGBColorGammaConverterSetup implements GammaConverterSetup
 			if(nRenderType != nRender)
 			{
 				nRenderType = nRender;
-				listeners.list.forEach( l -> l.setupParametersChanged( this ) );
+				fireParametersChanged();
 			}
 	}
 
@@ -367,7 +345,7 @@ public class RealARGBColorGammaConverterSetup implements GammaConverterSetup
 			if(nLightType != nLight)
 			{
 				nLightType = nLight;
-				listeners.list.forEach( l -> l.setupParametersChanged( this ) );
+				fireParametersChanged();
 			}
 	}
 
@@ -395,7 +373,7 @@ public class RealARGBColorGammaConverterSetup implements GammaConverterSetup
 		if(clipState != clipType )
 		{
 			clipState = clipType;
-			listeners.list.forEach( l -> l.setupParametersChanged( this ) );
+			fireParametersChanged();
 		}
 	}
 	
@@ -403,7 +381,7 @@ public class RealARGBColorGammaConverterSetup implements GammaConverterSetup
 	public void setClipInterval(final RealInterval clipInt) 
 	{
 		this.clipInt = new FinalRealInterval(clipInt);
-		listeners.list.forEach( l -> l.setupParametersChanged( this ) );
+		fireParametersChanged();
 	}
 
 	@Override
@@ -423,7 +401,7 @@ public class RealARGBColorGammaConverterSetup implements GammaConverterSetup
 	public void setClipTransform(final AffineTransform3D t) 
 	{
 		clipTransform.set( t );
-		listeners.list.forEach( l -> l.setupParametersChanged( this ) );
+		fireParametersChanged();
 	}
 
 	@Override
@@ -432,26 +410,13 @@ public class RealARGBColorGammaConverterSetup implements GammaConverterSetup
 		return icm;
 	}
 
-//	@Override
-//	public boolean updateNeededLUT()
-//	{
-//		return bUpdateTexture;
-//	}
-//
-//	@Override
-//	public void setLUTTexture(LutCSTexturePG lut_)
-//	{
-//		texLUT = lut_;	
-//		bUpdateTexture = false;
-//	}
-
 	@Override
 	public void setVoxelRenderInterpolation( int nInterpolation )
 	{
 		if(nVoxelInterpolation != nInterpolation)
 		{
 			nVoxelInterpolation = nInterpolation;	
-			listeners.list.forEach( l -> l.setupParametersChanged( this ) );
+			fireParametersChanged();
 		}
 	}
 

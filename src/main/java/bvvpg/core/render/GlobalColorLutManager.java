@@ -32,6 +32,9 @@ import java.awt.image.IndexColorModel;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.IntBuffer;
+import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.Deque;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -49,6 +52,7 @@ public class GlobalColorLutManager
 	private ColorLutArrayTexture globalLutArrayTexture = null;
 	private final Map<ColorLutKey, Integer> lutToLayerMap = new HashMap<>();
 	private final Map< ConverterSetup, Integer > converterToLayerMap = new HashMap<>();
+	private final Deque< Integer > freeSlots = new ArrayDeque<>();
 	
 	private int maxAllocatedLayers = 0;
 	private static final int LUT_EDGE = 256; // Fixed resolution for 1D LUT ramps in 2D array slice
@@ -64,67 +68,104 @@ public class GlobalColorLutManager
 	
 	public synchronized void updateLUTArray( final GpuContext context, final List< ConverterSetup > renderConverters )
 	{
-		if ( renderConverters == null || renderConverters.isEmpty() )
-			return;
-		
-		// Extract unique LUTs preserving order
-		final Map< ColorLutKey, IndexColorModel > uniqueLuts = new LinkedHashMap<>();
-		for ( final ConverterSetup cs : renderConverters )
-		{
-			final GammaConverterSetup gc = (GammaConverterSetup)cs;
-			final ColorLutKey key = gc.getLutKey();
-			if ( key != null )
-				uniqueLuts.putIfAbsent( key, gc.getLutICM() );
-		}
-		
-		//Check if all requested LUTs are already uploaded and mapped
-		boolean allPresent = true;
-		for ( final ColorLutKey key : uniqueLuts.keySet() )
-		{
-			if ( !lutToLayerMap.containsKey( key ) )
-			{
-				allPresent = false;
-				break;
-			}
-		}
-		
-		if ( allPresent && globalLutArrayTexture != null )
-		{
-			updateGCSindex( renderConverters );
-			return;
-		}
-		final int neededLayers = Math.max( 1, uniqueLuts.size() );
-		// Re-allocate texture array only if capacity is exceeded
-		if ( globalLutArrayTexture == null || neededLayers > maxAllocatedLayers )
-		{
-			if ( globalLutArrayTexture != null )
-			{
-				context.delete( globalLutArrayTexture );
-			}
-			
-			// Grow capacity to avoid frequent reallocations (min capacity 4)
-			maxAllocatedLayers = Math.max( 4, Math.max( neededLayers, maxAllocatedLayers * 2 ) );
-			globalLutArrayTexture = new ColorLutArrayTexture( LUT_EDGE, LUT_EDGE, maxAllocatedLayers );
-			lutToLayerMap.clear();
-		}
-		
-		//  Upload missing or all layers to texture array
-		int currentLayer = 0;
-		for ( final Map.Entry< ColorLutKey, IndexColorModel > entry : uniqueLuts.entrySet() )
-		{
-			final ColorLutKey key = entry.getKey();
-			final IndexColorModel icm = entry.getValue();
+	    if ( renderConverters == null || renderConverters.isEmpty() )
+	        return;
 
-			// Assign layer index and upload pixel data if not already present in current map
-			if ( !lutToLayerMap.containsKey( key ) )
-			{
-				uploadLayerToTexture( context, icm, currentLayer );
-				lutToLayerMap.put( key, currentLayer );
-			}
-			currentLayer++;
-		}
+	    // Collect unique active LUT keys requested for this frame
+	    final Map< ColorLutKey, IndexColorModel > activeLuts = new LinkedHashMap<>();
+	    for ( final ConverterSetup cs : renderConverters )
+	    {
+	        final GammaConverterSetup gc = (GammaConverterSetup) cs;
+	        final ColorLutKey key = gc.getLutKey();
+	        if ( key != null )
+	            activeLuts.putIfAbsent( key, gc.getLutICM() );
+	    }
+	    
+	    // Quick exit: All active LUTs are already mapped and texture exists
+	    if ( globalLutArrayTexture != null && lutToLayerMap.keySet().containsAll( activeLuts.keySet() ) )
+	    {
+	        updateGCSindex( renderConverters );
+	        return;
+	    }
 
-		updateGCSindex( renderConverters );
+	    // Reclaim slots from LUTs that are no longer active
+	    final Iterator< Map.Entry< ColorLutKey, Integer > > iter = lutToLayerMap.entrySet().iterator();
+	    while ( iter.hasNext() )
+	    {
+	        final Map.Entry< ColorLutKey, Integer > entry = iter.next();
+	        if ( !activeLuts.containsKey( entry.getKey() ) )
+	        {
+	            freeSlots.push( entry.getValue() ); // Free up this layer slot
+	            iter.remove();
+	        }
+	    }
+
+	    // Separate already mapped LUTs from completely new LUTs
+	    final List< Map.Entry< ColorLutKey, IndexColorModel > > newLuts = new ArrayList<>();
+	    for ( final Map.Entry< ColorLutKey, IndexColorModel > entry : activeLuts.entrySet() )
+	    {
+	        if ( !lutToLayerMap.containsKey( entry.getKey() ) )
+	            newLuts.add( entry );
+	    }
+
+	    // Quick exit: No new LUTs need to be uploaded
+	    if ( newLuts.isEmpty() && globalLutArrayTexture != null )
+	    {
+	        updateGCSindex( renderConverters );
+	        return;
+	    }
+
+	    // Determine if there is a need to resize the GPU texture array
+	    final boolean capacityExceeded = ( newLuts.size() > freeSlots.size() );
+
+	    if ( globalLutArrayTexture == null || capacityExceeded )
+	    {
+	        if ( globalLutArrayTexture != null )
+	            context.delete( globalLutArrayTexture );
+
+	        final int totalActiveCount = activeLuts.size();
+	        maxAllocatedLayers = Math.max( 4, Math.max( totalActiveCount, maxAllocatedLayers * 2 ) );
+	        globalLutArrayTexture = new ColorLutArrayTexture( LUT_EDGE, LUT_EDGE, maxAllocatedLayers );
+
+	        // Reset tracking state
+	        lutToLayerMap.clear();
+	        freeSlots.clear();
+	        //System.out.println( "maxAllocatedLayers " + maxAllocatedLayers );
+
+	        // Populate remaining unused slots for the new larger texture
+	        for ( int i = totalActiveCount; i < maxAllocatedLayers; i++ )
+	        {
+	            freeSlots.push( i );
+	        }
+
+	        // Complete re-upload of ALL active LUTs into continuous slots [0 ... N-1]
+	        int layerIndex = 0;
+	        for ( final Map.Entry< ColorLutKey, IndexColorModel > entry : activeLuts.entrySet() )
+	        {
+	            uploadLayerToTexture( context, entry.getValue(), layerIndex );
+	            lutToLayerMap.put( entry.getKey(), layerIndex );
+	            layerIndex++;
+	        }
+	    }
+	    else
+	    {
+	        // Incremental fill: there is enough freeSlots in the current texture
+	        for ( final Map.Entry< ColorLutKey, IndexColorModel > entry : newLuts )
+	        {
+	            final int targetLayer = freeSlots.pop();
+	            uploadLayerToTexture( context, entry.getValue(), targetLayer );
+	            lutToLayerMap.put( entry.getKey(), targetLayer );
+	        }
+	    }
+	    updateGCSindex( renderConverters );
+
+//	    updateGCSindex( renderConverters );
+//		System.out.println("lutToLayerMap");
+//		lutToLayerMap.forEach((key, value) -> System.out.println(key.hashCode() + " => " + value));
+//
+//		updateGCSindex( renderConverters );
+//		System.out.println("converterToLayerMap");
+//		converterToLayerMap.forEach((key, value) -> System.out.println(key + " => " + value));
 	}
 	
 	void updateGCSindex (final List< ConverterSetup > renderConverters)
@@ -141,43 +182,6 @@ public class GlobalColorLutManager
 			}
 		}
 	}
-	
-	/** Map each setup converter to its corresponding allocated layer index **/
-//	private void uploadLayerToTexture( final GpuContext context, final IndexColorModel icm, final int layer )
-//	{
-//		data.clear();
-//		if ( icm != null )
-//		{
-//			final int size_ = icm.getMapSize();
-//			final byte[][] colorsARGB = new byte[4][size_];
-//			icm.getAlphas( colorsARGB[0] );
-//			icm.getReds( colorsARGB[1] );
-//			icm.getGreens( colorsARGB[2] );
-//			icm.getBlues( colorsARGB[3] );
-//
-//			int lastColor = 0;
-//			final int count = Math.min( size_, LUT_SQUARE );
-//			for ( int i = 0; i < count; i++ )
-//			{
-//				final int a = colorsARGB[0][i] & 0xff;
-//				final int r = colorsARGB[1][i] & 0xff;
-//				final int g = colorsARGB[2][i] & 0xff;
-//				final int b = colorsARGB[3][i] & 0xff;
-//				lastColor = ( a << 24 ) | ( b << 16 ) | ( g << 8 ) | r;
-//				sdata.put( i, lastColor );
-//			}
-//			// Fill remainder if LUT map size < 256
-//			for ( int i = count; i < LUT_SQUARE; i++ )
-//			{
-//				sdata.put( i, lastColor );
-//			}
-//		}
-//
-//		data.rewind();
-//		// Calls glTexSubImage3D(GL_TEXTURE_2D_ARRAY, 0, x=0, y=0, z=layer, width=LUT_WIDTH, height=1, depth=1, ...)
-//		//globalLutArrayTexture.uploadSubImage3D( context, layer, data );
-//		globalLutArrayTexture.uploadLayer( context, layer, data );
-//	}
 	
 	private void uploadLayerToTexture( final GpuContext context, final IndexColorModel icm, final int layer )
 	{

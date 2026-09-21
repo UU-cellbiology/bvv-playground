@@ -1,7 +1,9 @@
 package bvvpg.debug.volumennum;
 
 
+import java.awt.image.IndexColorModel;
 import java.util.List;
+import java.util.Random;
 
 import net.imglib2.realtransform.AffineTransform3D;
 
@@ -36,10 +38,12 @@ public class DebugSpimData
 //		List< BvvStackSource< ? > > bvvSources16bit = BvvFunctions.show( spimData16bit, BvvOptions.options().addTo( bvv ) );
 //		bvvSources16bit.get( 0 ).setDisplayRange( 0, 700 );
 		List< BvvStackSource< ? > > bvvSources16bit = BvvFunctions.show( spimData16bit, BvvOptions.options().addTo( bvv ) );
-		bvvSources16bit.get( 0 ).setDisplayRange( 0, 255 );
-		//List< BvvStackSource< ? > > bvvSources8bit = BvvFunctions.show( spimData8bit, BvvOptions.options().addTo( bvv ) );
-		//bvvSources8bit.get( 0 ).setDisplayRange( 0, 255 );
 		bvvSources16bit.get( 0 ).setDisplayRange( 0, 1255 );
-		bvvSources16bit.get( 0 ).setLUT( "Fire" );
+		List< BvvStackSource< ? > > bvvSources8bit = BvvFunctions.show( spimData8bit, BvvOptions.options().addTo( bvv ) );
+		bvvSources8bit.get( 0 ).setDisplayRange( 0, 255 );
+		//bvvSources16bit.get( 0 ).setDisplayRange( 0, 1255 );
+		//bvvSources16bit.get( 0 ).setLUT( "Fire" );
 	}
+	
+
 }

@@ -44,6 +44,7 @@ import bdv.util.volatiles.VolatileViews;
 import bdv.viewer.ConverterSetups;
 import bdv.viewer.SourceAndConverter;
 import bvvpg.debug.GenerateVolumes;
+import bvvpg.source.converters.GammaConverterSetup;
 import bvvpg.vistools.Bvv;
 import bvvpg.vistools.BvvFunctions;
 import bvvpg.vistools.BvvOptions;
@@ -52,10 +53,10 @@ public class DebugVolumeNumber
 {
 	public static < T extends RealType< T > & NativeType< T >> void main( final String[] args )
 	{
-		int nMaxVolumesToTry = 20;
-		int nVolumeEdge = 50;
+		int nMaxVolumesToTry = 6;
+		int nVolumeEdge = 10;
 
-        double spreadCoeff = 2.5;
+        double spreadCoeff = 1.01;
         
 		int numThreads = 8;
 		int numQueueLevels = 10;
@@ -109,6 +110,8 @@ public class DebugVolumeNumber
 			float hue = (float) sN / nMaxVolumesToTry;
 		    int rgb = java.awt.Color.HSBtoRGB(hue, 0.8f, 1.0f);
 			convS.getConverterSetup( sac ).setColor( new ARGBType(rgb) );
+			GammaConverterSetup gammaConverterSetup = (GammaConverterSetup)convS.getConverterSetup( sac );
+			gammaConverterSetup.setRenderType( 1 );
 		    sN++;
 		}
 	}

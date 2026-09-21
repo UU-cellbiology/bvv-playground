@@ -95,6 +95,7 @@ public class MultiVolumeShaderMip
 	private final UniformSampler uniformGlobalCacheLut;
 	
 	private final UniformSampler uniformGlobalColorLut;
+	private final Uniform3f uniformGlobalCacheLutSize;
 	
 	private final UniformMatrix4f uniformIpv;
 	private final Uniform2f uniformViewportSize;
@@ -273,9 +274,12 @@ public class MultiVolumeShaderMip
         uniformCacheBlockSize.set( bs[ 0 ], bs[ 1 ], bs[ 2 ] );
 		uniformPaddedBlockSize.set( pbs[ 0 ], pbs[ 1 ], pbs[ 2 ] );
 		uniformCachePadOffset.set( bo[ 0 ], bo[ 1 ], bo[ 2 ] );	
-
+		
 		uniformGlobalCacheLut = prog.getUniformSampler( "globalCacheLut" );
+		uniformGlobalCacheLutSize = prog.getUniform3f( "globalCacheLutSize" );
+
 		uniformGlobalColorLut = prog.getUniformSampler( "globalColorLutArray" );
+
 		
 		volumeSegments = new VolumeSegment[ numVolumes ];
 		converterSegments = new ConverterSegment[ numVolumes ];
@@ -304,9 +308,9 @@ public class MultiVolumeShaderMip
 //		final StringBuilder vertexShaderCode = prog.getVertexShaderCode();
 //		System.out.println( "vertexShaderCode = " + vertexShaderCode );
 //		System.out.println( "\n\n--------------------------------\n\n" );
-		final StringBuilder fragmentShaderCode = prog.getFragmentShaderCode();
-		System.out.println( "fragmentShaderCode = " + fragmentShaderCode );
-		System.out.println( "\n\n--------------------------------\n\n" );
+//		final StringBuilder fragmentShaderCode = prog.getFragmentShaderCode();
+//		System.out.println( "fragmentShaderCode = " + fragmentShaderCode );
+//		System.out.println( "\n\n--------------------------------\n\n" );
 	}
 
 	public static Map< SegmentType, SegmentTemplate > getDefaultSegments( boolean useDepthTexture )
@@ -380,6 +384,7 @@ public class MultiVolumeShaderMip
 	public void setGlobalCacheLutTexture(final GlobalCacheLutTexture globalLutTexture)
 	{
 		 uniformGlobalCacheLut.set( globalLutTexture );
+		 uniformGlobalCacheLutSize.set( globalLutTexture.getSize3f() );
 	}
 	
 	public void setGlobalColorLutTexture(final Texture colorLutTexture)
@@ -605,9 +610,7 @@ public class MultiVolumeShaderMip
 				t.set( t.inverse() );
 				uniformClipTransform.set( MatrixMath.affine( t, new Matrix4f() ) );
 			}
-			//uniformLUT.set( gc.getLUTTexture() );
 
-			
 			final double s = 1.0 / ( fmax - fmin );
 			final double o = -fmin * s;
 			final double sA = 1.0 / ( fmaxA - fminA );
