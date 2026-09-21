@@ -5,7 +5,7 @@ uniform mat4 ipv;
 uniform float fwnw;
 uniform float nw;
 const vec3 lightDir = normalize(vec3(0, -0.2, -1));
-const float gradientHalfStep = 3.0;
+const float gradientHalfStep = 2.0;
 
 //$insert{cachesNumber}
 #define NUM_BLOCK_SCALES 10

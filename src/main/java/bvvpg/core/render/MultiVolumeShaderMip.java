@@ -326,14 +326,14 @@ public class MultiVolumeShaderMip
 				"sampleRaw", "gradientVolume" ) );
 		segments.put( SegmentType.SampleVolume, new SegmentTemplate(
 				"sample_volume_simple.frag",
-				"im", "itvm", "sourcemax", "voxelInterpolation",
+				"im", "itvm", "sourcemin", "sourcemax", "voxelInterpolation",
 				"clipactive", "clipmin", "clipmax", "cliptransform",
 				"intersectBoundingBox",
 				"volume", "sampleVolume",
 				"sampleRaw", "gradientVolume" ) );
 		segments.put( SegmentType.SampleRGBAVolume, new SegmentTemplate(
 				"sample_volume_simple_rgba.frag",
-				"im", "sourcemax", "voxelInterpolation",
+				"im", "sourcemin", "sourcemax", "voxelInterpolation",
 				"clipactive", "clipmin", "clipmax", "cliptransform",
 				"intersectBoundingBox",
 				"volume", "sampleVolume" ) ); 				
@@ -738,6 +738,7 @@ public class MultiVolumeShaderMip
 		private final UniformSampler uniformVolumeSampler;
 		private final UniformMatrix4f uniformIm;
 		private final UniformMatrix3f uniformItvm;
+		private final Uniform3f uniformSourcemin;
 		private final Uniform3f uniformSourcemax;
 
 		public VolumeSimpleSegment( final SegmentedShader prog, final Segment volume )
@@ -746,6 +747,7 @@ public class MultiVolumeShaderMip
 			uniformVolumeSampler = prog.getUniformSampler( volume, "volume" );
 			uniformIm = prog.getUniformMatrix4f( volume, "im" );
 			uniformItvm = prog.getUniformMatrix3f( volume, "itvm" );
+			uniformSourcemin = prog.getUniform3f( volume, "sourcemin" );
 			uniformSourcemax = prog.getUniform3f( volume, "sourcemax" );
 		}
 
@@ -756,6 +758,7 @@ public class MultiVolumeShaderMip
 			final Matrix4f vtm = renderData.getCamview().mul( volume.getIms(), new Matrix4f() );
 			final Matrix4f itvm = vtm.invert( new Matrix4f() ).transpose();
 			uniformItvm.set( itvm.get3x3( new Matrix3f() ) );
+			uniformSourcemin.set( volume.getSourceMin() );
 			uniformSourcemax.set( volume.getSourceMax() );
 		}
 	}

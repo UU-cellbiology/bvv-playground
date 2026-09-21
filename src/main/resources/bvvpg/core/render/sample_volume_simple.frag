@@ -1,5 +1,6 @@
 uniform mat4 im;
 uniform mat3 itvm;
+uniform vec3 sourcemin;
 uniform vec3 sourcemax;
 uniform int voxelInterpolation;
 uniform int clipactive;
@@ -12,7 +13,7 @@ void intersectBoundingBox( vec4 wfront, vec4 wback, out float tnear, out float t
 	vec4 mfront = im * wfront;
 	vec4 mback = im * wback;	
 
-	intersectBox( mfront.xyz, (mback - mfront).xyz, vec3( -0.5, -0.5, -0.5 ), sourcemax + 0.5, tnear, tfar );
+	intersectBox( mfront.xyz, (mback - mfront).xyz, sourcemin, sourcemax, tnear, tfar );
 }
 
 uniform sampler3D volume;
@@ -41,7 +42,7 @@ float sampleVolume( vec4 wpos )
 	}
 	return sampleRaw(pos);
 }
-vec3 gradientVolume( vec4 wpos, float fStep )
+vec3 gradientVolume( vec4 wpos, float h )
 {
 	vec3 pos = (im * wpos).xyz + 0.5;
 
@@ -49,20 +50,20 @@ vec3 gradientVolume( vec4 wpos, float fStep )
 	{
 		pos = floor(pos) + 0.5;
 	}
-	vec3 ox = vec3(fStep,0,0);
-	vec3 oy = vec3(0,fStep,0);
-	vec3 oz = vec3(0,0,fStep);
-	float fx1 = sampleRaw(pos + ox);
-	float fx0 = sampleRaw(pos - ox);
-	float fy1 = sampleRaw(pos + oy);
-	float fy0 = sampleRaw(pos - oy);
-	float fz1 = sampleRaw(pos + oz);
-	float fz0 = sampleRaw(pos - oz);
-
-	// divide by 2*voxelSize to approximate derivative in physical units
-	float dx = (fx1 - fx0) * 0.5 / fStep;
-	float dy = (fy1 - fy0) * 0.5 / fStep;
-	float dz = (fz1 - fz0) * 0.5 / fStep;
-
-	return -itvm*vec3(dx, dy, dz);	
+	vec3 d0 = clamp(pos + vec3(+h, +h, +h), sourcemin, sourcemax);
+	vec3 d1 = clamp(pos + vec3(+h, -h, -h), sourcemin, sourcemax);
+	vec3 d2 = clamp(pos + vec3(-h, +h, -h), sourcemin, sourcemax);
+	vec3 d3 = clamp(pos + vec3(-h, -h, +h), sourcemin, sourcemax);
+	
+	float v0 = sampleRaw(d0);
+	float v1 = sampleRaw(d1);
+	float v2 = sampleRaw(d2);
+	float v3 = sampleRaw(d3);
+	
+	vec3 grad = vec3(
+	    v0 + v1 - v2 - v3,
+	    v0 - v1 + v2 - v3,
+	    v0 - v1 - v2 + v3
+	) / (4.0 * h);	
+	return -itvm*grad;	
 }

@@ -43,8 +43,8 @@ public class DebugSpimData
 		bvvSources8bit.get( 0 ).setDisplayRange( 0, 255 );
 		//bvvSources16bit.get( 0 ).setDisplayRange( 0, 1255 );
 		//bvvSources16bit.get( 0 ).setLUT( "Fire" );
-		bvvSources16bit.get( 0 ).setVoxelRenderInterpolation( 0 );
-		bvvSources8bit.get( 0 ).setVoxelRenderInterpolation( 0 );
+		bvvSources16bit.get( 0 ).setVoxelRenderInterpolation( 1 );
+		bvvSources8bit.get( 0 ).setVoxelRenderInterpolation( 1 );
 	}
 	
 

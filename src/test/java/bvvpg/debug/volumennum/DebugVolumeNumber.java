@@ -111,8 +111,8 @@ public class DebugVolumeNumber
 		    int rgb = java.awt.Color.HSBtoRGB(hue, 0.8f, 1.0f);
 			convS.getConverterSetup( sac ).setColor( new ARGBType(rgb) );
 			GammaConverterSetup gammaConverterSetup = (GammaConverterSetup)convS.getConverterSetup( sac );
-			gammaConverterSetup.setRenderType( 1 );
-			gammaConverterSetup.setVoxelRenderInterpolation( 0 );
+			//gammaConverterSetup.setRenderType( 1 );
+			//gammaConverterSetup.setVoxelRenderInterpolation( 0 );
 		    sN++;
 		}
 	}

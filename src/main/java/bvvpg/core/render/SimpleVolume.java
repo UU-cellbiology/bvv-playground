@@ -61,7 +61,7 @@ public class SimpleVolume
 		this.texture = texture;
 		this.sourceToWorld = sourceTransform;
 		this.sourceMax = sourceMax.sub( sourceMin, new Vector3f() );
-
+		this.sourceMax.add( 0.5f, 0.5f, 0.5f );
 		AffineTransform3D t = new AffineTransform3D();
 		t.translate( sourceMin.x(), sourceMin.y(), sourceMin.z() );
 		t.preConcatenate( sourceTransform );
@@ -100,6 +100,11 @@ public class SimpleVolume
 			voxelSize = Math.min( voxelSize, LinAlgHelpers.length( tone ) );
 		}
 		return voxelSize;
+	}
+	
+	public Vector3f getSourceMin()
+	{
+		return new Vector3f(-0.5f, -0.5f, -0.5f);
 	}
 
 	public Vector3f getSourceMax()

@@ -13,7 +13,7 @@ void intersectBoundingBox( vec4 wfront, vec4 wback, out float tnear, out float t
 	vec4 mfront = im * wfront;
 	vec4 mback = im * wback;	
 
-	intersectBox( mfront.xyz, (mback - mfront).xyz, sourcemin - 0.5, sourcemax + 0.5, tnear, tfar );
+	intersectBox( mfront.xyz, (mback - mfront).xyz, sourcemin, sourcemax, tnear, tfar );
 }
 
 uniform vec3 blockScales[ NUM_BLOCK_SCALES ];
@@ -22,38 +22,25 @@ uniform vec3 lutOffset;
 uniform int cacheType;
 uniform int cacheLutZOffset;
 
-float sampleRaw( vec3 posin )
+float sampleRaw( vec3 pos )
 {	
-	vec3 pos = posin;
-
-	// Clamp tile lookup to minimum tile 0 so we don't hit the zero-LUT pad
-	vec3 qPos = max( vec3( 0.0 ), pos );
-	
-	vec3 tileIndex = floor( qPos / cacheBlockSize );
-	
-	ivec3 localQ = ivec3( tileIndex - lutOffset );
-	
-	if ( any( lessThan( localQ, ivec3( 0 ) ) ) || any( greaterThanEqual( localQ, ivec3( lutSize ) ) ) )
-		return 0.0;
-
-	// normalized sampling coordinate [0.0, 1.0] for lutSampler
-	vec3 q = (localQ + 0.5);
-	q.z += cacheLutZOffset;
-	q /= globalCacheLutSize;
-	
-	uvec4 lutv = texture( globalCacheLut, q );
-	
-	vec3 B0 = vec3(lutv.xyz) * paddedBlockSize + cachePadOffset;
+					
+	vec3 q = floor( pos / cacheBlockSize ) - lutOffset + 0.5;
+	q.z += cacheLutZOffset; 
+	uvec4 lutv = texture( globalCacheLut, q / globalCacheLutSize );
+	vec3 B0 = lutv.xyz * paddedBlockSize + cachePadOffset;
 	vec3 sj = blockScales[ lutv.w ];
-	
-	vec3 tileIndexCoarse = floor( qPos / ( cacheBlockSize * sj ) );
-	vec3 relativePos = (pos - tileIndexCoarse * (cacheBlockSize * sj)) * sj;
+	pos = mod(pos * sj, cacheBlockSize);
+		
 	//nearest neighbor
 	if(voxelInterpolation == 0)
-		relativePos = floor(relativePos + 0.5);
-	vec3 c0 = B0 + relativePos + 0.5;
+	{	
+		pos = floor(pos) + 0.5;
+	}
+	vec3 c0 = B0 + pos;
+	
+	return texture( u_Caches[cacheType], c0/ cacheSize[cacheType]  ).r;		
 
-	return texture( u_Caches[cacheType], c0/ cacheSize[cacheType] ).r;
 }
 
 float sampleVolume( vec4 wpos )
@@ -67,33 +54,38 @@ float sampleVolume( vec4 wpos )
 			return 0.0;
 	}
 
-	vec3 pos = (im * wpos).xyz;
+	vec3 pos = (im * wpos).xyz + 0.5; 
 
 	return sampleRaw(pos);	
 }
 
-vec3 gradientVolume( vec4 wpos, float fStep )
+
+vec3 gradientVolume( vec4 wpos, float h )
 {
 	vec3 pos = (im * wpos).xyz + 0.5;
-
+	
 	if(voxelInterpolation == 0)
 	{
 		pos = floor(pos) + 0.5;
 	}
-	vec3 ox = vec3(fStep, 0, 0);
-	vec3 oy = vec3(0, fStep, 0);
-	vec3 oz = vec3(0, 0, fStep);
-	float fx1 = sampleRaw(pos + ox);
-	float fx0 = sampleRaw(pos - ox);
-	float fy1 = sampleRaw(pos + oy);
-	float fy0 = sampleRaw(pos - oy);
-	float fz1 = sampleRaw(pos + oz);
-	float fz0 = sampleRaw(pos - oz);
-
-	// divide by 2*voxelSize to approximate derivative in physical units
-	float dx = (fx1 - fx0) * 0.5 / fStep;
-	float dy = (fy1 - fy0) * 0.5 / fStep;
-	float dz = (fz1 - fz0) * 0.5 / fStep;
-
-	return -itvm*vec3(dx, dy, dz);	
+	vec3 q = floor( pos / cacheBlockSize ) - lutOffset + 0.5;
+	q.z += cacheLutZOffset; 
+	uvec4 lutv = texture( globalCacheLut, q / globalCacheLutSize );
+	vec3 sj = 1./blockScales[ lutv.w ];
+	vec3 d0 = clamp(pos + vec3(+h, +h, +h) * sj, sourcemin, sourcemax);
+	vec3 d1 = clamp(pos + vec3(+h, -h, -h) * sj, sourcemin, sourcemax);
+	vec3 d2 = clamp(pos + vec3(-h, +h, -h) * sj, sourcemin, sourcemax);
+	vec3 d3 = clamp(pos + vec3(-h, -h, +h) * sj, sourcemin, sourcemax);
+	
+	float v0 = sampleRaw(d0);
+	float v1 = sampleRaw(d1);
+	float v2 = sampleRaw(d2);
+	float v3 = sampleRaw(d3);
+	
+	vec3 grad = vec3(
+	    v0 + v1 - v2 - v3,
+	    v0 - v1 + v2 - v3,
+	    v0 - v1 - v2 + v3
+	) / (4.0 * h);	
+	return -itvm*grad;	
 }
