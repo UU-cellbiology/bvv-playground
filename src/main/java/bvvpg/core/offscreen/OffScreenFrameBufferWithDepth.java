@@ -45,6 +45,7 @@ import net.imglib2.img.array.ArrayImgs;
 import net.imglib2.type.numeric.real.FloatType;
 
 import org.joml.Vector2f;
+import org.joml.Vector3f;
 
 import static com.jogamp.opengl.GL.GL_ARRAY_BUFFER;
 import static com.jogamp.opengl.GL.GL_CLAMP_TO_EDGE;
@@ -89,6 +90,8 @@ public class OffScreenFrameBufferWithDepth
 	private final DefaultShader progQuadAlpha;
 	
 	private final DefaultShader progQuadEDL;
+	
+	private final DefaultShader progQuadFog;
 	
 	private boolean flipY;
 
@@ -188,6 +191,9 @@ public class OffScreenFrameBufferWithDepth
 		final Segment quadfpEDL = new SegmentTemplate( OffScreenFrameBufferWithDepth.class, "edlfbquad.fp" ).instantiate();
 		progQuadEDL = new DefaultShader( quadvp.getCode(), quadfpEDL.getCode() );
 
+		final Segment quadfpFog = new SegmentTemplate( OffScreenFrameBufferWithDepth.class, "fogfbquad.fp" ).instantiate();
+		progQuadFog = new DefaultShader( quadvp.getCode(), quadfpFog.getCode() );
+		
 		depthTexture = new DepthTexture( fbWidth, fbHeight );
 	}
 
@@ -515,6 +521,41 @@ public class OffScreenFrameBufferWithDepth
 		progQuadEDL.getUniform1f( "strength" ).set( fStrength );
 		progQuadEDL.getUniform1f( "radius" ).set( fRadius );
 		progQuadEDL.setUniforms( context );
+
+		gl.glBindVertexArray( vaoQuad );
+		gl.glDrawElements( GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0 );
+		gl.glBindVertexArray( 0 );
+		gl.glBindTexture( GL_TEXTURE_2D, 0 );
+	}
+	
+	/** re-draws buffers using EDL lighting **/
+	public void drawQuadFog( GL3 gl, float fnratio, float[] fogColor, float fogDensity)
+	{
+		initQuad( gl );
+		JoglGpuContext context = JoglGpuContext.get( gl );
+
+		gl.glActiveTexture( GL_TEXTURE0 );
+		gl.glBindTexture( GL_TEXTURE_2D, texColorBuffer);
+		gl.glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,  GL_LINEAR);
+		gl.glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,  GL_LINEAR );
+		gl.glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE );
+		gl.glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE );
+		progQuadFog.getUniform1i( "colorTex" ).set( 0 );
+		gl.glActiveTexture(GL_TEXTURE1);
+		gl.glBindTexture(GL_TEXTURE_2D, texDepthBuffer );
+		gl.glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL.GL_NEAREST);
+		gl.glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL.GL_NEAREST);
+		gl.glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+		gl.glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+		
+		progQuadFog.getUniform1i( "depthTex" ).set( 1 );
+		progQuadFog.use( context );
+		Vector2f texel = new Vector2f ((1.0f) / fbWidth, (1.0f) / fbHeight); 
+		progQuadFog.getUniform2f( "texel" ).set( texel );
+		progQuadFog.getUniform1f( "fnratio" ).set( fnratio );
+		progQuadFog.getUniform3f( "fogColor" ).set( new Vector3f(fogColor) );
+		progQuadFog.getUniform1f( "fogDensity" ).set( fogDensity );
+		progQuadFog.setUniforms( context );
 
 		gl.glBindVertexArray( vaoQuad );
 		gl.glDrawElements( GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0 );
