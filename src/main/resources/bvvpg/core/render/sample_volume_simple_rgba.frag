@@ -1,4 +1,5 @@
 uniform mat4 im;
+uniform vec3 sourcemin;
 uniform vec3 sourcemax;
 uniform int clipactive;
 uniform int voxelInterpolation;
@@ -11,7 +12,7 @@ void intersectBoundingBox( vec4 wfront, vec4 wback, out float tnear, out float t
 	vec4 mfront = im * wfront;
 	vec4 mback = im * wback;
 
-	intersectBox( mfront.xyz, (mback - mfront).xyz,  vec3( -0.5, -0.5, -0.5 ), sourcemax + 0.5, tnear, tfar );
+	intersectBox( mfront.xyz, (mback - mfront).xyz,  sourcemin, sourcemax, tnear, tfar );
 }
 
 uniform sampler3D volume;

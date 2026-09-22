@@ -2,9 +2,6 @@ uniform vec4 offset;
 uniform vec4 scale;
 uniform float gamma;
 uniform float alphagamma;
-uniform int renderType;
-uniform int sizeLUT;
-uniform sampler3D lut;
 
 
 vec4 convert(vec4 v )

@@ -82,11 +82,24 @@ public interface GpuContext
 	// delete a texture (if it has already been allocated)
 	// used to redefine a texture that has changed size
 	void delete( Texture texture );
+	
+	/** Uploads sub-image data to a 2D or 2D Array texture. **/
+	void texSubImage2D( Texture texture, int xoffset, int yoffset, int width, int height, Buffer pixels );
 
+	/** Uploads sub-image data from a StagingBuffer (PBO offset) to a 3D / 2D Array texture. **/
+	void texSubImage3D( StagingBuffer stagingBuffer, Texture texture, int xoffset, int yoffset, int zoffset, int width, int height, int depth, long pixels_buffer_offset );
+	
+	/** Uploads sub-image data to a 3D or 2D Array texture (layer-based or volumetric). **/
+	void texSubImage3D( Texture texture, int xoffset, int yoffset, int zoffset, int width, int height, int depth, Buffer pixels );
+	
 	// upload texture block from staging buffer
 	// previous staging buffer binding is restored when done
 	void texSubImage3D( StagingBuffer stagingBuffer, Texture3D texture, int xoffset, int yoffset, int zoffset, int width, int height, int depth, long pixels_buffer_offset );
 
 	// upload texture block from Buffer
 	void texSubImage3D( Texture3D texture, int xoffset, int yoffset, int zoffset, int width, int height, int depth, Buffer pixels );
+	
+	//for uploading local luts to the  global lut cache texture
+	void glPixelStorei( final int pname, final int param );
+	
 }

@@ -11,7 +11,7 @@
 
 	<groupId>nl.uu.science.cellbiology</groupId>
 	<artifactId>bvv-playground</artifactId>
-	<version>0.5.10-SNAPSHOT</version>
+	<version>0.6.0-SNAPSHOT</version>
 
 	<name>BVV-playground</name>
 	<description>Volume rendering of bdv datasets with gamma and transparency option</description>
@@ -69,7 +69,7 @@
 	<scm>
 		<connection>scm:git:git://github.com/UU-cellbiology/bvv-playground</connection>
 		<developerConnection>scm:git:git@github.com:UU-cellbiology/bvv-playground</developerConnection>
-		<tag>bvv-playground-0.5.9</tag>
+		<tag>bvv-playground-0.6.0</tag>
 		<url>https://github.com/UU-cellbiology/bvv-playground</url>
 	</scm>
 	<issueManagement>
@@ -86,6 +86,12 @@
 		<package-name>bvvplayground</package-name>
 		<license.licenseName>bsd_2</license.licenseName>
 		<license.copyrightOwners>Cell Biology, Neurobiology and Biophysics Department of Utrecht University.</license.copyrightOwners>
+		<!-- NB: Parent pom-scijava sets Java 11. We override it here to stay compatible with FIJI stable / Java 8. -->
+        <scijava.jvm.version>1.8</scijava.jvm.version>
+        <scijava.jvm.build.version>[1.8.0-101,)</scijava.jvm.build.version>
+        <!-- Use older versions of dependencies to stay compatible with FIJI stable / Java 8. -->
+        <bigdataviewer-core.version>10.6.8</bigdataviewer-core.version>
+        <scifio.version>0.48.0</scifio.version>
 
 		<!-- NB: Deploy releases to the SciJava Maven repository. -->
 		<releaseProfiles>sign,deploy-to-scijava</releaseProfiles>  
@@ -195,20 +201,4 @@
 		</dependency>
 	</dependencies>
 	
-	<build>
-		<plugins>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<configuration>
-					<!-- Use source/target instead of release to allow sun.misc.Unsafe access on JDK 16+ -->
-					<release combine.self="override" />
-					<source>1.8</source>
-					<target>1.8</target>
-					<testSource>1.8</testSource>
-                	<testTarget>1.8</testTarget>
-				</configuration>
-			</plugin>
-		</plugins>
-	</build>
 </project>

@@ -4,13 +4,12 @@ uniform float gamma;
 uniform float alphagamma;
 uniform int renderType;
 uniform float lightType;
-uniform int sizeLUT;
-uniform sampler3D lut;
+uniform int sizeColorLut;
+uniform float colorLutLayer;
 
 vec4 convert(float v)
-{
-	vec4 finC = vec4(0);
-	
+{	
+	vec4 finC = vec4(0);	
 	float alphaFin = pow(clamp(offset.a + scale.a * v, 0.0, 1.0), alphagamma);
 
 	if(renderType == 2)
@@ -21,33 +20,31 @@ vec4 convert(float v)
 		}
 	}
 	
-	if(sizeLUT > 0)
+	if(sizeColorLut > 0)
 	{
-		vec3 q = vec3(0);
-
-		//2D texture with fixed width of 256
+		float normVal = clamp(offset.r + scale.r * v, 0.0, 1.0);
+		float val = pow(normVal, gamma) * (float(sizeColorLut) - 1.0);
 		
-		float val = 0.5 + (sizeLUT-1) * pow(clamp(offset.r + scale.r * v, 0.0, 1.0), gamma);
-
-		//q.x = (val/256.0)-floor(val/256.0);
-		//q.y = (floor(val/256.0)+0.5)/ceil(sizeLUT/256.0);
-		//or
-		q.y = floor(val / 256.0);
-		q.x = (val / 256.0)- q.y;
-		q.y = (q.y + 0.5) / ceil(sizeLUT / 256.0);
-				
-		finC =  texture( lut, q);
+		float col = mod(floor(val), 256.0);
+		float row = floor(floor(val) / 256.0);
 		
-		finC.a = finC.a * alphaFin;	
+		vec3 q;
+		q.x = (col + 0.5) / 256.0;
+		q.y = (row + 0.5) / 256.0;
+		q.z = colorLutLayer;
+		
+		finC =  texture( globalColorLutArray, q);
+		finC.a *= alphaFin;	
 	}
 	else
 	{
 		finC.r = pow(clamp(offset.r + scale.r * v, 0.0, 1.0), gamma);
 		finC.g = pow(clamp(offset.g + scale.g * v, 0.0, 1.0), gamma);
 		finC.b = pow(clamp(offset.b + scale.b * v, 0.0, 1.0), gamma);
-		finC.a = alphaFin;			
+		finC.a = alphaFin;				
 	}
 	
 	return finC;
+
 }
 		

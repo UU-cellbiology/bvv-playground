@@ -1,5 +1,10 @@
 # Updates history
 
+## 0.6.0
+
+ - large reordering of uniforms per volume to global;
+ - brings maximum number of possible volumes to ~ 100, but there is still a problem with shader compilation; 
+
 ## 0.5.9
 
 - change main scene buffer back to "regular" FBO. If needed, multisample can be used in render functions;

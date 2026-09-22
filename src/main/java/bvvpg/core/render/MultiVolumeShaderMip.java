@@ -55,6 +55,7 @@ import bvvpg.source.converters.GammaConverterSetup;
 
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import net.imglib2.realtransform.AffineTransform3D;
@@ -82,6 +83,20 @@ public class MultiVolumeShaderMip
 	private final VolumeSegment[] volumeSegments;
 	private final ConverterSegment[] converterSegments;
 
+	// Global caches
+	private final UniformSampler[] uniformCaches;
+    //it should be the same for all caches
+    private final Uniform3f uniformCacheBlockSize;
+    private final Uniform3f uniformPaddedBlockSize;
+    private final Uniform3f uniformCachePadOffset;
+    private final Uniform3f[] uniformCacheSize;
+
+    //Global cache lut-leve table for mutlires volumes
+	private final UniformSampler uniformGlobalCacheLut;
+	
+	private final UniformSampler uniformGlobalColorLut;
+	private final Uniform3f uniformGlobalCacheLutSize;
+	
 	private final UniformMatrix4f uniformIpv;
 	private final Uniform2f uniformViewportSize;
 
@@ -126,7 +141,8 @@ public class MultiVolumeShaderMip
 	public MultiVolumeShaderMip( VolumeShaderSignature signature, final boolean useDepthTexture, final double degrade,
 			final Map< SegmentType, SegmentTemplate > segments,
 			final SegmentConsumer runBeforeBinding,
-			final String depthTextureName )
+			final String depthTextureName,
+			final List<TextureCache> caches)
 	{
 		this.signature = signature;
 		this.useDepthTexture = useDepthTexture;
@@ -223,7 +239,10 @@ public class MultiVolumeShaderMip
 		fp.insert( "SampleVolume", sampleVolumeSegs );
 		fp.insert( "Convert", convertSegs );
 		fp.insert( "Accumulate", accumulateSegs );
-
+		
+		final int numCaches = caches.size();
+		fp.insert( "cachesNumber", SegmentTemplate.fromCode("#define CACHES_NUMBER " + Integer.toString( numCaches )).instantiate() );
+		
 		builder.fragment( fp );
 		prog = builder.build();
 
@@ -232,7 +251,36 @@ public class MultiVolumeShaderMip
 		uniformNw = prog.getUniform1f( "nw" );
 		uniformFwnw = prog.getUniform1f( "fwnw" );
 		uniformXf = prog.getUniform1f( "xf" );
+		
+		// Bind caches
+		uniformCaches = new UniformSampler[ numCaches  ];
+		uniformCacheSize = new Uniform3f[ numCaches ];
+		for(int i = 0; i < numCaches; i++ )
+		{
+			uniformCaches[ i ] = prog.getUniformSampler( "u_Caches[" + Integer.toString( i ) + "]" );
+			uniformCaches[ i ].set( caches.get( i ) );
+			uniformCacheSize[ i ] = prog.getUniform3f( "cacheSize[" + Integer.toString( i ) + "]" );
+			uniformCacheSize[ i ].set( caches.get( i ).texWidth(), caches.get( i ).texHeight(), caches.get( i ).texDepth() );
+		}
+		
+        uniformCacheBlockSize = prog.getUniform3f( "cacheBlockSize" );
+        uniformPaddedBlockSize = prog.getUniform3f( "paddedBlockSize" );
+        uniformCachePadOffset = prog.getUniform3f( "cachePadOffset" );
+    
+		final CacheSpec spec = caches.get( 0 ).spec();
+		final int[] bs = spec.blockSize();
+		final int[] pbs = spec.paddedBlockSize();
+		final int[] bo = spec.padOffset();
+        uniformCacheBlockSize.set( bs[ 0 ], bs[ 1 ], bs[ 2 ] );
+		uniformPaddedBlockSize.set( pbs[ 0 ], pbs[ 1 ], pbs[ 2 ] );
+		uniformCachePadOffset.set( bo[ 0 ], bo[ 1 ], bo[ 2 ] );	
+		
+		uniformGlobalCacheLut = prog.getUniformSampler( "globalCacheLut" );
+		uniformGlobalCacheLutSize = prog.getUniform3f( "globalCacheLutSize" );
 
+		uniformGlobalColorLut = prog.getUniformSampler( "globalColorLutArray" );
+
+		
 		volumeSegments = new VolumeSegment[ numVolumes ];
 		converterSegments = new ConverterSegment[ numVolumes ];
 		for ( int i = 0; i < numVolumes; ++i )
@@ -246,6 +294,7 @@ public class MultiVolumeShaderMip
 			case MULTIRESOLUTION:
 				volumeSegments[ i ] = new VolumeBlocksSegment( prog, sampleVolumeSegs[ i ] );
 				break;
+				default:
 			}
 			converterSegments[ i ] = new ConverterSegment( prog, convertSegs[ i ], sampleVolumeSegs[ i ], volumeSignature.getPixelType() );
 		}
@@ -270,22 +319,21 @@ public class MultiVolumeShaderMip
 
 		segments.put( SegmentType.SampleMultiresolutionVolume, new SegmentTemplate(
 				"sample_volume_blocks.frag",
-				"volumeCache", "blockSize", "paddedBlockSize", "cachePadOffset", "cacheSize",
-				"im", "itvm", "sourcemin", "sourcemax","voxelInterpolation", 
+				 "im", "itvm", "sourcemin", "sourcemax","voxelInterpolation", 
 				"clipactive", "clipmin", "clipmax", "cliptransform",
 				"intersectBoundingBox",
-				"lutSampler", "blockScales", "lutSize", "lutOffset", "sampleVolume",
+				"blockScales", "lutSize", "lutOffset", "sampleVolume", "cacheType", "cacheLutZOffset",
 				"sampleRaw", "gradientVolume" ) );
 		segments.put( SegmentType.SampleVolume, new SegmentTemplate(
 				"sample_volume_simple.frag",
-				"im", "itvm", "sourcemax", "voxelInterpolation",
+				"im", "itvm", "sourcemin", "sourcemax", "voxelInterpolation",
 				"clipactive", "clipmin", "clipmax", "cliptransform",
 				"intersectBoundingBox",
 				"volume", "sampleVolume",
 				"sampleRaw", "gradientVolume" ) );
 		segments.put( SegmentType.SampleRGBAVolume, new SegmentTemplate(
 				"sample_volume_simple_rgba.frag",
-				"im", "sourcemax", "voxelInterpolation",
+				"im", "sourcemin", "sourcemax", "voxelInterpolation",
 				"clipactive", "clipmin", "clipmax", "cliptransform",
 				"intersectBoundingBox",
 				"volume", "sampleVolume" ) ); 				
@@ -293,15 +341,15 @@ public class MultiVolumeShaderMip
 				"convert.frag",
 				"convert", "offset", "scale", "gamma", "alphagamma",
 				"renderType", "lightType",
-				"sizeLUT","lut" ) );
+				"sizeColorLut", "colorLutLayer" ) );
 		segments.put( SegmentType.ConvertRGBA, new SegmentTemplate(
 				"convert_rgba.frag",
-				"convert", "offset", "scale", "gamma", "alphagamma", "renderType", "sizeLUT","lut" ) );
+				"convert", "offset", "scale", "gamma", "alphagamma") );
 		segments.put( SegmentType.MaxDepth, new SegmentTemplate(
 				useDepthTexture ? "maxdepthtexture.frag" : "maxdepthone.frag" ) );
 		segments.put( SegmentType.VertexShader, new SegmentTemplate( "multi_volume.vert" ) );
 		segments.put( SegmentType.FragmentShader, new SegmentTemplate(
-				"multi_volume.frag",
+				"multi_volume.frag", "cachesNumber",
 				"intersectBoundingBox", "vis", "SampleVolume", "Convert", "Accumulate" ) );
 		segments.put( SegmentType.AccumulatorMultiresolution, new SegmentTemplate(
 				"accumulate_blocks.frag",
@@ -315,9 +363,9 @@ public class MultiVolumeShaderMip
 		return segments;
 	}
 
-	public MultiVolumeShaderMip( VolumeShaderSignature signature, final boolean useDepthTexture, final double degrade )
+	public MultiVolumeShaderMip( VolumeShaderSignature signature, final boolean useDepthTexture, final double degrade, final List<TextureCache> caches )
 	{
-		this( signature, useDepthTexture, degrade, getDefaultSegments( useDepthTexture ), null, "sceneDepth" );
+		this( signature, useDepthTexture, degrade, getDefaultSegments( useDepthTexture ), null, "sceneDepth", caches);
 	}
 
 	public void setDepthTexture( Texture2D depth )
@@ -332,10 +380,22 @@ public class MultiVolumeShaderMip
 	{
 		sceneDepthTextureName = name;
 	}
-
-	public void setConverter( int index, ConverterSetup converter )
+	
+	public void setGlobalCacheLutTexture(final GlobalCacheLutTexture globalLutTexture)
 	{
-		converterSegments[ index ].setData( converter );
+		 uniformGlobalCacheLut.set( globalLutTexture );
+		 uniformGlobalCacheLutSize.set( globalLutTexture.getSize3f() );
+	}
+	
+	public void setGlobalColorLutTexture(final Texture colorLutTexture)
+	{
+		uniformGlobalColorLut.set( colorLutTexture );
+	}
+
+	public void setConverter( int index, ConverterSetup converter, final int globalLUTLayer )
+	{
+		//System.out.println("converter index "+ index);
+		converterSegments[ index ].setData( converter, globalLUTLayer );
 	}
 
 	/**
@@ -377,61 +437,13 @@ public class MultiVolumeShaderMip
 		prog.setUniformValueByType( volumeSegments[ index ].volume, name, elementSize, value );
 	}
 
-	// TODO remove
-	/**
-	 * @deprecated replace by {@code setUniform( index, name, texture )}
-	 */
-	@Deprecated
-	public void registerCustomSampler( int index, String name, Texture texture )
-	{
-		setUniform( index, name, texture );
-	}
-
-	// TODO remove
-	/**
-	 * @deprecated replace by {@code setUniform( index, name, value )}
-	 */
-	@Deprecated
-	public void setCustomUniformForVolume( int index, String name, Object value )
-	{
-		setUniform( index, name, value );
-	}
-
-	// TODO remove
-	// TODO is this still needed?
-	@Deprecated
-	public void removeCustomUniformForVolume( int index, String name )
-	{
-		throw new UnsupportedOperationException();
-	}
-
-	// TODO remove
-	/**
-	 * @deprecated replace by {@code setUniform( index, name, elementSize, value )}
-	 */
-	@Deprecated
-	public void setCustomIntArrayUniformForVolume( int index, String name, final int elementSize, final int[] value )
-	{
-		setUniform( index, name, elementSize, value );
-	}
-
-	// TODO remove
-	/**
-	 * @deprecated replace by {@code setUniform( index, name, elementSize, value )}
-	 */
-	@Deprecated
-	public void setCustomFloatArrayUniformForVolume( int index, String name, final int elementSize, final float[] value )
-	{
-		setUniform( index, name, elementSize, value );
-	}
-
-	public void setVolume( int index, VolumeBlocks volume, final RenderData renderData )
+	public void setVolume( int index, VolumeBlocks volume, final RenderData renderData, final int cacheLutZOffset )
 	{
 		final VolumeShaderSignature.VolumeSignature vs = signature.getVolumeSignatures().get( index );
 		if ( vs.getSourceStackType() != SourceStacks.SourceStackType.MULTIRESOLUTION )
 			throw new IllegalArgumentException();
 
-		( ( VolumeBlocksSegment ) volumeSegments[ index ] ).setData( volume, renderData );
+		( ( VolumeBlocksSegment ) volumeSegments[ index ] ).setData( volume, renderData, cacheLutZOffset );
 	}
 
 	public void setVolume( int index, SimpleVolume volume, final RenderData renderData )
@@ -529,34 +541,32 @@ public class MultiVolumeShaderMip
 		private final Uniform1i uniformSizeLUT;
 		private final Uniform1i uniformRenderType;
 		private final Uniform1f uniformLightType;
-		private final UniformSampler uniformLUT;
 		private final Uniform1i uniformClipActive;
 		private final Uniform1i uniformVoxelInterpolation;
 		private final Uniform3f uniformClipMin;
 		private final Uniform3f uniformClipMax;
 		private final UniformMatrix4f uniformClipTransform;
+		private final Uniform1f uniformLutLayer;
 		
 		private final VolumeShaderSignature.PixelType pixelType;
 		private final double rangeScale;
 
 		public ConverterSegment( final SegmentedShader prog, final Segment segmentConv, final Segment segmentVol, final VolumeShaderSignature.PixelType pixelType )
 		{
-			uniformOffset = prog.getUniform4f( segmentConv,"offset" );
-			uniformScale = prog.getUniform4f( segmentConv,"scale" );
-			uniformGamma = prog.getUniform1f( segmentConv,"gamma" );
-			uniformGammaAlpha = prog.getUniform1f( segmentConv,"alphagamma" );
-			uniformRenderType = prog.getUniform1i( segmentConv,"renderType" );
-			uniformLightType = prog.getUniform1f( segmentConv,"lightType" );
-			uniformVoxelInterpolation = prog.getUniform1i( segmentVol,"voxelInterpolation" );
-			uniformSizeLUT = prog.getUniform1i( segmentConv,"sizeLUT" );
-			uniformLUT = prog.getUniformSampler(segmentConv, "lut");
-			uniformClipActive = prog.getUniform1i( segmentVol,"clipactive" );
-			uniformClipMin = prog.getUniform3f( segmentVol,"clipmin" );
-			uniformClipMax = prog.getUniform3f( segmentVol,"clipmax" );
-			uniformClipTransform = prog.getUniformMatrix4f(segmentVol,"cliptransform" );
-
+			uniformOffset = prog.getUniform4f( segmentConv, "offset" );
+			uniformScale = prog.getUniform4f( segmentConv, "scale" );
+			uniformGamma = prog.getUniform1f( segmentConv, "gamma" );
+			uniformGammaAlpha = prog.getUniform1f( segmentConv, "alphagamma" );
+			uniformRenderType = prog.getUniform1i( segmentConv, "renderType" );
+			uniformLightType = prog.getUniform1f( segmentConv, "lightType" );
+			uniformVoxelInterpolation = prog.getUniform1i( segmentVol, "voxelInterpolation" );
+			uniformSizeLUT = prog.getUniform1i( segmentConv, "sizeColorLut" );
+			uniformClipActive = prog.getUniform1i( segmentVol, "clipactive" );
+			uniformClipMin = prog.getUniform3f( segmentVol, "clipmin" );
+			uniformClipMax = prog.getUniform3f( segmentVol, "clipmax" );
+			uniformClipTransform = prog.getUniformMatrix4f( segmentVol, "cliptransform" );
+			uniformLutLayer = prog.getUniform1f( segmentConv, "colorLutLayer" );
 			this.pixelType = pixelType;
-
 			switch ( pixelType )
 			{
 			default:
@@ -571,45 +581,36 @@ public class MultiVolumeShaderMip
 				rangeScale = 1.0;
 				break;
 			}
+
 		}
 
-		public void setData( ConverterSetup converter)
+		public void setData( ConverterSetup converter, final int globalLUTLayer )
 		{
-			final double fmin = converter.getDisplayRangeMin() / rangeScale;
-			final double fmax = converter.getDisplayRangeMax() / rangeScale;
+			GammaConverterSetup gc = (GammaConverterSetup)converter;
+			final double fmin = gc.getDisplayRangeMin() / rangeScale;
+			final double fmax = gc.getDisplayRangeMax() / rangeScale;
 			double fminA = fmin;
 			double fmaxA = fmax;
 
-			uniformGamma.set(1.0f);
-			uniformGammaAlpha.set(1.0f);
-			uniformRenderType.set(0);
-			uniformLightType.set(0);
-			uniformClipActive.set(0);
-			uniformVoxelInterpolation.set( 0 );
-
-			if (converter instanceof GammaConverterSetup)
-			{	
-				final GammaConverterSetup gconverter = ((GammaConverterSetup)converter);
-				uniformGamma.set(1.0f/(float)gconverter.getDisplayGamma());
-				uniformGammaAlpha.set(1.0f/(float)gconverter.getAlphaGamma());
-				uniformRenderType.set(gconverter.getRenderType());
-				uniformLightType.set(gconverter.getLightingType());
-				uniformVoxelInterpolation.set(gconverter.getVoxelRenderInterpolation());
-				fminA = gconverter.getAlphaRangeMin() / rangeScale;
-				fmaxA = gconverter.getAlphaRangeMax() / rangeScale;
-				if(gconverter.getClipState()!=0 && gconverter.getClipInterval() != null)
-				{
-					uniformClipActive.set(gconverter.getClipState());
-					uniformClipMin.set(gconverter.getClipInterval(),bvvpg.core.shadergen.MinMax.MIN);
-					uniformClipMax.set(gconverter.getClipInterval(),bvvpg.core.shadergen.MinMax.MAX);	
-					final AffineTransform3D t = new AffineTransform3D();
-					gconverter.getClipTransform(t);
-					t.set(t.inverse());
-					uniformClipTransform.set(MatrixMath.affine(t, new Matrix4f()));
-				}
-				uniformLUT.set(((GammaConverterSetup) converter).getLUTTexture());
+			uniformClipActive.set( 0 );
+			uniformGamma.set( 1.0f / (float)gc.getDisplayGamma() );
+			uniformGammaAlpha.set( 1.0f / (float)gc.getAlphaGamma() );
+			uniformRenderType.set( gc.getRenderType() );
+			uniformLightType.set( gc.getLightingType() );
+			uniformVoxelInterpolation.set(gc.getVoxelRenderInterpolation());
+			fminA = gc.getAlphaRangeMin() / rangeScale;
+			fmaxA = gc.getAlphaRangeMax() / rangeScale;
+			if( gc.getClipState() != 0 && gc.getClipInterval() != null )
+			{
+				uniformClipActive.set(gc.getClipState());
+				uniformClipMin.set(gc.getClipInterval(),bvvpg.core.shadergen.MinMax.MIN);
+				uniformClipMax.set(gc.getClipInterval(),bvvpg.core.shadergen.MinMax.MAX);	
+				final AffineTransform3D t = new AffineTransform3D();
+				gc.getClipTransform( t );
+				t.set( t.inverse() );
+				uniformClipTransform.set( MatrixMath.affine( t, new Matrix4f() ) );
 			}
-			
+
 			final double s = 1.0 / ( fmax - fmin );
 			final double o = -fmin * s;
 			final double sA = 1.0 / ( fmaxA - fminA );
@@ -617,41 +618,33 @@ public class MultiVolumeShaderMip
 
 			if ( pixelType == VolumeShaderSignature.PixelType.ARGB )
 			{
-				uniformSizeLUT.set(0);
+				uniformSizeLUT.set( 0 );
 				uniformOffset.set( ( float ) o, ( float ) o, ( float ) o, ( float ) o );
 				uniformScale.set( ( float ) s, ( float ) s, ( float ) s, ( float ) s );
 			}
 			else
 			{
-				boolean bUseLUT = false;
-				
-				if (converter instanceof GammaConverterSetup)
+
+				final int nLUTSize = gc.getLUTSize();
+				uniformSizeLUT.set( nLUTSize );
+				if(nLUTSize > 0)
 				{
-					final int nLUTSize = ((GammaConverterSetup) converter).getLUTSize();
-					if(nLUTSize > 0)
-					{
-						bUseLUT = true;
-						uniformSizeLUT.set(nLUTSize);
-						uniformOffset.set(
-								( float ) ( o * 1.0 ),
-								( float ) ( o * 1.0 ),
-								( float ) ( o * 1.0 ),
-								( float ) ( oA ) );
-						uniformScale.set(
-								( float ) ( s * 1.0 ),
-								( float ) ( s * 1.0 ),
-								( float ) ( s * 1.0 ),
-								( float ) ( sA ) );
-					}
-					
+					uniformLutLayer.set( globalLUTLayer );
+					uniformOffset.set(
+							( float ) ( o * 1.0 ),
+							( float ) ( o * 1.0 ),
+							( float ) ( o * 1.0 ),
+							( float ) ( oA ) );
+					uniformScale.set(
+							( float ) ( s * 1.0 ),
+							( float ) ( s * 1.0 ),
+							( float ) ( s * 1.0 ),
+							( float ) ( sA ) );
 				}
-				
-				
-				if(!bUseLUT)
-				{
-					uniformSizeLUT.set(0);
-				
-					final int color = converter.getColor().get();
+				else
+				{				
+					uniformLutLayer.set( 0 );				
+					final int color = gc.getColor().get();
 					final double r = ARGBType.red( color ) / 255.0;
 					final double g = ARGBType.green( color ) / 255.0;
 					final double b = ARGBType.blue( color ) / 255.0;
@@ -683,65 +676,60 @@ public class MultiVolumeShaderMip
 
 	static class VolumeBlocksSegment extends VolumeSegment
 	{
-		private final UniformSampler uniformVolumeCache;
-		private final Uniform3f uniformBlockSize;
-		private final Uniform3f uniformPaddedBlockSize;
-		private final Uniform3f uniformCachePadOffset;
-		private final Uniform3f uniformCacheSize;
-		private final Uniform3fv uniformBlockScales;
-		private final UniformSampler uniformLutSampler;
-		private final Uniform3f uniformLutSize;
-		private final Uniform3f uniformLutOffset;
 		private final UniformMatrix4f uniformIm;
 		private final UniformMatrix3f uniformItvm;
 		private final Uniform3f uniformSourcemin;
 		private final Uniform3f uniformSourcemax;
+		private final Uniform1i uniformCacheType;
+		private final Uniform3fv uniformBlockScales;
+		private final Uniform3f uniformLutOffset;
+		private final Uniform3f uniformLutSize;
+		private final Uniform1i uniformCacheLutZOffset;
 
 		public VolumeBlocksSegment( final SegmentedShader prog, final Segment volume)
 		{
 			super( volume );			
 
-			uniformVolumeCache = prog.getUniformSampler(volume, "volumeCache" );
-			uniformBlockSize = prog.getUniform3f(volume, "blockSize" );
-			uniformPaddedBlockSize = prog.getUniform3f(volume, "paddedBlockSize" );
-			uniformCachePadOffset = prog.getUniform3f(volume, "cachePadOffset" );
-			uniformCacheSize = prog.getUniform3f(volume, "cacheSize" );
-			
-			uniformBlockScales = prog.getUniform3fv( volume, "blockScales" );
-			uniformLutSampler = prog.getUniformSampler( volume, "lutSampler" );
-			uniformLutSize = prog.getUniform3f( volume, "lutSize" );
-			uniformLutOffset = prog.getUniform3f( volume, "lutOffset" );
 			uniformIm = prog.getUniformMatrix4f( volume, "im" );
 			uniformItvm = prog.getUniformMatrix3f( volume, "itvm" );
 			uniformSourcemin = prog.getUniform3f( volume, "sourcemin" );
 			uniformSourcemax = prog.getUniform3f( volume, "sourcemax" );
+			
+			uniformCacheType = prog.getUniform1i( volume, "cacheType" );
+			uniformBlockScales = prog.getUniform3fv( volume, "blockScales" );
+			uniformLutSize = prog.getUniform3f( volume, "lutSize" );
+			uniformLutOffset = prog.getUniform3f( volume, "lutOffset" );
+			uniformCacheLutZOffset = prog.getUniform1i( volume, "cacheLutZOffset" );
 
 		}
 
-		public void setData( VolumeBlocks blocks, final RenderData renderData )
+		public void setData( VolumeBlocks blocks, final RenderData renderData, final int cacheLutZOffset)
 		{
-			final TextureCache cache = blocks.getTextureCache();
-			final CacheSpec spec = cache.spec();
-			final int[] bs = spec.blockSize();
-			final int[] pbs = spec.paddedBlockSize();
-			final int[] bo = spec.padOffset();
-			uniformVolumeCache.set( cache );
-			uniformBlockSize.set( bs[ 0 ], bs[ 1 ], bs[ 2 ] );
-			uniformPaddedBlockSize.set( pbs[ 0 ], pbs[ 1 ], pbs[ 2 ] );
-			uniformCachePadOffset.set( bo[ 0 ], bo[ 1 ], bo[ 2 ] );
-			uniformCacheSize.set( cache.texWidth(), cache.texHeight(), cache.texDepth() );
 
-			uniformBlockScales.set( blocks.getLutBlockScales( NUM_BLOCK_SCALES ) );
-			final LookupTextureARGB lut = blocks.getLookupTexture();
-			uniformLutSampler.set( lut );
-			uniformLutSize.set( lut.getSize3f() );
-			uniformLutOffset.set( lut.getOffset3f() );
 			uniformIm.set( blocks.getIms() );
 			final Matrix4f vtm = renderData.getCamview().mul( blocks.getIms(), new Matrix4f() );
 			final Matrix4f itvm = vtm.invert( new Matrix4f() ).transpose();
 			uniformItvm.set( itvm.get3x3( new Matrix3f() ) );
 			uniformSourcemin.set( blocks.getSourceLevelMin() );
 			uniformSourcemax.set( blocks.getSourceLevelMax() );
+			switch(blocks.getTextureCache().texInternalFormat())
+			{
+			case R8:
+				uniformCacheType.set( 0 );
+				break;
+			case R16:
+				uniformCacheType.set( 1 );
+				break;
+			case R32F:
+				uniformCacheType.set( 2 );
+				break;
+			default:
+			}
+			uniformBlockScales.set( blocks.getLutBlockScales( NUM_BLOCK_SCALES ) );
+			final LookupTextureARGB lut = blocks.getLookupTexture();
+			uniformLutOffset.set( lut.getOffset3f() );
+			uniformLutSize.set( lut.getSize3f() );
+			uniformCacheLutZOffset.set( cacheLutZOffset );
 		}
 	}
 
@@ -750,6 +738,7 @@ public class MultiVolumeShaderMip
 		private final UniformSampler uniformVolumeSampler;
 		private final UniformMatrix4f uniformIm;
 		private final UniformMatrix3f uniformItvm;
+		private final Uniform3f uniformSourcemin;
 		private final Uniform3f uniformSourcemax;
 
 		public VolumeSimpleSegment( final SegmentedShader prog, final Segment volume )
@@ -758,6 +747,7 @@ public class MultiVolumeShaderMip
 			uniformVolumeSampler = prog.getUniformSampler( volume, "volume" );
 			uniformIm = prog.getUniformMatrix4f( volume, "im" );
 			uniformItvm = prog.getUniformMatrix3f( volume, "itvm" );
+			uniformSourcemin = prog.getUniform3f( volume, "sourcemin" );
 			uniformSourcemax = prog.getUniform3f( volume, "sourcemax" );
 		}
 
@@ -768,6 +758,7 @@ public class MultiVolumeShaderMip
 			final Matrix4f vtm = renderData.getCamview().mul( volume.getIms(), new Matrix4f() );
 			final Matrix4f itvm = vtm.invert( new Matrix4f() ).transpose();
 			uniformItvm.set( itvm.get3x3( new Matrix3f() ) );
+			uniformSourcemin.set( volume.getSourceMin() );
 			uniformSourcemax.set( volume.getSourceMax() );
 		}
 	}

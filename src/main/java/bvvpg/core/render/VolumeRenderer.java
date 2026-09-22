@@ -89,7 +89,6 @@ import bvvpg.core.multires.MultiResolutionStack3D;
 import bvvpg.core.multires.SimpleStack3D;
 import bvvpg.core.multires.Stack3D;
 import bvvpg.core.offscreen.OffScreenFrameBufferWithDepth;
-import bvvpg.source.converters.GammaConverterSetup;
 
 public class VolumeRenderer
 {
@@ -153,6 +152,16 @@ public class VolumeRenderer
 	private final TextureCacheAndPboChain cacheR16;
 	
 	private final TextureCacheAndPboChain cacheR32F;
+	
+	/**	Global 3D texture containing all separate multires 
+	 * level luts per volume (LookupTextureARGB),
+	 * each has an offset along z-axis. **/
+	private final GlobalCacheLutTexture globalCacheLutTexture;
+	
+	/** sampler2DArray wrapper that handles color LUTs 
+	 * (GPU upload and check if they are expired) for ConverterSetups. 
+	 * One 256 x 256 layer per LUT. **/
+	private final GlobalColorLutManager globalColorLUTManager = new GlobalColorLutManager();
 
 	private final ForkJoinPool forkJoinPool;
 
@@ -172,10 +181,6 @@ public class VolumeRenderer
 	 */
 	private final SimpleStackManager simpleStackManager = new DefaultSimpleStackManager();
 	
-	/** handles LUTs (GPU upload and check if they are expired)
-	 * for converter Setups **/
-	private final SimpleLUTTextureManager simpleLUTManager = new SimpleLUTTextureManager();
-
 	private final DefaultQuad quad;
 
 //	private boolean bShowInfo = true;
@@ -224,6 +229,8 @@ public class VolumeRenderer
 		cacheR16 = new TextureCacheAndPboChain( R16, cacheBlockSize, maxCacheSizeInMB );
 		cacheR32F = new TextureCacheAndPboChain( R32F, cacheBlockSize, maxCacheSizeInMB );
 		
+		globalCacheLutTexture = new GlobalCacheLutTexture();
+		
 		final int parallelism = Math.max( 1, Runtime.getRuntime().availableProcessors() / 2 );
 		forkJoinPool = new ForkJoinPool( parallelism );
 
@@ -261,7 +268,12 @@ public class VolumeRenderer
 
 	private MultiVolumeShaderMip createMultiVolumeShader( final VolumeShaderSignature signature )
 	{
-		return new MultiVolumeShaderMip( signature, true, 1.0 );
+		List<TextureCache> caches = new ArrayList<>();
+		caches.add( cacheR8.textureCache() );
+		caches.add( cacheR16.textureCache() );
+		caches.add( cacheR32F.textureCache() );
+		
+		return new MultiVolumeShaderMip( signature, true, 1.0, caches );
 	}
 
 	public void init( final GL3 gl )
@@ -369,17 +381,19 @@ public class VolumeRenderer
 			progvol = progvols.computeIfAbsent( new VolumeShaderSignature( volumeSignatures ), this::createMultiVolumeShader );
 			if ( progvol != null )
 			{
+				//fill color lut textures
+				globalColorLUTManager.updateLUTArray(context, renderConverters);
 				int mri = 0;
 				for ( int i = 0; i < renderStacks.size(); i++ )
 				{
-					final GammaConverterSetup gc = ( GammaConverterSetup ) renderConverters.get( i );
+					final ConverterSetup cs = renderConverters.get( i );
 					
-					simpleLUTManager.processTextureLUT( context, gc );
-					progvol.setConverter( i, gc );
+					progvol.setConverter( i, cs, globalColorLUTManager.getLayerIndex( cs ));
+					
 					if ( volumeSignatures.get( i ).getSourceStackType() == MULTIRESOLUTION )
 					{
 						final VolumeBlocks volume = volumes.get( mri++ );
-						progvol.setVolume( i, volume, renderData );
+						progvol.setVolume( i, volume, renderData, globalCacheLutTexture.getGlobalCacheLutZOffset( mri - 1 ) );
 						minWorldVoxelSize = Math.min( minWorldVoxelSize, volume.getBaseLevelVoxelSizeInWorldCoordinates() );
 					}
 					else
@@ -391,12 +405,13 @@ public class VolumeRenderer
 					}
 				}
 				progvol.setDepthTexture( sceneBuf.getDepthTexture() );
+				progvol.setGlobalCacheLutTexture( globalCacheLutTexture );
+				progvol.setGlobalColorLutTexture( globalColorLUTManager.getGlobalLutArrayTexture() );
 				progvol.setViewportWidth( renderWidth );
 				progvol.setProjectionViewMatrix( renderData.getPv(), maxAllowedStepInVoxels * minWorldVoxelSize );
 			}
 
 			simpleStackManager.freeUnusedSimpleVolumes( context );
-			simpleLUTManager.freeUnusedLUTs( context );
 		}
 
 		if ( progvol != null )
@@ -547,7 +562,6 @@ public class VolumeRenderer
 		{
 			final VolumeBlocks volume = volumes.get( i );
 			complete &= volume.makeLut( timestamp );
-			volume.getLookupTexture().upload( context );
 		}
 
 		return complete;
@@ -598,6 +612,15 @@ public class VolumeRenderer
 		complete &= updateBlocks( context, multiResStacksR8, volumesR8, cacheR8, forkJoinPool, renderWidth, pv );
 		complete &= updateBlocks( context, multiResStacksR16, volumesR16, cacheR16, forkJoinPool, renderWidth, pv );
 		complete &= updateBlocks( context, multiResStacksR32, volumesR32, cacheR32F, forkJoinPool, renderWidth, pv );
+		
+		//fill and global cache lut
+		globalCacheLutTexture.init( context );
+		for ( int i = 0; i < multiResStacks.size(); i++ )
+		{
+			 volumes.get( i ).getLookupTexture().addToGlobalLut( globalCacheLutTexture );
+		}
+		globalCacheLutTexture.upload( context );
+		
 		if ( !complete )
 			nextRequestedRepaint.request( LOAD );
 	}

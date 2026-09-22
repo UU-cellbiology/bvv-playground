@@ -7,16 +7,17 @@ This is a fork of [BVV](https://github.com/bigdataviewer/bigvolumeviewer-core) w
 - gamma correction for brightness/opacity (and alpha);
 - volumetric ("alpha-blending") + isosurface rendering modes;
 - plain, shaded and shiny lighting modes for volume/surface modes;
-- nearest-neighbor and trilinear interpolation;
+- nearest-neighbor and trilinear intensity interpolation;
 - lookup tables (LUTs, custom with alpha values and loaded from ImageJ);
 - clipping of displayed sources in shaders (optionally using custom transform);
 - perspective and orthographic projections;
 - separate rendering for opaque and transparent objects (allows [weighted OIT](https://jcgt.org/published/0002/02/09/));
-- [multisampling anti-aliasing](https://learnopengl.com/Advanced-OpenGL/Anti-Aliasing) for geometry objects rendering;
+- [multisampling anti-aliasing](https://learnopengl.com/Advanced-OpenGL/Anti-Aliasing) buffer for geometry objects rendering;
 - additional "rendering" mode that waits for data to be loaded in full resolution;
-- supports 32-bit data.
+- supports 32-bit data;
+- maximum number of loaded volumes is 100 (vs 15 in BVV), but robustly works with 30-40.
 
-Currently synchronized to BVV version 0.4.2 (this [commit](https://github.com/bigdataviewer/bigvolumeviewer-core/commit/326248353fa1bc869be3ae1ab216ba284c20519c)).
+Currently synchronized to BVV version 0.5.1 (this [commit](https://github.com/bigdataviewer/bigvolumeviewer-core/commit/5c5ed88202cbedc06cf88000c30dad7592e82579)).
 
 For a stand-alone usage check out [BigVolumeBrowser](https://github.com/ekatrukha/bigvolumebrowser) plugin.
 
