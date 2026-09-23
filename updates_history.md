@@ -1,5 +1,10 @@
 # Updates history
 
+
+## 0.6.1
+
+ - for MSAA buffer, use `glTexImage2DMultisample` instead of `glTexStorage2DMultisample`, seems to be more widely supported;
+
 ## 0.6.0
 
  - large reordering of uniforms per volume to global;
