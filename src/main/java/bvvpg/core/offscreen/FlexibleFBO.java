@@ -122,7 +122,7 @@ public class FlexibleFBO
 		if ( framebufferInitialized )
 			return;
 		framebufferInitialized = true;
-
+		final int numSamples = 4;
 		final int[] tmp = new int[ 2 ];
 		gl.glGenFramebuffers( 1, tmp, 0 );
 		framebuffer = tmp[ 0 ];
@@ -137,10 +137,24 @@ public class FlexibleFBO
 		texDepthBuffer = tmp[ 1 ];
 		
 		gl.glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, texColorBuffer);
-		gl.glTexStorage2DMultisample( GL_TEXTURE_2D_MULTISAMPLE, 4, internalFormat, fbWidth, fbHeight, true );
+		gl.glTexImage2DMultisample(
+			    GL_TEXTURE_2D_MULTISAMPLE, 
+			    numSamples, 
+			    internalFormat, 
+			    fbWidth, 
+			    fbHeight, 
+			    true // fixedSampleLocations
+			);
 
 		gl.glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, texDepthBuffer);
-		gl.glTexStorage2DMultisample( GL_TEXTURE_2D_MULTISAMPLE, 4, GL_DEPTH_COMPONENT24, fbWidth, fbHeight, true );
+		gl.glTexImage2DMultisample(
+			    GL_TEXTURE_2D_MULTISAMPLE, 
+			    numSamples, 
+			    GL_DEPTH_COMPONENT24, 
+			    fbWidth, 
+			    fbHeight, 
+			    true
+			);
 
 		gl.glBindTexture( GL_TEXTURE_2D_MULTISAMPLE, 0 );
 
