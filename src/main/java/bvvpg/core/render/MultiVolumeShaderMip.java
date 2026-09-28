@@ -69,7 +69,7 @@ import org.joml.Vector4f;
 
 public class MultiVolumeShaderMip
 {
-	private static final int NUM_BLOCK_SCALES = 10;
+	public static final int NUM_BLOCK_SCALES = 6;
 
 	private final VolumeShaderSignature signature;
 
