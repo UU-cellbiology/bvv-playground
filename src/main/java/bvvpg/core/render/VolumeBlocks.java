@@ -189,7 +189,10 @@ public class VolumeBlocks
 		lut.init( rmin, rmax, baseLevel );
 
 		boolean complete = true;
-		final int maxLevel = multiResolutionStack.resolutions().size() - 1;
+		final int stackMaxLevel = multiResolutionStack.resolutions().size() - 1;
+		// Cap max level so it stays within lutBlockScales / blockScales[] array bounds
+		final int maxLevel = Math.min( stackMaxLevel, baseLevel + MultiVolumeShaderMip.NUM_BLOCK_SCALES - 2 );
+		//final int maxLevel = multiResolutionStack.resolutions().size() - 1;
 		final int[] r = multiResolutionStack.resolutions().get( baseLevel ).getR();
 		final int[] gj = new int[ 3 ];
 		for ( RequiredBlock block : requiredBlocks.getBlocks() )
@@ -236,7 +239,10 @@ public class VolumeBlocks
 		for ( int d = 0; d < 3; ++d )
 			lutBlockScales[ 0 ][ d ] = 0;
 
-		final int maxLevel = multiResolutionStack.resolutions().size() - 1;
+		final int stackMaxLevel = multiResolutionStack.resolutions().size() - 1;
+		//final int maxLevel = multiResolutionStack.resolutions().size() - 1;
+		// Cap max level to available array slots (NUM_BLOCK_SCALES - 1)
+		final int maxLevel = Math.min( stackMaxLevel, baseLevel + NUM_BLOCK_SCALES - 2 );
 		for ( int level = baseLevel; level <= maxLevel; ++level )
 		{
 			final ResolutionLevel3D< ? > resolution = multiResolutionStack.resolutions().get( level );

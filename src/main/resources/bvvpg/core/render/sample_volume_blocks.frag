@@ -17,7 +17,6 @@ void intersectBoundingBox( vec4 wfront, vec4 wback, out float tnear, out float t
 }
 
 uniform vec3 blockScales[ NUM_BLOCK_SCALES ];
-uniform vec3 lutSize;
 uniform vec3 lutOffset;
 uniform int cacheType;
 uniform int cacheLutZOffset;
