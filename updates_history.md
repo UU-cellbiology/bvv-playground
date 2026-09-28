@@ -1,6 +1,10 @@
 # Updates history
 
 
+## 0.6.2
+
+ - fixes maximum number of resolution levels in the uploaded LUT.
+
 ## 0.6.1
 
  - for MSAA buffer, use `glTexImage2DMultisample` instead of `glTexStorage2DMultisample`, seems to be more widely supported;
