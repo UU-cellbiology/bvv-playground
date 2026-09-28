@@ -8,7 +8,7 @@ const vec3 lightDir = normalize(vec3(0, -0.2, -1));
 const float gradientHalfStep = 2.0;
 
 //$insert{cachesNumber}
-#define NUM_BLOCK_SCALES 10
+//$insert{blockScalesNumber}
 
 uniform sampler3D u_Caches[CACHES_NUMBER];
 
