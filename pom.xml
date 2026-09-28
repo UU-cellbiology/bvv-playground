@@ -46,6 +46,7 @@
 			<name>Eugene Katrukha</name>
 			<url>https://imagej.net/people/ekatrukha</url>
 			<roles>
+				<role>lead</role>
 				<role>developer</role>
 				<role>maintainer</role>
 			</roles>
@@ -69,7 +70,7 @@
 	<scm>
 		<connection>scm:git:git://github.com/UU-cellbiology/bvv-playground</connection>
 		<developerConnection>scm:git:git@github.com:UU-cellbiology/bvv-playground</developerConnection>
-		<tag>bvv-playground-0.6.0</tag>
+		<tag>bvv-playground-0.6.2</tag>
 		<url>https://github.com/UU-cellbiology/bvv-playground</url>
 	</scm>
 	<issueManagement>
