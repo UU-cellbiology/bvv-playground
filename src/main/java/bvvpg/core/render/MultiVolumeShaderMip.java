@@ -323,7 +323,7 @@ public class MultiVolumeShaderMip
 				 "im", "itvm", "sourcemin", "sourcemax","voxelInterpolation", 
 				"clipactive", "clipmin", "clipmax", "cliptransform",
 				"intersectBoundingBox",
-				"blockScales", "lutOffset", "sampleVolume", "cacheType", "cacheLutZOffset",
+				"blockScales", "lutOffset", "lutSize", "sampleVolume", "cacheType", "cacheLutZOffset",
 				"sampleRaw", "gradientVolume" ) );
 		segments.put( SegmentType.SampleVolume, new SegmentTemplate(
 				"sample_volume_simple.frag",
@@ -685,6 +685,7 @@ public class MultiVolumeShaderMip
 		private final Uniform3fv uniformBlockScales;
 		private final Uniform3f uniformLutOffset;
 		private final Uniform1i uniformCacheLutZOffset;
+		private final Uniform3f uniformLutSize;
 
 		public VolumeBlocksSegment( final SegmentedShader prog, final Segment volume)
 		{
@@ -699,6 +700,7 @@ public class MultiVolumeShaderMip
 			uniformBlockScales = prog.getUniform3fv( volume, "blockScales" );
 			uniformLutOffset = prog.getUniform3f( volume, "lutOffset" );
 			uniformCacheLutZOffset = prog.getUniform1i( volume, "cacheLutZOffset" );
+			uniformLutSize = prog.getUniform3f( volume, "lutSize" );
 
 		}
 
@@ -728,6 +730,7 @@ public class MultiVolumeShaderMip
 			final LookupTextureARGB lut = blocks.getLookupTexture();
 			uniformLutOffset.set( lut.getOffset3f() );
 			uniformCacheLutZOffset.set( cacheLutZOffset );
+			uniformLutSize.set( lut.getSize3f() );
 		}
 	}
 

@@ -20,11 +20,20 @@ uniform vec3 blockScales[ NUM_BLOCK_SCALES ];
 uniform vec3 lutOffset;
 uniform int cacheType;
 uniform int cacheLutZOffset;
+uniform vec3 lutSize;
 
 float sampleRaw( vec3 pos )
 {	
 					
-	vec3 q = floor( pos / cacheBlockSize ) - lutOffset + 0.5;
+	vec3 q = floor( pos / cacheBlockSize ) - lutOffset;
+    
+    // Prevent spillage into other volumes' LUT slices
+    if ( any( lessThan( q, vec3( 0.0 ) ) ) || any( greaterThanEqual( q, lutSize ) ) )
+    {
+        return 0.0;
+    }
+    
+    q += 0.5;
 	q.z += cacheLutZOffset; 
 	uvec4 lutv = texture( globalCacheLut, q / globalCacheLutSize );
 	vec3 B0 = lutv.xyz * paddedBlockSize + cachePadOffset;
