@@ -1,5 +1,8 @@
 # Updates history
 
+## 0.6.3
+
+- fixed out-of-bounds sampling for multi-resolution volumes.
 
 ## 0.6.2
 
