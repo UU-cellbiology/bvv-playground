@@ -38,7 +38,6 @@ import bvvpg.core.backend.StagingBuffer;
 import bvvpg.core.backend.Texture;
 import bvvpg.core.backend.Texture3D;
 import bvvpg.core.render.ColorLutArrayTexture;
-import bvvpg.core.render.GlobalCacheLutTexture;
 import bvvpg.core.shadergen.Shader;
 
 import java.nio.Buffer;
