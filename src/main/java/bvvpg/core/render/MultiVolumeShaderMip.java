@@ -36,7 +36,6 @@ import bvvpg.core.cache.CacheSpec;
 import bvvpg.core.cache.TextureCache;
 import bvvpg.core.dither.DitherBuffer;
 import bvvpg.core.multires.SourceStacks;
-import bvvpg.core.render.VolumeShaderSignature.PixelType;
 import bvvpg.core.shadergen.Uniform1f;
 import bvvpg.core.shadergen.Uniform1i;
 import bvvpg.core.shadergen.Uniform2f;

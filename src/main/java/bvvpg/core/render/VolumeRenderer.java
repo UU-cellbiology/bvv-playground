@@ -581,7 +581,8 @@ public class VolumeRenderer
 		
 		final List< MultiResolutionStack3D< ? > > multiResStacksR32 = new ArrayList<>();
 		final List< VolumeBlocks > volumesR32 = new ArrayList<>();
-
+		final boolean [] updatePixelType = new boolean[3];
+		
 		for ( int i = 0; i < multiResStacks.size(); i++ )
 		{
 			final MultiResolutionStack3D< ? > stack = multiResStacks.get( i );
@@ -591,16 +592,19 @@ public class VolumeRenderer
 			{
 				multiResStacksR8.add( stack );
 				volumesR8.add( volume );
+				updatePixelType[0] = true;
 			}
 			else if ( primitiveType == SHORT )
 			{
 				multiResStacksR16.add( stack );
 				volumesR16.add( volume );
+				updatePixelType[1] = true;
 			}
 			else if ( primitiveType == FLOAT )
 			{
 				multiResStacksR32.add( stack );
 				volumesR32.add( volume );
+				updatePixelType[2] = true;
 			}
 			else
 			{
@@ -609,9 +613,13 @@ public class VolumeRenderer
 		}
 
 		boolean complete = true;
-		complete &= updateBlocks( context, multiResStacksR8, volumesR8, cacheR8, forkJoinPool, renderWidth, pv );
-		complete &= updateBlocks( context, multiResStacksR16, volumesR16, cacheR16, forkJoinPool, renderWidth, pv );
-		complete &= updateBlocks( context, multiResStacksR32, volumesR32, cacheR32F, forkJoinPool, renderWidth, pv );
+	
+		if(updatePixelType[0])
+			{complete &= updateBlocks( context, multiResStacksR8, volumesR8, cacheR8, forkJoinPool, renderWidth, pv );}
+		if(updatePixelType[1])
+			{complete &= updateBlocks( context, multiResStacksR16, volumesR16, cacheR16, forkJoinPool, renderWidth, pv );}
+		if(updatePixelType[2])
+			{complete &= updateBlocks( context, multiResStacksR32, volumesR32, cacheR32F, forkJoinPool, renderWidth, pv );}
 		
 		//fill and global cache lut
 		globalCacheLutTexture.init( context );
