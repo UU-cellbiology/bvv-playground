@@ -426,7 +426,6 @@ public class JoglGpuContext implements GpuContext
 			final int target = target( tex );
 			gl.glGetIntegerv( targetBinding( tex ), tmp, 0 );
 			final int restoreId = tmp[ 0 ];
-
 			gl.glBindTexture( target, id );
 			gl.glTexStorage3D( target, 1, internalFormat( tex ), tex.texWidth(), tex.texHeight(), tex.texDepth() );
 			gl.glTexParameteri( target, GL_TEXTURE_MIN_FILTER, minFilter( tex ) );

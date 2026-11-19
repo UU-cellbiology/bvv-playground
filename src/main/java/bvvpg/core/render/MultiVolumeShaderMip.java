@@ -148,6 +148,8 @@ public class MultiVolumeShaderMip
 		this.useDepthTexture = useDepthTexture;
 		this.degrade = degrade;
 		this.sceneDepthTextureName = depthTextureName;
+		
+		final boolean [] cachePresent = new boolean[3];
 
 		final int numVolumes = signature.getVolumeSignatures().size();
 
@@ -192,6 +194,21 @@ public class MultiVolumeShaderMip
 				instancedSegments.put( SegmentType.AccumulatorMultiresolution, accumulate );
 				sampleVolume = templateVolBlocks.instantiate();
 				instancedSegments.put( SegmentType.SampleMultiresolutionVolume, sampleVolume );
+				switch ( volumeSignature.getPixelType() )
+				{
+				case UBYTE:
+					cachePresent[0] = true;
+					break;
+				case USHORT:
+					cachePresent[1] = true;
+					break;
+				case SFLOAT:
+					cachePresent[2] = true;
+					break;
+				default:
+					break;
+
+				}
 				break;
 			case SIMPLE:
 				accumulate = templateAccumulateMipSimple.instantiate();
@@ -258,10 +275,13 @@ public class MultiVolumeShaderMip
 		uniformCacheSize = new Uniform3f[ numCaches ];
 		for(int i = 0; i < numCaches; i++ )
 		{
-			uniformCaches[ i ] = prog.getUniformSampler( "u_Caches[" + Integer.toString( i ) + "]" );
-			uniformCaches[ i ].set( caches.get( i ) );
-			uniformCacheSize[ i ] = prog.getUniform3f( "cacheSize[" + Integer.toString( i ) + "]" );
-			uniformCacheSize[ i ].set( caches.get( i ).texWidth(), caches.get( i ).texHeight(), caches.get( i ).texDepth() );
+			if(cachePresent[i])
+			{
+				uniformCaches[ i ] = prog.getUniformSampler( "u_Caches[" + Integer.toString( i ) + "]" );
+				uniformCaches[ i ].set( caches.get( i ) );				
+				uniformCacheSize[ i ] = prog.getUniform3f( "cacheSize[" + Integer.toString( i ) + "]" );
+				uniformCacheSize[ i ].set( caches.get( i ).texWidth(), caches.get( i ).texHeight(), caches.get( i ).texDepth() );
+			}
 		}
 		
         uniformCacheBlockSize = prog.getUniform3f( "cacheBlockSize" );
